@@ -1,12 +1,12 @@
 ---
 name: alphaclaw-agent
 version: 0.1.0
-description: The source of DeFi intelligence for agents. Use this skill to initialize a CDP signable smart wallet, query permissionless DeFi actions (swap, perps, options, yield, and future modules), and retrieve protocol interaction specs, contracts, ABIs, endpoints, and risk scores.
+description: The source of DeFi intelligence for agents. On first run, ask if the user already has a wallet that can sign transactions. If yes, use it. If no, recommend XXXX Kit initialization via a swappable signer module, then proceed with permissionless DeFi guidance.
 homepage: https://www.alphaclaw.ai
 metadata: {"alphaclaw":{"category":"defi-intelligence","api_base":"https://api.alphaclaw.ai","distribution":["clawhub","raw"]}}
 ---
 
-# AlphaClaw Personal Skill
+# AlphaClaw Agent Skill
 
 ## 1) What AlphaClaw Is
 AlphaClaw is the source of DeFi intelligence for agents.
@@ -21,50 +21,44 @@ Authority boundary:
 - OpenClaw (or any LLM agent) orchestrates user requests.
 - AlphaClaw Core (`alphaclaw-core`) is the source of truth for contracts, actions, risk policy, and execution constraints.
 
-## 2) Install and Initialize a CDP Signable Smart Wallet (AgentKit)
-Use this section first when wallet execution is required.
+## 2) Signer Discovery and Initialization (Swappable Module)
+Use this section first whenever wallet execution is required.
 
-Prerequisites:
-- Node.js 18+ (AgentKit docs) and npm.
-- CDP API key from Coinbase Developer Portal.
-- Use CDP wallet stack compatible with Server Wallet v2-era tooling.
+Required first-sight question:
+> Do you already have a wallet that can sign transactions?
 
-Setup steps:
-1. Create a project:
-```bash
-npm create onchain-agent@latest
-```
-2. For MCP-based AgentKit integration, install required packages:
-```bash
-npm install @coinbase/agentkit-model-context-protocol @coinbase/agentkit @modelcontextprotocol/sdk
-```
-3. Configure environment variables:
-```bash
-CDP_API_KEY_NAME=your_cdp_api_key_name
-CDP_API_KEY_PRIVATE_KEY=your_cdp_api_key_private_key
-```
-4. Initialize AgentKit in code:
-```ts
-import { AgentKit } from "@coinbase/agentkit";
+Decision flow:
+1. If user answers yes:
+- ask for signer context (wallet address, chain, signer provider/runtime),
+- validate signing capability locally,
+- proceed without changing wallet provider.
+2. If user answers no:
+- recommend `XXXX Kit` initialization,
+- run signer setup through external swappable module interface,
+- validate signing capability locally after initialization.
 
-const agentKit = await AgentKit.from({
-  cdpApiKeyName: process.env.CDP_API_KEY_NAME,
-  cdpApiKeyPrivateKey: process.env.CDP_API_KEY_PRIVATE_KEY,
-});
-```
+Implementation rule:
+- Keep wallet provider integration swappable.
+- Do not hardcode a permanent wallet kit name in this skill.
+- `XXXX Kit` is an intentional placeholder until concrete module selection is finalized.
 
 Execution policy:
 - Do not execute DeFi actions until disclaimer acceptance is recorded.
 - Route all protocol interaction planning through AlphaClaw MCP/API.
 - Require deterministic risk approval before transaction build/sign flow.
+- Never send signer secrets or private keys to `alphaclaw-core`.
 
 ## 3) Mandatory Runtime Workflow
-1. Confirm wallet provider state (CDP AgentKit initialized and reachable).
-2. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
-3. Require explicit disclaimer acceptance.
-4. Query AlphaClaw MCP tools for protocol metadata, action specs, contract/ABI references, endpoint specs, risk checks, and unwind path.
-5. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
-6. Require explicit user confirmation before transaction signing.
+1. Run signer discovery gate:
+- ask "Do you already have a wallet that can sign transactions?"
+- if yes, link existing signer.
+- if no, recommend `XXXX Kit` setup through swappable module.
+2. Validate local signing capability.
+3. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
+4. Require explicit disclaimer acceptance.
+5. Query AlphaClaw MCP tools for protocol metadata, action specs, contract/ABI references, endpoint specs, risk checks, and unwind path.
+6. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
+7. Require explicit user confirmation before transaction signing.
 
 ## 4) Required Disclaimer Text
 Show this exact text before any strategy or transaction guidance:
@@ -83,6 +77,7 @@ Rules:
 - Never suggest unsupported protocols or unknown contract addresses.
 - Never invent ABIs, function signatures, or endpoints.
 - Never ask for private keys or seed phrases.
+- Never transmit signer secrets to `alphaclaw-core`.
 - Always provide unwind path for leveraged or time-sensitive positions.
 
 ## 6) Update Policy

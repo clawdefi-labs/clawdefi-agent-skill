@@ -4,7 +4,9 @@ Distributable skill definition for local OpenClaw-compatible agents.
 
 ## Purpose
 Teach local agents how to:
-- initialize a CDP signable smart wallet,
+- ask first: "Do you already have a wallet that can sign transactions?",
+- if yes, connect the existing user-custodied signer,
+- if no, recommend `XXXX Kit` initialization through a swappable module,
 - capture user risk profile,
 - query AlphaClaw MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
 - perform permissionless DeFi actions (swap, perps, options, yield, and future modules) with guardrails,
@@ -54,3 +56,5 @@ Cron example (every 6 hours):
 
 Local development notes:
 - `references/` is intentionally local-only and ignored by git.
+- signer credentials stay local; never pass private key material to `alphaclaw-core`.
+- `XXXX Kit` is an intentional placeholder for future external signer module selection.
