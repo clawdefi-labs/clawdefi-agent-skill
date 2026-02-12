@@ -1,0 +1,19 @@
+# Local-only reference materials
+references/
+
+# Local env and package artifacts
+.env
+.env.*
+node_modules/
+dist/
+
+# Local update/cache artifacts
+*.log
+*.tmp
+*.bak
+SKILL.md.bak.*
+.installed-version
+
+# Editor/OS noise
+.DS_Store
+*.swp
