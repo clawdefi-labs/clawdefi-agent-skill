@@ -104,3 +104,38 @@ Support both installation channels:
 Notes:
 - Raw channel is for environments where ClawHub is not available.
 - Raw updates must validate checksum and keep a rollback backup before overwrite.
+
+## 8) Placeholder Action Modules
+
+### swap
+- Status: placeholder only.
+- Module ID: `swap`.
+- Description: PLACEHOLDER - add supported swap protocols, routes, and chain coverage.
+- Inputs: PLACEHOLDER - define required params and validation rules.
+- Execution policy: PLACEHOLDER - define pre-checks, risk checks, and confirmation flow.
+- Unwind/fallback: PLACEHOLDER - define failure handling and recovery path.
+
+### trade-perp
+- Status: placeholder only.
+- Module ID: `trade-perp`.
+- Description: PLACEHOLDER - add supported perp venues and position actions.
+- Inputs: PLACEHOLDER - define leverage, margin, size, and safety constraints.
+- Execution policy: PLACEHOLDER - define simulation, liquidation-buffer checks, and confirmations.
+- Unwind/fallback: PLACEHOLDER - define close/reduce-only emergency flow.
+
+### trade-options
+- Status: placeholder only.
+- Module ID: `trade-options`.
+- Description: PLACEHOLDER - add supported options venues and strategy types.
+- Inputs: PLACEHOLDER - define strike/expiry/size/risk-limit parameters.
+- Execution policy: PLACEHOLDER - define pricing checks, slippage bounds, and confirmations.
+- Unwind/fallback: PLACEHOLDER - define close/roll/expiry handling.
+
+### query-protocol
+- Status: placeholder only.
+- Module ID: `query-protocol`.
+- Description: PLACEHOLDER - query `alphaclaw-core` protocol intelligence by name/slug/category.
+- Inputs: PLACEHOLDER - define query keys (protocol slug, category, chain, action type, risk tier).
+- Output contract: PLACEHOLDER - return protocol overview, supported chains, supported actions, key contracts, ABI/interface refs, endpoint refs, and risk score snapshot.
+- Execution policy: PLACEHOLDER - read-only query path; no transaction building or signing.
+- Fallback: PLACEHOLDER - if protocol is not found, return nearest matches and request clarification.
