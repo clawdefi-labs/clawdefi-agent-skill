@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.9
+version: 0.1.11
 description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer the approved local SIWE wallet module, explicitly state more wallet options will be available in future releases, validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -113,12 +113,17 @@ Execution policy:
 - ask "Does this machine/agent already have a configured wallet that can sign transactions locally (without sharing any private key or seed phrase)?"
 - if yes, link existing signer.
 - if no, present wallet options in exact order, include pros/cons/requirements/credential-source notes, explicitly state that more wallet options will be available in future ClawDeFi releases, then run selected setup (`local-siwe-wallet`).
-2. Validate transaction-signing capability for the selected module.
-3. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
-4. Require explicit disclaimer acceptance.
-5. Query ClawDeFi MCP tools for protocol metadata, action specs, contract/ABI references, endpoint specs, risk checks, and unwind path.
-6. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
-7. Require explicit user confirmation before transaction signing.
+2. Run `wallet-readiness-check` (chain, balance, nonce, RPC health, signature roundtrip).
+3. Run `query-chain-registry` for canonical chain/RPC/explorer context.
+4. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
+5. Require explicit disclaimer acceptance.
+6. Run `query-action-spec` to fetch canonical action contract from `clawdefi-core`.
+7. Run `query-integration-endpoint` to fetch official endpoint/method/auth/rate-limit guidance.
+8. Run `simulate-transaction` before any sign request.
+9. Run `build-unwind-plan` and show fallback path before execution confirmation.
+10. If available, run `subscribe-alerts`; if not available in current release, explicitly return MVP-not-implemented notice.
+11. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
+12. Require explicit user confirmation before transaction signing.
 
 ## 4) Required Disclaimer Text
 Show this exact text before any strategy or transaction guidance:
@@ -168,6 +173,117 @@ Notes:
 - `references/` is local-only and is intentionally not installed by raw installer scripts.
 
 ## 8) Placeholder Action Modules
+
+### query-chain-registry
+- Priority: P0.
+- Status: placeholder only.
+- Module ID: `query-chain-registry`.
+- Purpose: resolve canonical chain metadata and trusted RPC/explorer registry data before execution planning.
+- Inputs: `chainSlug` or `chainId` (optional: `intent` = `read` | `simulate` | `broadcast`).
+- Output contract: canonical `chainId`, `chainSlug`, `nativeSymbol`, `explorerUrls`, prioritized RPC list with trust/health metadata.
+- Execution policy: read-only path via `clawdefi-core` (DB-backed); no free-form external chain lookup.
+- Safety rule: reject unknown chains or untrusted RPC endpoints (fail closed).
+- Fallback: return `chain_unavailable` and block execution actions until resolved.
+
+### query-action-spec
+- Priority: P0.
+- Status: active in MVP.
+- Module ID: `query-action-spec`.
+- Purpose: fetch canonical required params/functions/prechecks for a target action.
+- MCP mapping: `POST /tools/get_action_spec`.
+- Required input: `protocolSlug`, `chainSlug`, `actionKey`.
+- Output contract: action metadata, required functions (with contract context), required endpoints, unwind plan.
+- Safety rule: block execution planning when action spec is missing.
+
+### query-integration-endpoint
+- Priority: P0.
+- Status: active in MVP.
+- Module ID: `query-integration-endpoint`.
+- Purpose: fetch official endpoint/method/auth/rate-limit contract for an action.
+- MCP mapping: `POST /tools/get_integration_endpoint`.
+- Required input: `protocolSlug`, `chainSlug`, `actionKey` (optional: `serviceName`, `endpointKey`).
+- Output contract: filtered required endpoint list for deterministic integration.
+- Safety rule: never allow ad-hoc endpoint URLs outside curated response.
+
+### build-unwind-plan
+- Priority: P0.
+- Status: active in MVP (curated, not position-specific).
+- Module ID: `build-unwind-plan`.
+- Purpose: return deterministic unwind steps plus emergency fallback path.
+- MCP mapping: `POST /tools/build_unwind_plan`.
+- Required input: `protocolSlug`, `chainSlug`, `actionKey` (optional: `positionId`).
+- Output contract: curated `unwindPlan` + warning set; echo `positionId` when provided.
+- Safety rule: require user confirmation and live-state revalidation before unwind execution.
+
+### subscribe-alerts
+- Priority: P0.
+- Status: stubbed in MVP (not implemented yet).
+- Module ID: `subscribe-alerts`.
+- Purpose: register liquidation/exploit/policy alert expectations plus heartbeat assumptions.
+- MCP mapping: `POST /tools/subscribe_alerts`.
+- Current behavior: returns `not_implemented_mvp`.
+- Agent rule: do not fabricate alert subscription success when module is stubbed.
+
+### simulate-transaction
+- Priority: P0.
+- Status: placeholder (required before production execution).
+- Module ID: `simulate-transaction`.
+- Purpose: mandatory pre-sign simulation with revert decoding and slippage/risk checks.
+- Inputs: PLACEHOLDER - define call target, calldata, value, signer, chain, and slippage bounds.
+- Execution policy: PLACEHOLDER - run simulation before any sign prompt; block on revert/high-risk outcomes.
+- Output contract: PLACEHOLDER - simulation pass/fail, decoded revert reason, computed slippage and risk warnings.
+
+### wallet-readiness-check
+- Priority: P0.
+- Status: active policy gate (implementation may vary by wallet module).
+- Module ID: `wallet-readiness-check`.
+- Purpose: verify signer health before any DeFi action.
+- Required checks: chain selected, RPC reachable, balance sane, nonce readable, signature roundtrip verified.
+- Failure policy: fail closed; do not proceed to action planning/sign prompt until readiness passes.
+
+### quote-and-route-swap
+- Priority: P1.
+- Status: placeholder only.
+- Module ID: `quote-and-route-swap`.
+- Description: PLACEHOLDER - route and quote swaps with guardrails (`maxSlippage`, `minLiquidity`, route-risk constraints).
+- Inputs: PLACEHOLDER - define token pair, amount, side (`exactIn`/`exactOut`), chain, slippage cap, allowlist scope.
+- Output contract: PLACEHOLDER - candidate routes, quoted outputs, price impact, liquidity depth, and selected best route rationale.
+- Execution policy: PLACEHOLDER - require route allowlist + prechecks + simulation before sign prompt.
+- Safety rule: PLACEHOLDER - block when liquidity is below threshold or route risk exceeds policy.
+- Fallback: PLACEHOLDER - return no-safe-route result and request user adjustment.
+
+### allowance-manager
+- Priority: P1.
+- Status: placeholder only.
+- Module ID: `allowance-manager`.
+- Description: PLACEHOLDER - check and plan safe allowance changes (exact amount preferred over unlimited by default).
+- Inputs: PLACEHOLDER - token, spender, desired amount, current allowance, chain, account.
+- Output contract: PLACEHOLDER - allowance delta plan (`none`/`increase`/`revoke`), required tx steps, and risk notes.
+- Execution policy: PLACEHOLDER - exact allowance default; unlimited requires explicit user opt-in.
+- Safety rule: PLACEHOLDER - enforce spender allowlist; reject unknown spender contracts.
+- Fallback: PLACEHOLDER - if allowance state cannot be verified, block execution and request retry.
+
+### position-health-check
+- Priority: P1.
+- Status: placeholder only.
+- Module ID: `position-health-check`.
+- Description: PLACEHOLDER - check exposure/LTV/liquidation distance before and after planned actions.
+- Inputs: PLACEHOLDER - protocol, position id(s), account, market params, projected action deltas.
+- Output contract: PLACEHOLDER - current health metrics, projected post-action metrics, threshold breaches, and warning set.
+- Execution policy: PLACEHOLDER - run pre-action and post-action checks as deterministic gates.
+- Safety rule: PLACEHOLDER - block when projected liquidation distance or health factor violates policy.
+- Fallback: PLACEHOLDER - return safer alternatives (reduce size/deleverage/partial unwind).
+
+### contract-trust-check
+- Priority: P1.
+- Status: placeholder only.
+- Module ID: `contract-trust-check`.
+- Description: PLACEHOLDER - combine verification status, allowlist status, and risk snapshot into one trust verdict.
+- Inputs: PLACEHOLDER - chain, contract address, protocol context, expected contract role.
+- Output contract: PLACEHOLDER - verdict (`allow`/`warn`/`deny`) with evidence fields and timestamps.
+- Execution policy: PLACEHOLDER - read-only checks against curated registry and verification sources.
+- Safety rule: PLACEHOLDER - deny by default for unknown or unverified contracts unless explicitly overridden by policy.
+- Fallback: PLACEHOLDER - return `trust_unknown` and block automated execution.
 
 ### swap
 - Status: placeholder only.
