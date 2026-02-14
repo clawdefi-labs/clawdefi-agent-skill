@@ -59,6 +59,7 @@ Local development notes:
 - `references/` is intentionally local-only and ignored by git.
 - raw installer scripts sync required runtime files only and do not install `references/`.
 - signer credentials stay local; never pass private key material to `clawdefi-core`.
+- if provider credentials are required (for example CDP), create them in provider dashboards and set them in local env/secret storage; never paste credential values into chat.
 - wallet module remains swappable; never force one provider for every user.
 - CDP v1 is deprecated (effective February 2, 2026); use CDP Server Wallet v2 for all new integrations.
 - `scripts/create-wallet.js` requires: `npm install ethers`.

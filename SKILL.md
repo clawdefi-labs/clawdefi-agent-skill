@@ -1,7 +1,7 @@
 ---
 name: clawdefi-agent
-version: 0.1.7
-description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer approved wallet modules (local SIWE wallet flow, AgentKit+MCP+CDP v2, or direct CDP v2 EOA flow), validate readiness, then proceed with permissionless DeFi guidance.
+version: 0.1.8
+description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer approved wallet modules (local SIWE wallet flow, AgentKit+MCP+CDP v2, or direct CDP v2 EOA flow), show explicit pros/cons and requirements, validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
 ---
@@ -24,7 +24,7 @@ Authority boundary:
 ## 2) Signer Discovery and Initialization (Swappable Module)
 Use this section first whenever wallet execution is required.
 
-Required first-sight question:
+Required first-sight question (exact text, no paraphrase):
 > Does this machine/agent already have a configured wallet that can sign transactions locally (without sharing any private key or seed phrase)?
 
 Decision flow:
@@ -33,16 +33,45 @@ Decision flow:
 - validate signing capability locally,
 - proceed without changing wallet provider.
 2. If user answers no:
-- present approved wallet module choices below,
+- present this exact wallet option list in this exact order:
+  1. `local-siwe-wallet`
+  2. `coinbase-agentkit-mcp-cdp-v2`
+  3. `coinbase-cdp-v2-direct-eoa`
+- include pros, cons, requirements, and credential-source notes from this section for each option,
 - let user select one,
 - run setup through swappable module interface,
 - validate module readiness locally after initialization.
+
+Credential custody and prompt policy (must be stated before setup):
+- Wallet credentials/secrets are stored locally on the user-controlled machine/agent runtime.
+- ClawDeFi never asks for private keys, seed phrases, or raw credential secrets.
+- ClawDeFi does not custody wallet credentials.
+- If credentials are needed, instruct the user to create them at provider dashboards and set them in local env/secret storage only.
+- Never ask users to paste credential values into chat.
 
 ### Approved Wallet Module Choices
 
 #### option-a: local-siwe-wallet
 Best for:
-- lightweight local wallet bootstrap and SIWE-based auth/signing flow.
+- lightweight local wallet bootstrap and SIWE-based auth/signing flow with no external wallet provider dependency.
+
+Pros:
+- fully local signer control (non-custodial, no third-party wallet API credential required),
+- fastest bootstrap path for local OpenClaw agents.
+
+Cons:
+- user/operator is fully responsible for key backup, rotation, and endpoint reliability,
+- insecure local key handling can still lead to loss.
+
+Requirements:
+- Node.js runtime in the skill environment,
+- dependency: `npm install ethers`,
+- local secure env or secret-storage path for signer variables,
+- selected-chain RPC endpoint for balance/readiness checks.
+
+Credential source:
+- no external provider credential required,
+- signer credentials are generated locally via bundled script on this machine.
 
 Setup:
 - Install dependency once in the skill runtime environment:
@@ -65,6 +94,31 @@ Security guard:
 #### option-b: coinbase-agentkit-mcp-cdp-v2
 Best for:
 - AgentKit-based agents that need MCP-exposed onchain tooling with CDP-managed signing.
+
+Pros:
+- strong fit for agents already using AgentKit + MCP tool orchestration,
+- managed signing path can simplify operations versus fully custom wallet plumbing.
+
+Cons:
+- requires Coinbase CDP credentials and provider-specific setup,
+- larger runtime/tooling surface than local SIWE flow.
+
+Requirements:
+- packages:
+  - `@coinbase/agentkit`
+  - `@coinbase/agentkit-model-context-protocol`
+  - `@modelcontextprotocol/sdk`
+- local env secret storage for CDP vars,
+- AgentKit runtime with MCP server/tool wiring.
+
+Credential source:
+- create credentials from Coinbase Developer Portal (CDP dashboard):
+  - dashboard URL: `https://portal.cdp.coinbase.com/`,
+  - create/select project,
+  - create CDP API key (`CDP_API_KEY_ID`, `CDP_API_KEY_SECRET`),
+  - create wallet secret (`CDP_WALLET_SECRET`).
+- set credentials locally (env/secret manager) on the user-controlled machine only.
+- never paste credential values into chat.
 
 Wallet model:
 - CDP Server Wallet v2 account through AgentKit `CdpV2WalletProvider`, exposed via MCP extension tools.
@@ -98,6 +152,26 @@ Scope guard:
 #### option-c: coinbase-cdp-v2-direct-eoa
 Best for:
 - Direct backend integration with CDP v2 SDK/REST without AgentKit runtime dependency.
+
+Pros:
+- minimal framework dependency (no AgentKit requirement),
+- full control over direct SDK/REST integration behavior.
+
+Cons:
+- team must implement and maintain direct integration details (error handling, retries, observability),
+- still requires secure CDP credential lifecycle management.
+
+Requirements:
+- CDP v2 SDK/REST integration path in the local runtime,
+- local env secret storage for CDP vars,
+- explicit chain/network routing configuration.
+
+Credential source:
+- same Coinbase Developer Portal (CDP dashboard) project flow as option-b:
+  - dashboard URL: `https://portal.cdp.coinbase.com/`,
+  - create CDP API key (`CDP_API_KEY_ID`, `CDP_API_KEY_SECRET`),
+  - create wallet secret (`CDP_WALLET_SECRET`).
+- set values locally only; never send to ClawDeFi services or chat.
 
 Setup:
 - Set required CDP env vars before account operations:
@@ -138,7 +212,7 @@ Execution policy:
 1. Run signer discovery gate:
 - ask "Does this machine/agent already have a configured wallet that can sign transactions locally (without sharing any private key or seed phrase)?"
 - if yes, link existing signer.
-- if no, offer approved wallet modules and run selected setup (`local-siwe-wallet`, `coinbase-agentkit-mcp-cdp-v2`, `coinbase-cdp-v2-direct-eoa`).
+- if no, present wallet options in exact order, include pros/cons/requirements/credential-source notes, then run selected setup (`local-siwe-wallet`, `coinbase-agentkit-mcp-cdp-v2`, `coinbase-cdp-v2-direct-eoa`).
 2. Validate transaction-signing capability for the selected module.
 3. Enforce v2-only policy for any CDP-backed path.
 4. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
@@ -164,6 +238,7 @@ Rules:
 - Never suggest unsupported protocols or unknown contract addresses.
 - Never invent ABIs, function signatures, or endpoints.
 - Never ask for private keys or seed phrases.
+- Never ask users to paste API secrets or wallet credentials into chat.
 - Never transmit signer secrets to `clawdefi-core`.
 - Always provide unwind path for leveraged or time-sensitive positions.
 
