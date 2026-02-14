@@ -1,7 +1,7 @@
 ---
 name: clawdefi-agent
-version: 0.1.3
-description: The source of DeFi intelligence for agents. On first run, ask if the user already has a wallet that can sign transactions. If yes, use it. If no, recommend XXXX Kit initialization via a swappable signer module, then proceed with permissionless DeFi guidance.
+version: 0.1.5
+description: The source of DeFi intelligence for agents. On first run, ask if the user already has a wallet that can sign transactions. If yes, use it. If no, offer approved wallet modules (AgentKit+MCP+CDP v2, direct CDP v2 EOA flow, or local SIWE wallet flow), validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
 ---
@@ -33,32 +33,98 @@ Decision flow:
 - validate signing capability locally,
 - proceed without changing wallet provider.
 2. If user answers no:
-- recommend `XXXX Kit` initialization,
-- run signer setup through external swappable module interface,
-- validate signing capability locally after initialization.
+- present approved wallet module choices below,
+- let user select one,
+- run setup through swappable module interface,
+- validate module readiness locally after initialization.
+
+### Approved Wallet Module Choices
+
+#### option-a: coinbase-agentkit-mcp-cdp-v2
+Best for:
+- AgentKit-based agents that need MCP-exposed onchain tooling with CDP-managed signing.
+
+Wallet model:
+- CDP Server Wallet v2 account through AgentKit `CdpV2WalletProvider`, exposed via MCP extension tools.
+
+Setup:
+- Install packages:
+  - `@coinbase/agentkit`
+  - `@coinbase/agentkit-model-context-protocol`
+  - `@modelcontextprotocol/sdk`
+- Configure AgentKit with `CdpV2WalletProvider.configureWithWallet(...)`.
+- Expose tool surface using MCP extension (`getMcpTools(...)`) and connect through stdio MCP server.
+
+Readiness checks:
+- MCP tool list resolves successfully,
+- wallet/account address is resolvable from AgentKit context,
+- signing-capable transaction path is available for allowed actions.
+
+Scope guard:
+- CDP Server Wallet v2 only.
+- Never use CDP Server Wallet v1 / Wallet API / MPC Wallet in this module.
+
+#### option-b: coinbase-cdp-v2-direct-eoa
+Best for:
+- Direct backend integration with CDP v2 SDK/REST without AgentKit runtime dependency.
+
+Setup:
+- Create/import EOA using CDP v2 SDK or v2 REST API.
+- If smart account features are needed, create a smart account with explicit owner EOA mapping.
+- Enforce CDP account constraint for smart accounts:
+  - one smart account per owner,
+  - one owner per smart account.
+
+Readiness checks:
+- EOA account resolves and can execute signed transaction flow,
+- if smart account is used, owner mapping resolves as expected,
+- dry-run/simulation path is available before execution.
+
+Operational note:
+- For simple execution flows, keep a 1:1 runtime binding between agent instance and selected owner EOA context.
+
+#### option-c: local-siwe-wallet
+Best for:
+- lightweight local wallet bootstrap and SIWE-based auth/signing flow.
+
+Setup:
+- Create wallet in env-output mode (example module command: `node scripts/create-wallet.js --env`).
+- Persist `WALLET_ADDRESS` and `PRIVATE_KEY` in secure local environment storage.
+- Build SIWE message (domain/URI, address, chain ID, nonce, issued-at timestamp) and sign with local key.
+
+Readiness checks:
+- recover signer from SIWE signature and match expected address,
+- selected-chain RPC balance query succeeds,
+- controlled transaction simulation succeeds before live execution.
+
+Security guard:
+- never print private key or seed in logs,
+- never transmit signer secrets to external services.
 
 Implementation rule:
 - Keep wallet provider integration swappable.
-- Do not hardcode a permanent wallet kit name in this skill.
-- `XXXX Kit` is an intentional placeholder until concrete module selection is finalized.
+- Do not hardcode a single mandatory wallet provider for all users.
+- Wallet module selection must stay user-consented, replaceable, and least-privilege.
 
 Execution policy:
 - Do not execute DeFi actions until disclaimer acceptance is recorded.
 - Route all protocol interaction planning through ClawDeFi MCP/API.
 - Require deterministic risk approval before transaction build/sign flow.
 - Never send signer secrets or private keys to `clawdefi-core`.
+- Never onboard new integrations on CDP v1 because it is deprecated (effective February 2, 2026).
 
 ## 3) Mandatory Runtime Workflow
 1. Run signer discovery gate:
 - ask "Do you already have a wallet that can sign transactions?"
 - if yes, link existing signer.
-- if no, recommend `XXXX Kit` setup through swappable module.
-2. Validate local signing capability.
-3. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
-4. Require explicit disclaimer acceptance.
-5. Query ClawDeFi MCP tools for protocol metadata, action specs, contract/ABI references, endpoint specs, risk checks, and unwind path.
-6. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
-7. Require explicit user confirmation before transaction signing.
+- if no, offer approved wallet modules and run selected setup (`coinbase-agentkit-mcp-cdp-v2`, `coinbase-cdp-v2-direct-eoa`, `local-siwe-wallet`).
+2. Validate transaction-signing capability for the selected module.
+3. Enforce v2-only policy for any CDP-backed path.
+4. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
+5. Require explicit disclaimer acceptance.
+6. Query ClawDeFi MCP tools for protocol metadata, action specs, contract/ABI references, endpoint specs, risk checks, and unwind path.
+7. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
+8. Require explicit user confirmation before transaction signing.
 
 ## 4) Required Disclaimer Text
 Show this exact text before any strategy or transaction guidance:

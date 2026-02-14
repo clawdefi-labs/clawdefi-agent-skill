@@ -6,7 +6,7 @@ Distributable skill definition for local OpenClaw-compatible agents.
 Teach local agents how to:
 - ask first: "Do you already have a wallet that can sign transactions?",
 - if yes, connect the existing user-custodied signer,
-- if no, recommend `XXXX Kit` initialization through a swappable module,
+- if no, offer approved swappable wallet modules (`coinbase-agentkit-mcp-cdp-v2`, `coinbase-cdp-v2-direct-eoa`, `local-siwe-wallet`),
 - capture user risk profile,
 - query ClawDeFi MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
 - perform permissionless DeFi actions (swap, perps, options, yield, and future modules) with guardrails,
@@ -57,4 +57,5 @@ Cron example (every 6 hours):
 Local development notes:
 - `references/` is intentionally local-only and ignored by git.
 - signer credentials stay local; never pass private key material to `clawdefi-core`.
-- `XXXX Kit` is an intentional placeholder for future external signer module selection.
+- wallet module remains swappable; never force one provider for every user.
+- CDP v1 is deprecated (effective February 2, 2026); use CDP Server Wallet v2 for all new integrations.
