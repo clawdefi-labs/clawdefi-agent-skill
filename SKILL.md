@@ -1,7 +1,7 @@
 ---
 name: clawdefi-agent
-version: 0.1.5
-description: The source of DeFi intelligence for agents. On first run, ask if the user already has a wallet that can sign transactions. If yes, use it. If no, offer approved wallet modules (AgentKit+MCP+CDP v2, direct CDP v2 EOA flow, or local SIWE wallet flow), validate readiness, then proceed with permissionless DeFi guidance.
+version: 0.1.6
+description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer approved wallet modules (AgentKit+MCP+CDP v2, local SIWE wallet flow, or direct CDP v2 EOA flow), validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
 ---
@@ -25,7 +25,7 @@ Authority boundary:
 Use this section first whenever wallet execution is required.
 
 Required first-sight question:
-> Do you already have a wallet that can sign transactions?
+> Does this machine/agent already have a configured wallet that can sign transactions locally (without sharing any private key or seed phrase)?
 
 Decision flow:
 1. If user answers yes:
@@ -52,6 +52,15 @@ Setup:
   - `@coinbase/agentkit`
   - `@coinbase/agentkit-model-context-protocol`
   - `@modelcontextprotocol/sdk`
+- Set required CDP env vars before initialization:
+  - `CDP_API_KEY_ID`
+  - `CDP_API_KEY_SECRET`
+  - `CDP_WALLET_SECRET`
+- Set recommended env vars:
+  - `NETWORK_ID` (for explicit network selection)
+- Set optional env vars:
+  - `ADDRESS` (reuse existing account)
+  - `IDEMPOTENCY_KEY` (deterministic account creation)
 - Configure AgentKit with `CdpV2WalletProvider.configureWithWallet(...)`.
 - Expose tool surface using MCP extension (`getMcpTools(...)`) and connect through stdio MCP server.
 
@@ -64,11 +73,38 @@ Scope guard:
 - CDP Server Wallet v2 only.
 - Never use CDP Server Wallet v1 / Wallet API / MPC Wallet in this module.
 
-#### option-b: coinbase-cdp-v2-direct-eoa
+#### option-b: local-siwe-wallet
+Best for:
+- lightweight local wallet bootstrap and SIWE-based auth/signing flow.
+
+Setup:
+- Install dependency once in the skill runtime environment:
+  - `npm install ethers`
+- Create wallet in env-output mode using bundled script:
+  - `node scripts/create-wallet.js --env`
+- Persist `WALLET_ADDRESS` and `PRIVATE_KEY` in secure local environment storage.
+- Build SIWE message (domain/URI, address, chain ID, nonce, issued-at timestamp) and sign with local key.
+
+Readiness checks:
+- recover signer from SIWE signature and match expected address,
+- selected-chain RPC balance query succeeds,
+- controlled transaction simulation succeeds before live execution.
+
+Security guard:
+- never print private key or seed in logs,
+- never transmit signer secrets to external services.
+
+#### option-c: coinbase-cdp-v2-direct-eoa
 Best for:
 - Direct backend integration with CDP v2 SDK/REST without AgentKit runtime dependency.
 
 Setup:
+- Set required CDP env vars before account operations:
+  - `CDP_API_KEY_ID`
+  - `CDP_API_KEY_SECRET`
+  - `CDP_WALLET_SECRET`
+- Set recommended env vars:
+  - `NETWORK_ID` (explicit routing)
 - Create/import EOA using CDP v2 SDK or v2 REST API.
 - If smart account features are needed, create a smart account with explicit owner EOA mapping.
 - Enforce CDP account constraint for smart accounts:
@@ -81,25 +117,9 @@ Readiness checks:
 - dry-run/simulation path is available before execution.
 
 Operational note:
-- For simple execution flows, keep a 1:1 runtime binding between agent instance and selected owner EOA context.
-
-#### option-c: local-siwe-wallet
-Best for:
-- lightweight local wallet bootstrap and SIWE-based auth/signing flow.
-
-Setup:
-- Create wallet in env-output mode (example module command: `node scripts/create-wallet.js --env`).
-- Persist `WALLET_ADDRESS` and `PRIVATE_KEY` in secure local environment storage.
-- Build SIWE message (domain/URI, address, chain ID, nonce, issued-at timestamp) and sign with local key.
-
-Readiness checks:
-- recover signer from SIWE signature and match expected address,
-- selected-chain RPC balance query succeeds,
-- controlled transaction simulation succeeds before live execution.
-
-Security guard:
-- never print private key or seed in logs,
-- never transmit signer secrets to external services.
+- Smart-account 1:1 constraint applies to owner<->smart-account mapping only.
+- Basic EOA usage does not require owner<->smart-account mapping.
+- For operational clarity, keep one selected EOA context per running agent session.
 
 Implementation rule:
 - Keep wallet provider integration swappable.
@@ -115,9 +135,9 @@ Execution policy:
 
 ## 3) Mandatory Runtime Workflow
 1. Run signer discovery gate:
-- ask "Do you already have a wallet that can sign transactions?"
+- ask "Does this machine/agent already have a configured wallet that can sign transactions locally (without sharing any private key or seed phrase)?"
 - if yes, link existing signer.
-- if no, offer approved wallet modules and run selected setup (`coinbase-agentkit-mcp-cdp-v2`, `coinbase-cdp-v2-direct-eoa`, `local-siwe-wallet`).
+- if no, offer approved wallet modules and run selected setup (`coinbase-agentkit-mcp-cdp-v2`, `local-siwe-wallet`, `coinbase-cdp-v2-direct-eoa`).
 2. Validate transaction-signing capability for the selected module.
 3. Enforce v2-only policy for any CDP-backed path.
 4. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.

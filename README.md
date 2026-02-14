@@ -4,9 +4,9 @@ Distributable skill definition for local OpenClaw-compatible agents.
 
 ## Purpose
 Teach local agents how to:
-- ask first: "Do you already have a wallet that can sign transactions?",
+- ask first: "Does this machine/agent already have a configured wallet that can sign transactions locally (without sharing any private key or seed phrase)?",
 - if yes, connect the existing user-custodied signer,
-- if no, offer approved swappable wallet modules (`coinbase-agentkit-mcp-cdp-v2`, `coinbase-cdp-v2-direct-eoa`, `local-siwe-wallet`),
+- if no, offer approved swappable wallet modules (`coinbase-agentkit-mcp-cdp-v2`, `local-siwe-wallet`, `coinbase-cdp-v2-direct-eoa`),
 - capture user risk profile,
 - query ClawDeFi MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
 - perform permissionless DeFi actions (swap, perps, options, yield, and future modules) with guardrails,
@@ -53,9 +53,11 @@ Cron example (every 6 hours):
 - `SKILL.md`: main behavioral and workflow instructions.
 - `scripts/install-raw.sh`: raw installer script.
 - `scripts/update-from-manifest.sh`: checksum-verified raw updater script.
+- `scripts/create-wallet.js`: bundled local EVM wallet bootstrap script for `local-siwe-wallet`.
 
 Local development notes:
 - `references/` is intentionally local-only and ignored by git.
 - signer credentials stay local; never pass private key material to `clawdefi-core`.
 - wallet module remains swappable; never force one provider for every user.
 - CDP v1 is deprecated (effective February 2, 2026); use CDP Server Wallet v2 for all new integrations.
+- `scripts/create-wallet.js` requires: `npm install ethers`.
