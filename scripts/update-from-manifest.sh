@@ -6,8 +6,11 @@ MANIFEST_URL="${MANIFEST_URL:-https://skills.clawdefi.ai/${SKILL_NAME}/manifest.
 TARGET_ROOT="${TARGET_ROOT:-$HOME/.openclaw/skills}"
 TARGET_DIR="${TARGET_ROOT}/${SKILL_NAME}"
 TARGET_FILE="${TARGET_DIR}/SKILL.md"
-SCRIPT_REL_PATH="scripts/create-wallet.js"
-TARGET_SCRIPT="${TARGET_DIR}/${SCRIPT_REL_PATH}"
+RUNTIME_FILES=(
+  "scripts/create-wallet.js"
+  "scripts/wallet-readiness-check.js"
+  "scripts/allowance-manager.js"
+)
 
 hash_file() {
   local file_path="$1"
@@ -30,24 +33,18 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 1
 fi
 
-mkdir -p "$TARGET_DIR"
+mkdir -p "$TARGET_DIR" "$TARGET_DIR/scripts"
 
-manifest_tmp="$(mktemp)"
-skill_tmp="$(mktemp)"
-script_tmp="$(mktemp)"
-trap 'rm -f "$manifest_tmp" "$skill_tmp" "$script_tmp"' EXIT
+tmp_dir="$(mktemp -d)"
+manifest_tmp="${tmp_dir}/manifest.json"
+skill_tmp="${tmp_dir}/SKILL.md"
+trap 'rm -rf "$tmp_dir"' EXIT
 
 curl -fsSL "$MANIFEST_URL" -o "$manifest_tmp"
 
 remote_version="$(jq -r '.version' "$manifest_tmp")"
 remote_skill_url="$(jq -r '.skill_url' "$manifest_tmp")"
 remote_sha256="$(jq -r '.sha256' "$manifest_tmp")"
-remote_script_url="$(jq -r --arg p "$SCRIPT_REL_PATH" '.files[]? | select(.path == $p) | .url // empty' "$manifest_tmp" | head -n 1)"
-remote_script_sha256="$(jq -r --arg p "$SCRIPT_REL_PATH" '.files[]? | select(.path == $p) | .sha256 // empty' "$manifest_tmp" | head -n 1)"
-
-if [ -z "$remote_script_url" ]; then
-  remote_script_url="$(dirname "$remote_skill_url")/${SCRIPT_REL_PATH}"
-fi
 
 if [ -z "$remote_version" ] || [ "$remote_version" = "null" ] || [ -z "$remote_skill_url" ] || [ "$remote_skill_url" = "null" ] || [ -z "$remote_sha256" ] || [ "$remote_sha256" = "null" ]; then
   echo "Manifest is missing required fields (version, skill_url, sha256)" >&2
@@ -63,47 +60,12 @@ if [ "$actual_sha256" != "$remote_sha256" ]; then
   exit 1
 fi
 
-script_fetched=0
-script_changed=0
-downloaded_script_sha256=""
-if curl -fsSL "$remote_script_url" -o "$script_tmp"; then
-  script_fetched=1
-  downloaded_script_sha256="$(hash_file "$script_tmp")"
-
-  if [ -n "$remote_script_sha256" ]; then
-    if [ "$downloaded_script_sha256" != "$remote_script_sha256" ]; then
-      echo "Checksum mismatch for downloaded ${SCRIPT_REL_PATH}" >&2
-      exit 1
-    fi
-  else
-    echo "Warning: no checksum provided for ${SCRIPT_REL_PATH}; syncing without checksum verification." >&2
-  fi
-else
-  echo "Warning: unable to fetch ${SCRIPT_REL_PATH}; script sync check skipped." >&2
-fi
-
 skill_changed=1
 if [ -f "$TARGET_FILE" ]; then
   local_sha256="$(hash_file "$TARGET_FILE")"
   if [ "$local_sha256" = "$remote_sha256" ]; then
     skill_changed=0
   fi
-fi
-
-if [ "$script_fetched" -eq 1 ]; then
-  if [ -f "$TARGET_SCRIPT" ]; then
-    local_script_sha256="$(hash_file "$TARGET_SCRIPT")"
-    if [ "$local_script_sha256" != "$downloaded_script_sha256" ]; then
-      script_changed=1
-    fi
-  else
-    script_changed=1
-  fi
-fi
-
-if [ "$skill_changed" -eq 0 ] && [ "$script_fetched" -eq 1 ] && [ "$script_changed" -eq 0 ]; then
-  echo "${SKILL_NAME} is already up to date (${remote_version})"
-  exit 0
 fi
 
 if [ "$skill_changed" -eq 1 ]; then
@@ -115,20 +77,62 @@ else
   skill_status="unchanged"
 fi
 
-echo "$remote_version" > "${TARGET_DIR}/.installed-version"
+runtime_changed_any=0
+runtime_results=()
 
-if [ "$script_fetched" -eq 1 ]; then
-  if [ "$script_changed" -eq 1 ]; then
-    mkdir -p "${TARGET_DIR}/scripts"
-    backup_if_exists "$TARGET_SCRIPT"
-    mv "$script_tmp" "$TARGET_SCRIPT"
-    chmod +x "$TARGET_SCRIPT"
-    script_status="updated"
-  else
-    script_status="unchanged"
+for runtime_file in "${RUNTIME_FILES[@]}"; do
+  runtime_tmp="${tmp_dir}/$(basename "$runtime_file")"
+  runtime_target="${TARGET_DIR}/${runtime_file}"
+  runtime_url="$(jq -r --arg p "$runtime_file" '.files[]? | select(.path == $p) | .url // empty' "$manifest_tmp" | head -n 1)"
+  runtime_sha256="$(jq -r --arg p "$runtime_file" '.files[]? | select(.path == $p) | .sha256 // empty' "$manifest_tmp" | head -n 1)"
+
+  if [ -z "$runtime_url" ]; then
+    runtime_url="$(dirname "$remote_skill_url")/${runtime_file}"
   fi
-else
-  script_status="check-skipped"
+
+  curl -fsSL "$runtime_url" -o "$runtime_tmp"
+  downloaded_runtime_sha256="$(hash_file "$runtime_tmp")"
+
+  if [ -n "$runtime_sha256" ]; then
+    if [ "$downloaded_runtime_sha256" != "$runtime_sha256" ]; then
+      echo "Checksum mismatch for downloaded ${runtime_file}" >&2
+      exit 1
+    fi
+  else
+    echo "Warning: no checksum provided for ${runtime_file}; syncing without checksum verification." >&2
+  fi
+
+  runtime_changed=0
+  if [ -f "$runtime_target" ]; then
+    local_runtime_sha256="$(hash_file "$runtime_target")"
+    if [ "$local_runtime_sha256" != "$downloaded_runtime_sha256" ]; then
+      runtime_changed=1
+    fi
+  else
+    runtime_changed=1
+  fi
+
+  if [ "$runtime_changed" -eq 1 ]; then
+    mkdir -p "$(dirname "$runtime_target")"
+    backup_if_exists "$runtime_target"
+    mv "$runtime_tmp" "$runtime_target"
+    chmod +x "$runtime_target"
+    runtime_changed_any=1
+    runtime_results+=("${runtime_file}=updated")
+  else
+    rm -f "$runtime_tmp"
+    runtime_results+=("${runtime_file}=unchanged")
+  fi
+done
+
+if [ "$skill_changed" -eq 0 ] && [ "$runtime_changed_any" -eq 0 ]; then
+  echo "${SKILL_NAME} is already up to date (${remote_version})"
+  exit 0
 fi
 
-echo "Update result for ${SKILL_NAME} (${remote_version}): SKILL.md=${skill_status}, ${SCRIPT_REL_PATH}=${script_status}"
+echo "$remote_version" > "${TARGET_DIR}/.installed-version"
+
+echo "Update result for ${SKILL_NAME} (${remote_version}): SKILL.md=${skill_status}"
+for runtime_result in "${runtime_results[@]}"; do
+  echo "- ${runtime_result}"
+done

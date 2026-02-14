@@ -30,7 +30,7 @@ bash scripts/install-raw.sh
 
 Raw one-liner (manual style):
 ```bash
-mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js
+mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/wallet-readiness-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/allowance-manager.js -o ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js
 ```
 
 ## Update Channels
@@ -54,6 +54,8 @@ Cron example (every 6 hours):
 - `scripts/install-raw.sh`: raw installer script.
 - `scripts/update-from-manifest.sh`: checksum-verified raw updater script.
 - `scripts/create-wallet.js`: bundled local EVM wallet bootstrap script for `local-siwe-wallet`.
+- `scripts/wallet-readiness-check.js`: bundled signer readiness verifier (RPC/chain/balance/nonce/signature roundtrip).
+- `scripts/allowance-manager.js`: bundled IERC20 allowance planner (safe exact-allowance default, revoke/unlimited with explicit policy).
 
 Local development notes:
 - `references/` is intentionally local-only and ignored by git.
@@ -62,4 +64,6 @@ Local development notes:
 - wallet module remains swappable; never force one provider for every user.
 - additional wallet modules will be added in future releases; current default module is `local-siwe-wallet`.
 - `scripts/create-wallet.js` requires: `npm install ethers`.
+- `scripts/wallet-readiness-check.js` requires: `npm install ethers` and local signer env values (`RPC_URL`, `CHAIN_ID`, `PRIVATE_KEY`, optional `WALLET_ADDRESS`).
+- `scripts/allowance-manager.js` requires: `npm install ethers` and token+spender context (`RPC_URL`, `CHAIN_ID`, `TOKEN_ADDRESS`, `SPENDER_ADDRESS`, owner wallet context).
 - `scripts/create-wallet.js --managed` stores plaintext private key JSON at rest; local development only (not production).

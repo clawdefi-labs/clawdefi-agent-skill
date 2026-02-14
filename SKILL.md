@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.11
+version: 0.1.13
 description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer the approved local SIWE wallet module, explicitly state more wallet options will be available in future releases, validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -66,6 +66,7 @@ Cons:
 Requirements:
 - Node.js runtime in the skill environment,
 - dependency: `npm install ethers`,
+- bundled scripts: `scripts/create-wallet.js`, `scripts/wallet-readiness-check.js`, and `scripts/allowance-manager.js`,
 - local secure env or secret-storage path for signer variables,
 - selected-chain RPC endpoint for balance/readiness checks.
 
@@ -82,8 +83,11 @@ Setup:
 - Build SIWE message (domain/URI, address, chain ID, nonce, issued-at timestamp) and sign with local key.
 
 Readiness checks:
+- run bundled readiness module:
+  - `node scripts/wallet-readiness-check.js --json`
 - recover signer from SIWE signature and match expected address,
 - selected-chain RPC balance query succeeds,
+- nonce query succeeds on selected chain,
 - controlled transaction simulation succeeds before live execution.
 
 Security guard:
@@ -114,16 +118,18 @@ Execution policy:
 - if yes, link existing signer.
 - if no, present wallet options in exact order, include pros/cons/requirements/credential-source notes, explicitly state that more wallet options will be available in future ClawDeFi releases, then run selected setup (`local-siwe-wallet`).
 2. Run `wallet-readiness-check` (chain, balance, nonce, RPC health, signature roundtrip).
+  - recommended command: `node scripts/wallet-readiness-check.js --json`
 3. Run `query-chain-registry` for canonical chain/RPC/explorer context.
 4. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
 5. Require explicit disclaimer acceptance.
 6. Run `query-action-spec` to fetch canonical action contract from `clawdefi-core`.
 7. Run `query-integration-endpoint` to fetch official endpoint/method/auth/rate-limit guidance.
 8. Run `simulate-transaction` before any sign request.
-9. Run `build-unwind-plan` and show fallback path before execution confirmation.
-10. If available, run `subscribe-alerts`; if not available in current release, explicitly return MVP-not-implemented notice.
-11. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
-12. Require explicit user confirmation before transaction signing.
+9. When action requires ERC20 approvals, run `allowance-manager` before tx build/sign.
+10. Run `build-unwind-plan` and show fallback path before execution confirmation.
+11. If available, run `subscribe-alerts`; if not available in current release, explicitly return MVP-not-implemented notice.
+12. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
+13. Require explicit user confirmation before transaction signing.
 
 ## 4) Required Disclaimer Text
 Show this exact text before any strategy or transaction guidance:
@@ -163,7 +169,7 @@ Support both installation channels:
 - Install directly from hosted raw artifacts (`SKILL.md` + required runtime script):
   - `bash scripts/install-raw.sh`
   - or manual one-liner:
-    - `mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js`
+    - `mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/wallet-readiness-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/allowance-manager.js -o ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js`
 - Poll manifest and update with hash verification:
   - `bash scripts/update-from-manifest.sh`
 
@@ -235,11 +241,24 @@ Notes:
 
 ### wallet-readiness-check
 - Priority: P0.
-- Status: active policy gate (implementation may vary by wallet module).
+- Status: active in MVP (implemented as local bundled module).
 - Module ID: `wallet-readiness-check`.
 - Purpose: verify signer health before any DeFi action.
-- Required checks: chain selected, RPC reachable, balance sane, nonce readable, signature roundtrip verified.
-- Failure policy: fail closed; do not proceed to action planning/sign prompt until readiness passes.
+- Implementation path: `scripts/wallet-readiness-check.js`.
+- Required inputs:
+  - `RPC_URL` (or `CHAIN_RPC_URL` / `ETH_RPC_URL`) or `--rpc-url`,
+  - `CHAIN_ID` or `--chain-id`,
+  - `PRIVATE_KEY` or `--private-key`,
+  - optional `WALLET_ADDRESS` or `--wallet-address` (must match derived signer),
+  - optional `MIN_NATIVE_BALANCE_WEI` / `--min-native-balance-wei`.
+- Standard run command:
+  - `node scripts/wallet-readiness-check.js --json`
+- Output contract:
+  - `ok` boolean,
+  - `walletAddress`, `chainId`, `rpcUrl`,
+  - checks: `rpcHealthy`, `chainSelected`, `chainMatchesExpected`, `balanceSane`, `nonceReadable`, `signatureRoundtrip`,
+  - metrics: `balanceWei`, `balanceEth`, `nonce`, `minNativeBalanceWei`.
+- Failure policy: fail closed; do not proceed to action planning/sign prompt until readiness passes with `ok=true`.
 
 ### quote-and-route-swap
 - Priority: P1.
@@ -254,14 +273,37 @@ Notes:
 
 ### allowance-manager
 - Priority: P1.
-- Status: placeholder only.
+- Status: active in MVP (local planning module).
 - Module ID: `allowance-manager`.
-- Description: PLACEHOLDER - check and plan safe allowance changes (exact amount preferred over unlimited by default).
-- Inputs: PLACEHOLDER - token, spender, desired amount, current allowance, chain, account.
-- Output contract: PLACEHOLDER - allowance delta plan (`none`/`increase`/`revoke`), required tx steps, and risk notes.
-- Execution policy: PLACEHOLDER - exact allowance default; unlimited requires explicit user opt-in.
-- Safety rule: PLACEHOLDER - enforce spender allowlist; reject unknown spender contracts.
-- Fallback: PLACEHOLDER - if allowance state cannot be verified, block execution and request retry.
+- Purpose: check current ERC20 allowance and build deterministic approval/revoke transaction plan.
+- Implementation path: `scripts/allowance-manager.js` (IERC20 ABI-based: `allowance`, `approve`, optional `symbol` and `decimals`).
+- Required inputs:
+  - `RPC_URL` (or `CHAIN_RPC_URL` / `ETH_RPC_URL`) or `--rpc-url`,
+  - `CHAIN_ID` or `--chain-id`,
+  - `TOKEN_ADDRESS` or `--token-address`,
+  - `SPENDER_ADDRESS` or `--spender-address`,
+  - owner context via `WALLET_ADDRESS`/`--owner-address` or `PRIVATE_KEY`/`--private-key` (owner can be derived from private key),
+  - for exact mode: `DESIRED_AMOUNT_WEI` or `--desired-amount-wei`.
+- Supported modes:
+  - `exact` (default, safest),
+  - `revoke`,
+  - `unlimited` (requires explicit `--allow-unlimited`).
+- Standard run command:
+  - `node scripts/allowance-manager.js --mode exact --token-address <token> --spender-address <spender> --desired-amount-wei <wei> --json`
+- Output contract:
+  - `policy`, token/owner/spender/chain context,
+  - allowance state (`currentWei`, `targetWei`, `deltaWei`, `action`),
+  - deterministic approval steps with encoded calldata (`steps[]`),
+  - warning set (including unlimited and reset-first cautions).
+- Execution policy:
+  - exact allowance by default,
+  - unlimited allowance requires explicit user opt-in,
+  - module is planning only and does not broadcast transactions.
+- Safety rule:
+  - enforce spender allowlist from `query-action-spec` before execution,
+  - reject unknown token/spender addresses (fail closed).
+- Fallback:
+  - if allowance cannot be queried, return failure and block execution until RPC/token state is healthy.
 
 ### position-health-check
 - Priority: P1.
