@@ -81,7 +81,7 @@ function ensureDirSecure(dirPath) {
 }
 
 function appendAudit(event, details) {
-  const auditDir = path.join(os.homedir(), ".base-wallet");
+  const auditDir = path.join(os.homedir(), ".openclaw", "wallets");
   ensureDirSecure(auditDir);
 
   const logPath = path.join(auditDir, "audit.log");
@@ -157,6 +157,9 @@ function main() {
     return;
   }
 
+  console.error(
+    "WARNING: --env prints the private key to stdout. Run only in a secure local terminal; do not run in CI or anywhere stdout is logged.",
+  );
   console.log(`export WALLET_ADDRESS="${payload.address}"`);
   console.log(`export PRIVATE_KEY="${payload.privateKey}"`);
   appendAudit("wallet_created", { mode: "env", address: payload.address });

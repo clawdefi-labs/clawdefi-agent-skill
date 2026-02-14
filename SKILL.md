@@ -87,7 +87,7 @@ Readiness checks:
 - controlled transaction simulation succeeds before live execution.
 
 Security guard:
-- never print private key or seed in logs,
+- never print private key or seed in logs (the `--env` mode prints it to stdout intentionally; treat stdout as secret and do not run in CI or log-captured environments),
 - never transmit signer secrets to external services.
 - `--managed` file mode stores plaintext private key JSON at rest and is local-development only (not production).
 
