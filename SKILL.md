@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.13
+version: 0.1.14
 description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer the approved local SIWE wallet module, explicitly state more wallet options will be available in future releases, validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -127,7 +127,7 @@ Execution policy:
 8. Run `simulate-transaction` before any sign request.
 9. When action requires ERC20 approvals, run `allowance-manager` before tx build/sign.
 10. Run `build-unwind-plan` and show fallback path before execution confirmation.
-11. If available, run `subscribe-alerts`; if not available in current release, explicitly return MVP-not-implemented notice.
+11. Run `subscribe-alerts` (poll-mode MVP), then use `poll-alert-events` and `close-alert-subscription` as needed.
 12. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
 13. Require explicit user confirmation before transaction signing.
 
@@ -213,22 +213,46 @@ Notes:
 
 ### build-unwind-plan
 - Priority: P0.
-- Status: active in MVP (curated, not position-specific).
+- Status: active in MVP (position-aware when snapshot exists, curated fallback otherwise).
 - Module ID: `build-unwind-plan`.
 - Purpose: return deterministic unwind steps plus emergency fallback path.
 - MCP mapping: `POST /tools/build_unwind_plan`.
 - Required input: `protocolSlug`, `chainSlug`, `actionKey` (optional: `positionId`).
-- Output contract: curated `unwindPlan` + warning set; echo `positionId` when provided.
+- Output contract:
+  - returns `position_aware` plan when a matching snapshot exists,
+  - returns `curated_fallback` when snapshot is missing/stale-hard,
+  - includes confidence, abort conditions, warnings, and metadata.
 - Safety rule: require user confirmation and live-state revalidation before unwind execution.
 
 ### subscribe-alerts
 - Priority: P0.
-- Status: stubbed in MVP (not implemented yet).
+- Status: active in MVP (poll mode).
 - Module ID: `subscribe-alerts`.
 - Purpose: register liquidation/exploit/policy alert expectations plus heartbeat assumptions.
 - MCP mapping: `POST /tools/subscribe_alerts`.
-- Current behavior: returns `not_implemented_mvp`.
-- Agent rule: do not fabricate alert subscription success when module is stubbed.
+- Current behavior:
+  - returns `subscriptionId`, `mode=poll`, polling cadence, expiry, and `nextCursor`.
+  - use cursor-based polling for new events.
+- Agent rule: do not claim WebSocket/SSE streaming in MVP.
+
+### poll-alert-events
+- Priority: P0.
+- Status: active in MVP (poll mode).
+- Module ID: `poll-alert-events`.
+- Purpose: fetch incremental alert events for a subscription using signed cursor.
+- MCP mapping: `POST /tools/poll_alert_events`.
+- Required input: `subscriptionId`, `wallet` (optional: `cursor`, `limit`).
+- Output contract: event list + updated `nextCursor`.
+- Safety rule: handle `cursor_replay` and `cursor_out_of_sync` as hard sync errors.
+
+### close-alert-subscription
+- Priority: P0.
+- Status: active in MVP.
+- Module ID: `close-alert-subscription`.
+- Purpose: close a poll subscription when no longer needed.
+- MCP mapping: `POST /tools/close_alert_subscription`.
+- Required input: `subscriptionId`, `wallet`.
+- Output contract: close result with `closed=true`.
 
 ### simulate-transaction
 - Priority: P0.
