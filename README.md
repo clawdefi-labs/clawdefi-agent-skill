@@ -6,7 +6,7 @@ Distributable skill definition for local OpenClaw-compatible agents.
 Teach local agents how to:
 - ask first: "Does this machine/agent already have a configured wallet that can sign transactions locally (without sharing any private key or seed phrase)?",
 - if yes, connect the existing user-custodied signer,
-- if no, offer approved swappable wallet modules (`coinbase-agentkit-mcp-cdp-v2`, `local-siwe-wallet`, `coinbase-cdp-v2-direct-eoa`),
+- if no, offer approved swappable wallet modules (`local-siwe-wallet`, `coinbase-agentkit-mcp-cdp-v2`, `coinbase-cdp-v2-direct-eoa`),
 - capture user risk profile,
 - query ClawDeFi MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
 - perform permissionless DeFi actions (swap, perps, options, yield, and future modules) with guardrails,
@@ -30,7 +30,7 @@ bash scripts/install-raw.sh
 
 Raw one-liner (manual style):
 ```bash
-mkdir -p ~/.openclaw/skills/clawdefi-agent && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md
+mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js
 ```
 
 ## Update Channels
@@ -57,6 +57,7 @@ Cron example (every 6 hours):
 
 Local development notes:
 - `references/` is intentionally local-only and ignored by git.
+- raw installer scripts sync required runtime files only and do not install `references/`.
 - signer credentials stay local; never pass private key material to `clawdefi-core`.
 - wallet module remains swappable; never force one provider for every user.
 - CDP v1 is deprecated (effective February 2, 2026); use CDP Server Wallet v2 for all new integrations.

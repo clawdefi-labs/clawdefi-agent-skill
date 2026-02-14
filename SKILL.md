@@ -1,7 +1,7 @@
 ---
 name: clawdefi-agent
-version: 0.1.6
-description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer approved wallet modules (AgentKit+MCP+CDP v2, local SIWE wallet flow, or direct CDP v2 EOA flow), validate readiness, then proceed with permissionless DeFi guidance.
+version: 0.1.7
+description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer approved wallet modules (local SIWE wallet flow, AgentKit+MCP+CDP v2, or direct CDP v2 EOA flow), validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
 ---
@@ -40,7 +40,29 @@ Decision flow:
 
 ### Approved Wallet Module Choices
 
-#### option-a: coinbase-agentkit-mcp-cdp-v2
+#### option-a: local-siwe-wallet
+Best for:
+- lightweight local wallet bootstrap and SIWE-based auth/signing flow.
+
+Setup:
+- Install dependency once in the skill runtime environment:
+  - `npm install ethers`
+- Create wallet in env-output mode using bundled script:
+  - `node scripts/create-wallet.js --env`
+- Persist `WALLET_ADDRESS` and `PRIVATE_KEY` in secure local environment storage.
+- Build SIWE message (domain/URI, address, chain ID, nonce, issued-at timestamp) and sign with local key.
+
+Readiness checks:
+- recover signer from SIWE signature and match expected address,
+- selected-chain RPC balance query succeeds,
+- controlled transaction simulation succeeds before live execution.
+
+Security guard:
+- never print private key or seed in logs,
+- never transmit signer secrets to external services.
+- `--managed` file mode stores plaintext private key JSON at rest and is local-development only (not production).
+
+#### option-b: coinbase-agentkit-mcp-cdp-v2
 Best for:
 - AgentKit-based agents that need MCP-exposed onchain tooling with CDP-managed signing.
 
@@ -72,28 +94,6 @@ Readiness checks:
 Scope guard:
 - CDP Server Wallet v2 only.
 - Never use CDP Server Wallet v1 / Wallet API / MPC Wallet in this module.
-
-#### option-b: local-siwe-wallet
-Best for:
-- lightweight local wallet bootstrap and SIWE-based auth/signing flow.
-
-Setup:
-- Install dependency once in the skill runtime environment:
-  - `npm install ethers`
-- Create wallet in env-output mode using bundled script:
-  - `node scripts/create-wallet.js --env`
-- Persist `WALLET_ADDRESS` and `PRIVATE_KEY` in secure local environment storage.
-- Build SIWE message (domain/URI, address, chain ID, nonce, issued-at timestamp) and sign with local key.
-
-Readiness checks:
-- recover signer from SIWE signature and match expected address,
-- selected-chain RPC balance query succeeds,
-- controlled transaction simulation succeeds before live execution.
-
-Security guard:
-- never print private key or seed in logs,
-- never transmit signer secrets to external services.
-- `--managed` file mode stores plaintext private key JSON at rest and is local-development only (not production).
 
 #### option-c: coinbase-cdp-v2-direct-eoa
 Best for:
@@ -138,7 +138,7 @@ Execution policy:
 1. Run signer discovery gate:
 - ask "Does this machine/agent already have a configured wallet that can sign transactions locally (without sharing any private key or seed phrase)?"
 - if yes, link existing signer.
-- if no, offer approved wallet modules and run selected setup (`coinbase-agentkit-mcp-cdp-v2`, `local-siwe-wallet`, `coinbase-cdp-v2-direct-eoa`).
+- if no, offer approved wallet modules and run selected setup (`local-siwe-wallet`, `coinbase-agentkit-mcp-cdp-v2`, `coinbase-cdp-v2-direct-eoa`).
 2. Validate transaction-signing capability for the selected module.
 3. Enforce v2-only policy for any CDP-backed path.
 4. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
@@ -181,16 +181,17 @@ Support both installation channels:
 - Update skill later: `clawhub update clawdefi-agent` or `clawhub update --all`
 
 2. Raw URL channel:
-- Install directly from hosted `SKILL.md`:
+- Install directly from hosted raw artifacts (`SKILL.md` + required runtime script):
   - `bash scripts/install-raw.sh`
   - or manual one-liner:
-    - `mkdir -p ~/.openclaw/skills/clawdefi-agent && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md`
+    - `mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js`
 - Poll manifest and update with hash verification:
   - `bash scripts/update-from-manifest.sh`
 
 Notes:
 - Raw channel is for environments where ClawHub is not available.
-- Raw updates must validate checksum and keep a rollback backup before overwrite.
+- Raw updates keep rollback backups before overwrite and sync required runtime script files.
+- `references/` is local-only and is intentionally not installed by raw installer scripts.
 
 ## 8) Placeholder Action Modules
 
