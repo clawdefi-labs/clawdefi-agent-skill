@@ -9,6 +9,22 @@ TARGET_FILE="${TARGET_DIR}/SKILL.md"
 SCRIPT_REL_PATH="scripts/create-wallet.js"
 TARGET_SCRIPT="${TARGET_DIR}/${SCRIPT_REL_PATH}"
 
+hash_file() {
+  local file_path="$1"
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$file_path" | awk '{print $1}'
+  else
+    shasum -a 256 "$file_path" | awk '{print $1}'
+  fi
+}
+
+backup_if_exists() {
+  local file_path="$1"
+  if [ -f "$file_path" ]; then
+    cp "$file_path" "${file_path}.bak.$(date +%Y%m%d%H%M%S)"
+  fi
+}
+
 if ! command -v jq >/dev/null 2>&1; then
   echo "jq is required for manifest parsing" >&2
   exit 1
@@ -40,59 +56,79 @@ fi
 
 curl -fsSL "$remote_skill_url" -o "$skill_tmp"
 
-if command -v sha256sum >/dev/null 2>&1; then
-  actual_sha256="$(sha256sum "$skill_tmp" | awk '{print $1}')"
-else
-  actual_sha256="$(shasum -a 256 "$skill_tmp" | awk '{print $1}')"
-fi
+actual_sha256="$(hash_file "$skill_tmp")"
 
 if [ "$actual_sha256" != "$remote_sha256" ]; then
   echo "Checksum mismatch for downloaded SKILL.md" >&2
   exit 1
 fi
 
-if [ -f "$TARGET_FILE" ]; then
-  if command -v sha256sum >/dev/null 2>&1; then
-    local_sha256="$(sha256sum "$TARGET_FILE" | awk '{print $1}')"
-  else
-    local_sha256="$(shasum -a 256 "$TARGET_FILE" | awk '{print $1}')"
-  fi
-
-  if [ "$local_sha256" = "$remote_sha256" ]; then
-    echo "${SKILL_NAME} is already up to date (${remote_version})"
-    exit 0
-  fi
-
-  cp "$TARGET_FILE" "${TARGET_FILE}.bak.$(date +%Y%m%d%H%M%S)"
-fi
-
-mv "$skill_tmp" "$TARGET_FILE"
-echo "$remote_version" > "${TARGET_DIR}/.installed-version"
-
+script_fetched=0
+script_changed=0
+downloaded_script_sha256=""
 if curl -fsSL "$remote_script_url" -o "$script_tmp"; then
-  if [ -n "$remote_script_sha256" ]; then
-    if command -v sha256sum >/dev/null 2>&1; then
-      actual_script_sha256="$(sha256sum "$script_tmp" | awk '{print $1}')"
-    else
-      actual_script_sha256="$(shasum -a 256 "$script_tmp" | awk '{print $1}')"
-    fi
+  script_fetched=1
+  downloaded_script_sha256="$(hash_file "$script_tmp")"
 
-    if [ "$actual_script_sha256" != "$remote_script_sha256" ]; then
+  if [ -n "$remote_script_sha256" ]; then
+    if [ "$downloaded_script_sha256" != "$remote_script_sha256" ]; then
       echo "Checksum mismatch for downloaded ${SCRIPT_REL_PATH}" >&2
       exit 1
     fi
   else
     echo "Warning: no checksum provided for ${SCRIPT_REL_PATH}; syncing without checksum verification." >&2
   fi
-
-  mkdir -p "${TARGET_DIR}/scripts"
-  if [ -f "$TARGET_SCRIPT" ]; then
-    cp "$TARGET_SCRIPT" "${TARGET_SCRIPT}.bak.$(date +%Y%m%d%H%M%S)"
-  fi
-  mv "$script_tmp" "$TARGET_SCRIPT"
-  chmod +x "$TARGET_SCRIPT"
 else
-  echo "Warning: unable to fetch ${SCRIPT_REL_PATH}; keeping current local copy." >&2
+  echo "Warning: unable to fetch ${SCRIPT_REL_PATH}; script sync check skipped." >&2
 fi
 
-echo "Updated ${SKILL_NAME} to version ${remote_version}"
+skill_changed=1
+if [ -f "$TARGET_FILE" ]; then
+  local_sha256="$(hash_file "$TARGET_FILE")"
+  if [ "$local_sha256" = "$remote_sha256" ]; then
+    skill_changed=0
+  fi
+fi
+
+if [ "$script_fetched" -eq 1 ]; then
+  if [ -f "$TARGET_SCRIPT" ]; then
+    local_script_sha256="$(hash_file "$TARGET_SCRIPT")"
+    if [ "$local_script_sha256" != "$downloaded_script_sha256" ]; then
+      script_changed=1
+    fi
+  else
+    script_changed=1
+  fi
+fi
+
+if [ "$skill_changed" -eq 0 ] && [ "$script_fetched" -eq 1 ] && [ "$script_changed" -eq 0 ]; then
+  echo "${SKILL_NAME} is already up to date (${remote_version})"
+  exit 0
+fi
+
+if [ "$skill_changed" -eq 1 ]; then
+  backup_if_exists "$TARGET_FILE"
+  mv "$skill_tmp" "$TARGET_FILE"
+  skill_status="updated"
+else
+  rm -f "$skill_tmp"
+  skill_status="unchanged"
+fi
+
+echo "$remote_version" > "${TARGET_DIR}/.installed-version"
+
+if [ "$script_fetched" -eq 1 ]; then
+  if [ "$script_changed" -eq 1 ]; then
+    mkdir -p "${TARGET_DIR}/scripts"
+    backup_if_exists "$TARGET_SCRIPT"
+    mv "$script_tmp" "$TARGET_SCRIPT"
+    chmod +x "$TARGET_SCRIPT"
+    script_status="updated"
+  else
+    script_status="unchanged"
+  fi
+else
+  script_status="check-skipped"
+fi
+
+echo "Update result for ${SKILL_NAME} (${remote_version}): SKILL.md=${skill_status}, ${SCRIPT_REL_PATH}=${script_status}"
