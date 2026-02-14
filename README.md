@@ -1,4 +1,4 @@
-# AlphaClaw Skill Package
+# ClawDeFi Skill Package
 
 Distributable skill definition for local OpenClaw-compatible agents.
 
@@ -8,7 +8,7 @@ Teach local agents how to:
 - if yes, connect the existing user-custodied signer,
 - if no, recommend `XXXX Kit` initialization through a swappable module,
 - capture user risk profile,
-- query AlphaClaw MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
+- query ClawDeFi MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
 - perform permissionless DeFi actions (swap, perps, options, yield, and future modules) with guardrails,
 - enforce disclaimer checks,
 - handle emergency unwind routines,
@@ -20,7 +20,7 @@ This skill is designed to support two install methods.
 1. ClawHub install (preferred)
 ```bash
 npm i -g clawhub
-clawhub install alphaclaw-agent
+clawhub install clawdefi-agent
 ```
 
 2. Raw install (fallback)
@@ -30,13 +30,13 @@ bash scripts/install-raw.sh
 
 Raw one-liner (manual style):
 ```bash
-mkdir -p ~/.openclaw/skills/alphaclaw-agent && curl -fsSL https://skills.alphaclaw.ai/alphaclaw-agent/SKILL.md -o ~/.openclaw/skills/alphaclaw-agent/SKILL.md
+mkdir -p ~/.openclaw/skills/clawdefi-agent && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md
 ```
 
 ## Update Channels
 1. ClawHub update
 ```bash
-clawhub update alphaclaw-agent
+clawhub update clawdefi-agent
 ```
 
 2. Raw manifest update
@@ -46,7 +46,7 @@ bash scripts/update-from-manifest.sh
 
 Cron example (every 6 hours):
 ```bash
-0 */6 * * * /bin/bash /absolute/path/to/skill/scripts/update-from-manifest.sh >> /tmp/alphaclaw-skill-update.log 2>&1
+0 */6 * * * /bin/bash /absolute/path/to/skill/scripts/update-from-manifest.sh >> /tmp/clawdefi-skill-update.log 2>&1
 ```
 
 ## Files
@@ -56,5 +56,5 @@ Cron example (every 6 hours):
 
 Local development notes:
 - `references/` is intentionally local-only and ignored by git.
-- signer credentials stay local; never pass private key material to `alphaclaw-core`.
+- signer credentials stay local; never pass private key material to `clawdefi-core`.
 - `XXXX Kit` is an intentional placeholder for future external signer module selection.

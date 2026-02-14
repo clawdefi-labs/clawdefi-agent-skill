@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SKILL_NAME="${SKILL_NAME:-alphaclaw-agent}"
-SKILL_URL="${SKILL_URL:-https://skills.alphaclaw.ai/${SKILL_NAME}/SKILL.md}"
+SKILL_NAME="${SKILL_NAME:-clawdefi-agent}"
+SKILL_URL="${SKILL_URL:-https://skills.clawdefi.ai/${SKILL_NAME}/SKILL.md}"
 TARGET_ROOT="${TARGET_ROOT:-$HOME/.openclaw/skills}"
 TARGET_DIR="${TARGET_ROOT}/${SKILL_NAME}"
 

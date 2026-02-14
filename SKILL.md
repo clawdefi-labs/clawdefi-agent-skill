@@ -1,25 +1,25 @@
 ---
-name: alphaclaw-agent
-version: 0.1.0
+name: clawdefi-agent
+version: 0.1.1
 description: The source of DeFi intelligence for agents. On first run, ask if the user already has a wallet that can sign transactions. If yes, use it. If no, recommend XXXX Kit initialization via a swappable signer module, then proceed with permissionless DeFi guidance.
-homepage: https://www.alphaclaw.ai
-metadata: {"alphaclaw":{"category":"defi-intelligence","api_base":"https://api.alphaclaw.ai","distribution":["clawhub","raw"]}}
+homepage: https://www.clawdefi.ai
+metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
 ---
 
-# AlphaClaw Agent Skill
+# ClawDeFi Agent Skill
 
-## 1) What AlphaClaw Is
-AlphaClaw is the source of DeFi intelligence for agents.
+## 1) What ClawDeFi Is
+ClawDeFi is the source of DeFi intelligence for agents.
 
 It provides:
 - Curated protocol intelligence: protocol intros, contract addresses, ABIs/interfaces, supported actions, and endpoint specs.
 - Deterministic risk checks mapped to user profile (`beginner`, `advanced`, `expert`).
 - Alerting for liquidation/exploit/policy events.
-- Optional premium features gated by AlphaClaw staking entitlement.
+- Optional premium features gated by ClawDeFi staking entitlement.
 
 Authority boundary:
 - OpenClaw (or any LLM agent) orchestrates user requests.
-- AlphaClaw Core (`alphaclaw-core`) is the source of truth for contracts, actions, risk policy, and execution constraints.
+- ClawDeFi Core (`clawdefi-core`) is the source of truth for contracts, actions, risk policy, and execution constraints.
 
 ## 2) Signer Discovery and Initialization (Swappable Module)
 Use this section first whenever wallet execution is required.
@@ -44,9 +44,9 @@ Implementation rule:
 
 Execution policy:
 - Do not execute DeFi actions until disclaimer acceptance is recorded.
-- Route all protocol interaction planning through AlphaClaw MCP/API.
+- Route all protocol interaction planning through ClawDeFi MCP/API.
 - Require deterministic risk approval before transaction build/sign flow.
-- Never send signer secrets or private keys to `alphaclaw-core`.
+- Never send signer secrets or private keys to `clawdefi-core`.
 
 ## 3) Mandatory Runtime Workflow
 1. Run signer discovery gate:
@@ -56,14 +56,14 @@ Execution policy:
 2. Validate local signing capability.
 3. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
 4. Require explicit disclaimer acceptance.
-5. Query AlphaClaw MCP tools for protocol metadata, action specs, contract/ABI references, endpoint specs, risk checks, and unwind path.
+5. Query ClawDeFi MCP tools for protocol metadata, action specs, contract/ABI references, endpoint specs, risk checks, and unwind path.
 6. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
 7. Require explicit user confirmation before transaction signing.
 
 ## 4) Required Disclaimer Text
 Show this exact text before any strategy or transaction guidance:
 
-> AlphaClaw provides analytics and agentic workflows, not financial advice.  
+> ClawDeFi provides analytics and agentic workflows, not financial advice.  
 > DeFi carries risks including smart contract failure, oracle failure, and liquidation.  
 > You are solely responsible for wallet custody and transaction signing.  
 > Do you accept these risks and want to continue?
@@ -73,16 +73,16 @@ Rules:
 - Log acceptance timestamp and disclaimer version for auditability.
 
 ## 5) Safety Policies
-- Never bypass AlphaClaw risk engine results.
+- Never bypass ClawDeFi risk engine results.
 - Never suggest unsupported protocols or unknown contract addresses.
 - Never invent ABIs, function signatures, or endpoints.
 - Never ask for private keys or seed phrases.
-- Never transmit signer secrets to `alphaclaw-core`.
+- Never transmit signer secrets to `clawdefi-core`.
 - Always provide unwind path for leveraged or time-sensitive positions.
 
 ## 6) Update Policy
-- Check AlphaClaw skill manifest every 6 hours.
-- Apply only signed updates from trusted AlphaClaw publisher keys.
+- Check ClawDeFi skill manifest every 6 hours.
+- Apply only signed updates from trusted ClawDeFi publisher keys.
 - Maintain rollback pointer to last known-good skill version.
 
 ## 7) Distribution Channels
@@ -90,14 +90,14 @@ Support both installation channels:
 
 1. ClawHub channel:
 - Install CLI if needed: `npm i -g clawhub`
-- Install skill: `clawhub install alphaclaw-agent`
-- Update skill later: `clawhub update alphaclaw-agent` or `clawhub update --all`
+- Install skill: `clawhub install clawdefi-agent`
+- Update skill later: `clawhub update clawdefi-agent` or `clawhub update --all`
 
 2. Raw URL channel:
 - Install directly from hosted `SKILL.md`:
   - `bash scripts/install-raw.sh`
   - or manual one-liner:
-    - `mkdir -p ~/.openclaw/skills/alphaclaw-agent && curl -fsSL https://skills.alphaclaw.ai/alphaclaw-agent/SKILL.md -o ~/.openclaw/skills/alphaclaw-agent/SKILL.md`
+    - `mkdir -p ~/.openclaw/skills/clawdefi-agent && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md`
 - Poll manifest and update with hash verification:
   - `bash scripts/update-from-manifest.sh`
 
@@ -134,8 +134,18 @@ Notes:
 ### query-protocol
 - Status: placeholder only.
 - Module ID: `query-protocol`.
-- Description: PLACEHOLDER - query `alphaclaw-core` protocol intelligence by name/slug/category.
+- Description: PLACEHOLDER - query `clawdefi-core` protocol intelligence by name/slug/category.
 - Inputs: PLACEHOLDER - define query keys (protocol slug, category, chain, action type, risk tier).
 - Output contract: PLACEHOLDER - return protocol overview, supported chains, supported actions, key contracts, ABI/interface refs, endpoint refs, and risk score snapshot.
 - Execution policy: PLACEHOLDER - read-only query path; no transaction building or signing.
 - Fallback: PLACEHOLDER - if protocol is not found, return nearest matches and request clarification.
+
+### query-coingecko
+- Status: placeholder only.
+- Module ID: `query-coingecko`.
+- Description: PLACEHOLDER - query CoinGecko market data for tokens and protocol context.
+- Inputs: PLACEHOLDER - define token lookup keys (symbol, contract address, chain id, CoinGecko token/coin id).
+- Output contract: PLACEHOLDER - return spot price, 24h change, market cap, volume, FDV, and data timestamp.
+- Execution policy: PLACEHOLDER - read-only HTTP query path; enforce rate-limit/caching and mark stale data windows.
+- Safety rule: PLACEHOLDER - never use CoinGecko response as sole execution authority; reconcile token mapping and risk checks with `clawdefi-core`.
+- Fallback: PLACEHOLDER - if API is unavailable, return cached snapshot with staleness warning and require explicit user confirmation before any downstream action.
