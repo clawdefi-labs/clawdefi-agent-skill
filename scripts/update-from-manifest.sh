@@ -10,6 +10,10 @@ RUNTIME_FILES=(
   "scripts/create-wallet.js"
   "scripts/wallet-readiness-check.js"
   "scripts/allowance-manager.js"
+  "scripts/simulate-transaction.js"
+  "scripts/swap-1inch.js"
+  "scripts/query-protocol.js"
+  "scripts/query-coingecko.js"
 )
 
 hash_file() {

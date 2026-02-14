@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.14
+version: 0.1.18
 description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer the approved local SIWE wallet module, explicitly state more wallet options will be available in future releases, validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -66,7 +66,7 @@ Cons:
 Requirements:
 - Node.js runtime in the skill environment,
 - dependency: `npm install ethers`,
-- bundled scripts: `scripts/create-wallet.js`, `scripts/wallet-readiness-check.js`, and `scripts/allowance-manager.js`,
+- bundled scripts: `scripts/create-wallet.js`, `scripts/wallet-readiness-check.js`, `scripts/allowance-manager.js`, `scripts/simulate-transaction.js`, `scripts/swap-1inch.js`, `scripts/query-protocol.js`, and `scripts/query-coingecko.js`,
 - local secure env or secret-storage path for signer variables,
 - selected-chain RPC endpoint for balance/readiness checks.
 
@@ -120,16 +120,20 @@ Execution policy:
 2. Run `wallet-readiness-check` (chain, balance, nonce, RPC health, signature roundtrip).
   - recommended command: `node scripts/wallet-readiness-check.js --json`
 3. Run `query-chain-registry` for canonical chain/RPC/explorer context.
-4. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
-5. Require explicit disclaimer acceptance.
-6. Run `query-action-spec` to fetch canonical action contract from `clawdefi-core`.
-7. Run `query-integration-endpoint` to fetch official endpoint/method/auth/rate-limit guidance.
-8. Run `simulate-transaction` before any sign request.
-9. When action requires ERC20 approvals, run `allowance-manager` before tx build/sign.
-10. Run `build-unwind-plan` and show fallback path before execution confirmation.
-11. Run `subscribe-alerts` (poll-mode MVP), then use `poll-alert-events` and `close-alert-subscription` as needed.
-12. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
-13. Require explicit user confirmation before transaction signing.
+4. Run `query-protocol` for protocol overview and supported chain/action context from `clawdefi-core`.
+5. Run `query-coingecko` for market context (price, 24h movement, market-cap/volume) as advisory data.
+6. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
+7. Require explicit disclaimer acceptance.
+8. Run `query-action-spec` to fetch canonical action contract from `clawdefi-core`.
+9. Run `query-integration-endpoint` to fetch official endpoint/method/auth/rate-limit guidance.
+10. Run `simulate-transaction` before any sign request.
+  - recommended command: `node scripts/simulate-transaction.js --to <target> --data <calldata> --json`
+11. When action requires ERC20 approvals, run `allowance-manager` before tx build/sign.
+12. For swap actions, run `swap` (1inch-first routing) and keep `simulate-transaction` as a hard pre-sign gate.
+13. Run `build-unwind-plan` and show fallback path before execution confirmation.
+14. Run `subscribe-alerts` (poll-mode MVP), then use `poll-alert-events` and `close-alert-subscription` as needed.
+15. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
+16. Require explicit user confirmation before transaction signing.
 
 ## 4) Required Disclaimer Text
 Show this exact text before any strategy or transaction guidance:
@@ -169,7 +173,7 @@ Support both installation channels:
 - Install directly from hosted raw artifacts (`SKILL.md` + required runtime script):
   - `bash scripts/install-raw.sh`
   - or manual one-liner:
-    - `mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/wallet-readiness-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/allowance-manager.js -o ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js`
+    - `mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/wallet-readiness-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/allowance-manager.js -o ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/simulate-transaction.js -o ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/swap-1inch.js -o ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-protocol.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-coingecko.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js`
 - Poll manifest and update with hash verification:
   - `bash scripts/update-from-manifest.sh`
 
@@ -182,11 +186,12 @@ Notes:
 
 ### query-chain-registry
 - Priority: P0.
-- Status: placeholder only.
+- Status: active in MVP.
 - Module ID: `query-chain-registry`.
 - Purpose: resolve canonical chain metadata and trusted RPC/explorer registry data before execution planning.
+- MCP mapping: `POST /tools/query_chain_registry`.
 - Inputs: `chainSlug` or `chainId` (optional: `intent` = `read` | `simulate` | `broadcast`).
-- Output contract: canonical `chainId`, `chainSlug`, `nativeSymbol`, `explorerUrls`, prioritized RPC list with trust/health metadata.
+- Output contract: canonical `chainId`, `chainSlug`, `nativeSymbol`, `explorerUrls`, full explorer set, prioritized RPC list with trust/health metadata, recommended RPC, and availability signal (`available` | `chain_unavailable`).
 - Execution policy: read-only path via `clawdefi-core` (DB-backed); no free-form external chain lookup.
 - Safety rule: reject unknown chains or untrusted RPC endpoints (fail closed).
 - Fallback: return `chain_unavailable` and block execution actions until resolved.
@@ -256,12 +261,30 @@ Notes:
 
 ### simulate-transaction
 - Priority: P0.
-- Status: placeholder (required before production execution).
+- Status: active in MVP (implemented as local bundled module).
 - Module ID: `simulate-transaction`.
 - Purpose: mandatory pre-sign simulation with revert decoding and slippage/risk checks.
-- Inputs: PLACEHOLDER - define call target, calldata, value, signer, chain, and slippage bounds.
-- Execution policy: PLACEHOLDER - run simulation before any sign prompt; block on revert/high-risk outcomes.
-- Output contract: PLACEHOLDER - simulation pass/fail, decoded revert reason, computed slippage and risk warnings.
+- Implementation path: `scripts/simulate-transaction.js`.
+- Required inputs:
+  - `RPC_URL` (or `CHAIN_RPC_URL` / `ETH_RPC_URL`) or `--rpc-url`,
+  - `CHAIN_ID` or `--chain-id`,
+  - `TX_TO` or `--to`,
+  - optional sender context via `WALLET_ADDRESS` / `--from-address` or `PRIVATE_KEY` / `--private-key`,
+  - optional `TX_DATA` / `--data` (default `0x`),
+  - optional `TX_VALUE_WEI` / `--value-wei`,
+  - optional slippage policy fields `QUOTED_OUT_WEI`, `MIN_OUT_WEI`, `MAX_SLIPPAGE_BPS`.
+- Standard run command:
+  - `node scripts/simulate-transaction.js --to <target> --data <calldata> --json`
+- Output contract:
+  - `ok` boolean gate,
+  - checks: `callSucceeded`, `gasEstimated`, `balanceSufficient`, `slippageWithinBounds`,
+  - simulation details: `returnData`, `gasEstimate`, fee data, estimated max cost,
+  - revert object with decoded reason (`Error(string)` / `Panic(uint256)` / custom selector) when call fails,
+  - warnings array for policy breaches.
+- Execution policy:
+  - run before any sign prompt,
+  - fail closed on call revert, gas estimation failure, chain mismatch, or slippage policy breach,
+  - module is simulation-only and must never sign or broadcast.
 
 ### wallet-readiness-check
 - Priority: P0.
@@ -284,16 +307,44 @@ Notes:
   - metrics: `balanceWei`, `balanceEth`, `nonce`, `minNativeBalanceWei`.
 - Failure policy: fail closed; do not proceed to action planning/sign prompt until readiness passes with `ok=true`.
 
-### quote-and-route-swap
-- Priority: P1.
-- Status: placeholder only.
-- Module ID: `quote-and-route-swap`.
-- Description: PLACEHOLDER - route and quote swaps with guardrails (`maxSlippage`, `minLiquidity`, route-risk constraints).
-- Inputs: PLACEHOLDER - define token pair, amount, side (`exactIn`/`exactOut`), chain, slippage cap, allowlist scope.
-- Output contract: PLACEHOLDER - candidate routes, quoted outputs, price impact, liquidity depth, and selected best route rationale.
-- Execution policy: PLACEHOLDER - require route allowlist + prechecks + simulation before sign prompt.
-- Safety rule: PLACEHOLDER - block when liquidity is below threshold or route risk exceeds policy.
-- Fallback: PLACEHOLDER - return no-safe-route result and request user adjustment.
+### swap
+- Priority: P0.
+- Status: active in MVP (`1inch` infrastructure first).
+- Module ID: `swap`.
+- Purpose: quote route, build swap transaction, and execute swap using 1inch Swap API v6.1 as the first integration path.
+- Implementation path: `scripts/swap-1inch.js`.
+- Current provider policy:
+  - route all swap quote/build calls through 1inch first,
+  - use endpoint family `/swap/v6.1/{chainId}/quote` and `/swap/v6.1/{chainId}/swap`,
+  - use API key auth (`Authorization: Bearer <ONEINCH_API_KEY>`),
+  - keep `ONEINCH_API_KEY` only in local environment/secret storage (never pasted into chat),
+  - default base URL is `https://api.1inch.com` (not `api.1inch.dev`, which was deprecated after January 31, 2026).
+- Required inputs:
+  - quote/build/execute mode,
+  - `CHAIN_ID`, `FROM_TOKEN`, `TO_TOKEN`, `AMOUNT_WEI`,
+  - `ONEINCH_API_KEY`,
+  - for build/execute: sender wallet address,
+  - for execute: signer private key + RPC URL.
+- Standard run commands:
+  - quote:
+    - `node scripts/swap-1inch.js quote --chain-id <id> --from-token <token> --to-token <token> --amount-wei <wei> --json`
+  - build:
+    - `node scripts/swap-1inch.js build --chain-id <id> --from-token <token> --to-token <token> --amount-wei <wei> --from-address <wallet> --slippage-bps <bps> --json`
+  - execute (explicit user confirmation required):
+    - `node scripts/swap-1inch.js execute --chain-id <id> --rpc-url <rpc> --from-token <token> --to-token <token> --amount-wei <wei> --from-address <wallet> --private-key <key> --slippage-bps <bps> --confirm-execute --json`
+- Output contract:
+  - quote mode: route quote, destination amount, token metadata, gas estimate.
+  - build mode: swap tx payload (`to`, `data`, `value`, gas fields) and routing metadata.
+  - execute mode: tx hash, confirmation result, and execution warnings.
+- Execution policy:
+  - always run `simulate-transaction` as a hard gate before sign prompt,
+  - use `allowance-manager` first for ERC20 allowance planning when needed,
+  - fail closed on API/RPC errors, chain mismatch, preflight simulation failure, or policy breaches.
+- Safety rule:
+  - never execute if action-spec or integration policy disallows selected token pair/route,
+  - never accept ad-hoc router addresses outside curated action/integration specs.
+- Fallback:
+  - if 1inch route/build fails, return no-safe-route and stop automated execution (do not silently fall back to unknown routers).
 
 ### allowance-manager
 - Priority: P1.
@@ -351,14 +402,6 @@ Notes:
 - Safety rule: PLACEHOLDER - deny by default for unknown or unverified contracts unless explicitly overridden by policy.
 - Fallback: PLACEHOLDER - return `trust_unknown` and block automated execution.
 
-### swap
-- Status: placeholder only.
-- Module ID: `swap`.
-- Description: PLACEHOLDER - add supported swap protocols, routes, and chain coverage.
-- Inputs: PLACEHOLDER - define required params and validation rules.
-- Execution policy: PLACEHOLDER - define pre-checks, risk checks, and confirmation flow.
-- Unwind/fallback: PLACEHOLDER - define failure handling and recovery path.
-
 ### trade-perp
 - Status: placeholder only.
 - Module ID: `trade-perp`.
@@ -376,23 +419,70 @@ Notes:
 - Unwind/fallback: PLACEHOLDER - define close/roll/expiry handling.
 
 ### query-protocol
-- Status: placeholder only.
+- Priority: P0.
+- Status: active in MVP (local bundled module).
 - Module ID: `query-protocol`.
-- Description: PLACEHOLDER - query `clawdefi-core` protocol intelligence by name/slug/category.
-- Inputs: PLACEHOLDER - define query keys (protocol slug, category, chain, action type, risk tier).
-- Output contract: PLACEHOLDER - return protocol overview, supported chains, supported actions, key contracts, ABI/interface refs, endpoint refs, and risk score snapshot.
-- Execution policy: PLACEHOLDER - read-only query path; no transaction building or signing.
-- Fallback: PLACEHOLDER - if protocol is not found, return nearest matches and request clarification.
+- Purpose: query `clawdefi-core` for protocol listing, protocol profile, and action-spec details.
+- Implementation path: `scripts/query-protocol.js`.
+- API mappings:
+  - list mode -> `GET /api/v1/protocols`,
+  - profile mode -> `GET /api/v1/protocols/:slug`,
+  - action-spec mode -> `GET /api/v1/action-specs/latest`.
+- Required inputs:
+  - list mode: optional `type`, `chainSlug`, `limit`,
+  - profile mode: `slug`,
+  - action-spec mode: `protocolSlug`, `chainSlug`, `actionKey`.
+- Standard run commands:
+  - list:
+    - `node scripts/query-protocol.js list --type swap --chain-slug base-mainnet --limit 20 --json`
+  - profile:
+    - `node scripts/query-protocol.js profile --slug uniswap-v3 --json`
+  - action-spec:
+    - `node scripts/query-protocol.js action-spec --protocol-slug uniswap-v3 --chain-slug base-mainnet --action-key swap_exact_in --json`
+- Output contract:
+  - list mode returns protocol catalog and count,
+  - profile mode returns protocol overview, supported chains, and latest chain risk snapshots,
+  - action-spec mode returns canonical function/endpoint/action policy payload.
+- Execution policy:
+  - read-only calls only,
+  - never invent missing protocol metadata if core returns not found.
+- Fallback:
+  - return not-found signal and request user clarification on slug/chain/action key.
 
 ### query-coingecko
-- Status: placeholder only.
+- Priority: P0.
+- Status: active in MVP (local bundled module).
 - Module ID: `query-coingecko`.
-- Description: PLACEHOLDER - query CoinGecko market data for tokens and protocol context.
-- Inputs: PLACEHOLDER - define token lookup keys (symbol, contract address, chain id, CoinGecko token/coin id).
-- Output contract: PLACEHOLDER - return spot price, 24h change, market cap, volume, FDV, and data timestamp.
-- Execution policy: PLACEHOLDER - read-only HTTP query path; enforce rate-limit/caching and mark stale data windows.
-- Safety rule: PLACEHOLDER - never use CoinGecko response as sole execution authority; reconcile token mapping and risk checks with `clawdefi-core`.
-- Fallback: PLACEHOLDER - if API is unavailable, return cached snapshot with staleness warning and require explicit user confirmation before any downstream action.
+- Purpose: query CoinGecko market data for advisory market context (pricing, movement, liquidity metrics, token discovery).
+- Implementation path: `scripts/query-coingecko.js`.
+- Supported API modes:
+  - `simple-price` -> `/api/v3/simple/price`,
+  - `token-price` -> `/api/v3/simple/token_price/{asset_platform_id}`,
+  - `coin` -> `/api/v3/coins/{id}`,
+  - `search` -> `/api/v3/search`.
+- Credential policy:
+  - optional API key in local env (`COINGECKO_API_KEY`),
+  - `demo` plan uses header `x-cg-demo-api-key`,
+  - `pro` plan uses header `x-cg-pro-api-key`,
+  - key is local-only and must never be pasted into chat.
+- Standard run commands:
+  - simple price:
+    - `node scripts/query-coingecko.js simple-price --ids ethereum,bitcoin --vs-currencies usd --json`
+  - token price:
+    - `node scripts/query-coingecko.js token-price --asset-platform base --contract-addresses 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913 --vs-currencies usd --json`
+  - coin details:
+    - `node scripts/query-coingecko.js coin --coin-id ethereum --json`
+  - search:
+    - `node scripts/query-coingecko.js search --query usdc --json`
+- Output contract:
+  - returns request metadata (mode/path/plan) and parsed data payload from CoinGecko response.
+- Execution policy:
+  - read-only HTTP data retrieval,
+  - treat API failures/rate-limit responses as advisory failure, not execution authorization.
+- Safety rule:
+  - never use CoinGecko as sole execution authority; reconcile all execution-critical fields with `clawdefi-core`.
+- Fallback:
+  - if unavailable, return explicit error/staleness warning and continue only with core-backed deterministic data.
 
 ### query-contract-verification
 - Status: placeholder only.
