@@ -93,6 +93,7 @@ Readiness checks:
 Security guard:
 - never print private key or seed in logs,
 - never transmit signer secrets to external services.
+- `--managed` file mode stores plaintext private key JSON at rest and is local-development only (not production).
 
 #### option-c: coinbase-cdp-v2-direct-eoa
 Best for:

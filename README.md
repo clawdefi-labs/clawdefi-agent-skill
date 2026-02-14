@@ -61,3 +61,4 @@ Local development notes:
 - wallet module remains swappable; never force one provider for every user.
 - CDP v1 is deprecated (effective February 2, 2026); use CDP Server Wallet v2 for all new integrations.
 - `scripts/create-wallet.js` requires: `npm install ethers`.
+- `scripts/create-wallet.js --managed` stores plaintext private key JSON at rest; local development only (not production).

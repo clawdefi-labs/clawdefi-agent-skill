@@ -12,12 +12,13 @@ function printUsage() {
   console.log("  node scripts/create-wallet.js --managed [wallet-name]");
   console.log("");
   console.log("Notes:");
-  console.log("  - Default mode is --env.");
+  console.log("  - You must pass an explicit mode flag (no default mode).");
   console.log("  - Requires dependency: npm install ethers");
+  console.log("  - --managed writes plaintext key JSON to disk (local development only).");
 }
 
 function parseArgs(argv) {
-  let mode = "env";
+  let mode = null;
   let managedName = "agent";
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -46,6 +47,10 @@ function parseArgs(argv) {
     }
 
     throw new Error(`Unknown argument: ${arg}`);
+  }
+
+  if (!mode) {
+    throw new Error("No mode selected. Use --env, --json, or --managed.");
   }
 
   return { mode, managedName };
@@ -117,7 +122,13 @@ function writeManagedWalletFile(payload, managedName) {
 }
 
 function main() {
-  const { mode, managedName } = parseArgs(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  if (argv.length === 0) {
+    printUsage();
+    process.exit(2);
+  }
+
+  const { mode, managedName } = parseArgs(argv);
   const Wallet = loadWalletFactory();
   const wallet = Wallet.createRandom();
 
@@ -137,6 +148,7 @@ function main() {
     const outPath = writeManagedWalletFile(payload, managedName);
     console.log(`Wallet created: ${payload.address}`);
     console.log(`Stored at: ${outPath}`);
+    console.log("WARNING: --managed stores plaintext private key on disk. Use local development only.");
     appendAudit("wallet_created", {
       mode: "managed",
       address: payload.address,
@@ -155,5 +167,9 @@ try {
 } catch (err) {
   const message = err instanceof Error ? err.message : String(err);
   console.error(`create-wallet error: ${message}`);
+  if (message.includes("No mode selected")) {
+    printUsage();
+    process.exit(2);
+  }
   process.exit(1);
 }
