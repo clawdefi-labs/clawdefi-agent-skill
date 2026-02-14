@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.18
+version: 0.1.20
 description: The source of DeFi intelligence for agents. On first run, ask whether this machine/agent already has a configured wallet that can sign transactions locally (without sharing any private key or seed phrase). If yes, use it. If no, offer the approved local SIWE wallet module, explicitly state more wallet options will be available in future releases, validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -66,7 +66,7 @@ Cons:
 Requirements:
 - Node.js runtime in the skill environment,
 - dependency: `npm install ethers`,
-- bundled scripts: `scripts/create-wallet.js`, `scripts/wallet-readiness-check.js`, `scripts/allowance-manager.js`, `scripts/simulate-transaction.js`, `scripts/swap-1inch.js`, `scripts/query-protocol.js`, and `scripts/query-coingecko.js`,
+- bundled scripts: `scripts/create-wallet.js`, `scripts/wallet-readiness-check.js`, `scripts/token-balance-check.js`, `scripts/allowance-manager.js`, `scripts/simulate-transaction.js`, `scripts/swap-1inch.js`, `scripts/query-protocol.js`, `scripts/query-coingecko.js`, and `scripts/query-contract-verification.js`,
 - local secure env or secret-storage path for signer variables,
 - selected-chain RPC endpoint for balance/readiness checks.
 
@@ -119,21 +119,24 @@ Execution policy:
 - if no, present wallet options in exact order, include pros/cons/requirements/credential-source notes, explicitly state that more wallet options will be available in future ClawDeFi releases, then run selected setup (`local-siwe-wallet`).
 2. Run `wallet-readiness-check` (chain, balance, nonce, RPC health, signature roundtrip).
   - recommended command: `node scripts/wallet-readiness-check.js --json`
-3. Run `query-chain-registry` for canonical chain/RPC/explorer context.
-4. Run `query-protocol` for protocol overview and supported chain/action context from `clawdefi-core`.
-5. Run `query-coingecko` for market context (price, 24h movement, market-cap/volume) as advisory data.
-6. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
-7. Require explicit disclaimer acceptance.
-8. Run `query-action-spec` to fetch canonical action contract from `clawdefi-core`.
-9. Run `query-integration-endpoint` to fetch official endpoint/method/auth/rate-limit guidance.
-10. Run `simulate-transaction` before any sign request.
+3. Run `token-balance-check` for native gas and target token balance sanity.
+  - recommended command: `node scripts/token-balance-check.js --chain-id <id> --wallet-address <wallet> --token-address NATIVE --json`
+4. Run `query-chain-registry` for canonical chain/RPC/explorer context.
+5. Run `query-protocol` for protocol overview and supported chain/action context from `clawdefi-core`.
+6. Run `query-coingecko` for market context (price, 24h movement, market-cap/volume) as advisory data.
+7. Collect/confirm user risk profile: `beginner`, `advanced`, or `expert`.
+8. Require explicit disclaimer acceptance.
+9. Run `query-action-spec` to fetch canonical action contract from `clawdefi-core`.
+10. Run `query-contract-verification` for each execution-critical contract address before execution planning.
+11. Run `query-integration-endpoint` to fetch official endpoint/method/auth/rate-limit guidance.
+12. Run `simulate-transaction` before any sign request.
   - recommended command: `node scripts/simulate-transaction.js --to <target> --data <calldata> --json`
-11. When action requires ERC20 approvals, run `allowance-manager` before tx build/sign.
-12. For swap actions, run `swap` (1inch-first routing) and keep `simulate-transaction` as a hard pre-sign gate.
-13. Run `build-unwind-plan` and show fallback path before execution confirmation.
-14. Run `subscribe-alerts` (poll-mode MVP), then use `poll-alert-events` and `close-alert-subscription` as needed.
-15. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
-16. Require explicit user confirmation before transaction signing.
+13. When action requires ERC20 approvals, run `allowance-manager` before tx build/sign.
+14. For swap actions, run `swap` (1inch-first routing) and keep `simulate-transaction` as a hard pre-sign gate.
+15. Run `build-unwind-plan` and show fallback path before execution confirmation.
+16. Run `subscribe-alerts` (poll-mode MVP), then use `poll-alert-events` and `close-alert-subscription` as needed.
+17. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
+18. Require explicit user confirmation before transaction signing.
 
 ## 4) Required Disclaimer Text
 Show this exact text before any strategy or transaction guidance:
@@ -173,7 +176,7 @@ Support both installation channels:
 - Install directly from hosted raw artifacts (`SKILL.md` + required runtime script):
   - `bash scripts/install-raw.sh`
   - or manual one-liner:
-    - `mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/wallet-readiness-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/allowance-manager.js -o ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/simulate-transaction.js -o ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/swap-1inch.js -o ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-protocol.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-coingecko.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js`
+    - `mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/wallet-readiness-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/token-balance-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/token-balance-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/allowance-manager.js -o ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/simulate-transaction.js -o ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/swap-1inch.js -o ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-protocol.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-coingecko.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-contract-verification.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-contract-verification.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js ~/.openclaw/skills/clawdefi-agent/scripts/token-balance-check.js ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js ~/.openclaw/skills/clawdefi-agent/scripts/query-contract-verification.js`
 - Poll manifest and update with hash verification:
   - `bash scripts/update-from-manifest.sh`
 
@@ -306,6 +309,37 @@ Notes:
   - checks: `rpcHealthy`, `chainSelected`, `chainMatchesExpected`, `balanceSane`, `nonceReadable`, `signatureRoundtrip`,
   - metrics: `balanceWei`, `balanceEth`, `nonce`, `minNativeBalanceWei`.
 - Failure policy: fail closed; do not proceed to action planning/sign prompt until readiness passes with `ok=true`.
+
+### token-balance-check
+- Priority: P0.
+- Status: active in MVP (implemented as local bundled module).
+- Module ID: `token-balance-check`.
+- Purpose: read native or ERC20 token balance for a wallet on a selected chain before planning or signing.
+- Implementation path: `scripts/token-balance-check.js`.
+- Required inputs:
+  - `RPC_URL` (or `CHAIN_RPC_URL` / `ETH_RPC_URL`) or `--rpc-url`,
+  - `CHAIN_ID` or `--chain-id`,
+  - `WALLET_ADDRESS` or `--wallet-address`,
+  - `TOKEN_ADDRESS` or `--token-address` (`NATIVE` alias supported).
+- Optional inputs:
+  - `TOKEN_BALANCE_TIMEOUT_MS` or `--timeout-ms`.
+- Standard run commands:
+  - native balance:
+    - `node scripts/token-balance-check.js --chain-id <id> --wallet-address <wallet> --token-address NATIVE --json`
+  - ERC20 balance:
+    - `node scripts/token-balance-check.js --chain-id <id> --wallet-address <wallet> --token-address <erc20> --json`
+- Output contract:
+  - `checkedAt`, `walletAddress`, `chainId`, `rpcUrl`,
+  - token context (`tokenType`, `tokenAddress`, optional `symbol`, `decimals`),
+  - `balanceWei`, `balanceFormatted`.
+- Execution policy:
+  - verify RPC network chain matches requested `chainId`,
+  - use read-only calls (`getBalance` for native, `balanceOf` for ERC20),
+  - fail closed on chain mismatch, invalid address, or RPC timeout.
+- Safety rule:
+  - treat non-readable balances as blocking errors for execution planning.
+- Fallback:
+  - return explicit error and require operator to fix RPC or token parameters before continuing.
 
 ### swap
 - Priority: P0.
@@ -485,14 +519,37 @@ Notes:
   - if unavailable, return explicit error/staleness warning and continue only with core-backed deterministic data.
 
 ### query-contract-verification
-- Status: placeholder only.
+- Priority: P0.
+- Status: active in MVP (local bundled module, Etherscan-first).
 - Module ID: `query-contract-verification`.
-- Description: PLACEHOLDER - query block explorer sources (Etherscan-family) to verify whether a contract is source-verified.
-- Inputs: PLACEHOLDER - define required params (chain id/slug, contract address, explorer type, optional expected compiler version).
-- Output contract: PLACEHOLDER - return verification status, explorer URL, contract name, compiler metadata, source-hash match, and last-checked timestamp.
-- Execution policy: PLACEHOLDER - read-only lookup path with deterministic address validation and normalized chain routing.
-- Safety rule: PLACEHOLDER - treat `unverified` or `unknown` as high caution; require ClawDeFi risk-policy confirmation before any fund-impacting action.
-- Fallback: PLACEHOLDER - if explorer API is unavailable, return `verification_unknown`, include retry guidance, and block automated execution by default.
+- Purpose: check whether a contract is source-verified before execution planning.
+- Implementation path: `scripts/query-contract-verification.js`.
+- Required inputs:
+  - `CHAIN_ID` or `--chain-id`,
+  - `CONTRACT_ADDRESS` or `--contract-address`,
+  - `ETHERSCAN_API_KEY` or `--api-key`.
+- Optional inputs:
+  - `ETHERSCAN_API_BASE_URL` or `--api-base-url` (default `https://api.etherscan.io/v2/api`),
+  - `ETHERSCAN_TIMEOUT_MS` or `--timeout-ms`.
+- Standard run command:
+  - `node scripts/query-contract-verification.js --chain-id <id> --contract-address <address> --json`
+- Output contract:
+  - `verification.isVerified`, `verification.status`,
+  - contract metadata (`contractName`, `compilerVersion`, `licenseType`, `isProxy`, `implementationAddress`),
+  - `explorerCodeUrl`, `provider`, `checkedAt`.
+- Credential policy:
+  - users provide their own `ETHERSCAN_API_KEY` in local env/secret storage,
+  - never ask users to paste API keys into chat,
+  - ClawDeFi does not custody explorer API keys.
+- Execution policy:
+  - read-only lookup via Etherscan V2 endpoint (`module=contract`, `action=getsourcecode`, `chainid=<id>`),
+  - perform deterministic address validation before remote call,
+  - treat API failure and timeout as verification failure.
+- Safety rule:
+  - treat `unverified_or_unknown` as a high-caution signal,
+  - require explicit user confirmation and ClawDeFi risk-policy checks before fund-impacting actions.
+- Fallback:
+  - return explicit error/unknown-verification signal and block automated execution by default.
 
 ### connect-prediction-market
 - Status: placeholder only.
