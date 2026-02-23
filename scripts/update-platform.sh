@@ -149,7 +149,18 @@ for i in $(seq 0 $(( file_count - 1 ))); do
       # Get the SHA we installed last time
       state_installed_sha="$(echo "$existing_state" | jq -r --arg p "$file_path" '.files[$p].installed_sha256 // empty')"
 
-      if [ -n "$state_installed_sha" ] && [ "$current_sha" != "$state_installed_sha" ]; then
+      if [ -z "$state_installed_sha" ]; then
+        # No state record for this file (legacy VM or first run without bootstrap).
+        # File exists on disk but we have no baseline — assume agent may have
+        # customized it. Skip to avoid destroying local changes.
+        results+=("${file_path}=skipped_no_baseline")
+
+        new_state="$(echo "$new_state" | jq --arg p "$file_path" --arg ps "$file_sha256" \
+          '.files[$p].status = "skipped_no_baseline" | .files[$p].platform_sha256 = $ps')"
+        continue
+      fi
+
+      if [ "$current_sha" != "$state_installed_sha" ]; then
         # On-disk SHA differs from what we installed → agent modified it
         results+=("${file_path}=skipped_agent_modified")
 
