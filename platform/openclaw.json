@@ -1,0 +1,30 @@
+{
+  "model": "claude-sonnet-4-20250514",
+  "channels": {
+    "main": {
+      "type": "main",
+      "enabled": true
+    },
+    "heartbeat": {
+      "type": "heartbeat",
+      "enabled": true,
+      "interval_seconds": 300
+    }
+  },
+  "session": {
+    "max_turns": 200,
+    "idle_timeout_minutes": 30,
+    "max_concurrent_sessions": 3
+  },
+  "features": {
+    "memory": true,
+    "sub_agents": true,
+    "tool_use": true,
+    "web_search": false,
+    "code_execution": true
+  },
+  "skills": [
+    "clawdefi-agent"
+  ],
+  "_comment": "Per-agent keys (agent_id, gateway_url, control_plane_url, agent_token) are injected at bootstrap and preserved during platform updates."
+}

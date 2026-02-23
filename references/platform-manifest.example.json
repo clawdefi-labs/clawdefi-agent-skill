@@ -1,0 +1,47 @@
+{
+  "_comment": "Platform manifest — controls bootstrap/config files on agent VMs. Separate from the skill manifest (clawdefi-agent/manifest.json) which manages SKILL.md + runtime scripts.",
+  "version": "0.1.0",
+  "published_at": "2026-02-23T00:00:00Z",
+  "files": [
+    {
+      "_comment": "Category A: always overwritten by platform. Per-agent keys (agent_id, gateway_url, etc.) are preserved during merge.",
+      "path": "openclaw.json",
+      "category": "A",
+      "target": "config/openclaw.json",
+      "url": "https://skills.clawdefi.ai/platform/openclaw.json",
+      "sha256": "replace-with-sha256"
+    },
+    {
+      "_comment": "Category A: always overwritten. Heartbeat task checklist controlled by platform.",
+      "path": "HEARTBEAT.md",
+      "category": "A",
+      "target": "workspace/HEARTBEAT.md",
+      "url": "https://skills.clawdefi.ai/platform/HEARTBEAT.md",
+      "sha256": "replace-with-sha256"
+    },
+    {
+      "_comment": "Category B: platform-seeded, agent can modify. Skipped on update if agent has customized.",
+      "path": "TOOLS.md",
+      "category": "B",
+      "target": "workspace/TOOLS.md",
+      "url": "https://skills.clawdefi.ai/platform/TOOLS.md",
+      "sha256": "replace-with-sha256"
+    },
+    {
+      "_comment": "Category B: persona template. Agent is encouraged to evolve this file.",
+      "path": "SOUL.md",
+      "category": "B",
+      "target": "workspace/SOUL.md",
+      "url": "https://skills.clawdefi.ai/platform/SOUL.md",
+      "sha256": "replace-with-sha256"
+    },
+    {
+      "_comment": "Category B: operating instructions. Agent and user can modify.",
+      "path": "AGENTS.md",
+      "category": "B",
+      "target": "workspace/AGENTS.md",
+      "url": "https://skills.clawdefi.ai/platform/AGENTS.md",
+      "sha256": "replace-with-sha256"
+    }
+  ]
+}
