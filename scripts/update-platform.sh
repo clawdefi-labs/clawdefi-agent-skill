@@ -3,16 +3,22 @@
 # ClawDeFi Platform File Updater
 #
 # Periodic updater for platform-managed files (Categories A + B).
-# Downloads manifest from CDN, applies category-aware update logic:
+# Downloads manifest from the control plane (authenticated), applies
+# category-aware update logic:
 #   - Category A: always overwrite with latest
 #   - Category B: skip if agent has locally modified the file
 #
 # Run by PlatformUpdater (TypeScript) every ~1 hour with jitter.
+#
+# Required env: CONTROL_PLANE_URL, AGENT_TOKEN
 # =============================================================================
 set -euo pipefail
 
-PLATFORM_URL="${PLATFORM_URL:-https://skills.clawdefi.ai/platform}"
-MANIFEST_URL="${PLATFORM_URL}/manifest.json"
+CONTROL_PLANE_URL="${CONTROL_PLANE_URL:?CONTROL_PLANE_URL is required}"
+AGENT_TOKEN="${AGENT_TOKEN:?AGENT_TOKEN is required}"
+AGENT_ID="${AGENT_ID:?AGENT_ID is required}"
+PLATFORM_BASE_URL="${CONTROL_PLANE_URL}/internal/platform"
+MANIFEST_URL="${PLATFORM_BASE_URL}/manifest.json"
 OPENCLAW_HOME="${OPENCLAW_HOME:-$HOME/.openclaw}"
 STATE_FILE="${OPENCLAW_HOME}/.platform-state.json"
 VERSION_FILE="${OPENCLAW_HOME}/.installed-platform-version"
@@ -20,6 +26,10 @@ LOCK_FILE="${OPENCLAW_HOME}/.platform-update.lock"
 
 # Per-agent keys preserved during openclaw.json merge
 AGENT_KEYS=("agent_id" "gateway_url" "control_plane_url" "agent_token")
+
+auth_curl() {
+  curl -fsSL -H "Authorization: Bearer ${AGENT_TOKEN}" -H "X-Agent-Id: ${AGENT_ID}" "$@"
+}
 
 sha256_file() {
   local file_path="$1"
@@ -97,7 +107,7 @@ manifest_tmp="${tmp_dir}/manifest.json"
 trap 'rm -rf "$tmp_dir"' EXIT
 
 # ── Download manifest ─────────────────────────────────────────
-if ! curl -fsSL "$MANIFEST_URL" -o "$manifest_tmp"; then
+if ! auth_curl "$MANIFEST_URL" -o "$manifest_tmp"; then
   echo "Failed to download platform manifest" >&2
   exit 1
 fi
@@ -128,9 +138,10 @@ for i in $(seq 0 $(( file_count - 1 ))); do
   file_path="$(jq -r --argjson i "$i" '.files[$i].path' "$manifest_tmp")"
   file_category="$(jq -r --argjson i "$i" '.files[$i].category' "$manifest_tmp")"
   file_target="$(jq -r --argjson i "$i" '.files[$i].target' "$manifest_tmp")"
-  file_url="$(jq -r --argjson i "$i" '.files[$i].url' "$manifest_tmp")"
   file_sha256="$(jq -r --argjson i "$i" '.files[$i].sha256' "$manifest_tmp")"
 
+  # Construct authenticated URL from control plane base + file path
+  file_url="${PLATFORM_BASE_URL}/files/${file_path}"
   target_path="$(resolve_target "$file_target")"
   file_tmp="${tmp_dir}/${file_path}"
 
@@ -172,8 +183,8 @@ for i in $(seq 0 $(( file_count - 1 ))); do
     fi
   fi
 
-  # ── Download file ───────────────────────────────────────
-  if ! curl -fsSL "$file_url" -o "$file_tmp"; then
+  # ── Download file (authenticated) ────────────────────────
+  if ! auth_curl "$file_url" -o "$file_tmp"; then
     echo "WARNING: failed to download ${file_path}" >&2
     results+=("${file_path}=download_failed")
     continue

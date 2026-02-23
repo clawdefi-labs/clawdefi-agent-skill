@@ -6,35 +6,30 @@
       "path": "openclaw.json",
       "category": "A",
       "target": "config/openclaw.json",
-      "url": "https://skills.clawdefi.ai/platform/openclaw.json",
       "sha256": "c0e8cc83a6dd81fbf9520652599b3cb8f7ed714e8e6036b0d0797a1759990ed8"
     },
     {
       "path": "HEARTBEAT.md",
       "category": "A",
       "target": "workspace/HEARTBEAT.md",
-      "url": "https://skills.clawdefi.ai/platform/HEARTBEAT.md",
       "sha256": "16a349fdf00f304d8ce71993f79415984c7f3dfb1f29f1dd44af237b08026072"
     },
     {
       "path": "TOOLS.md",
       "category": "B",
       "target": "workspace/TOOLS.md",
-      "url": "https://skills.clawdefi.ai/platform/TOOLS.md",
       "sha256": "f1651ad51d01fb6d8c755c68fac2dc6cc5cd9726a9a8e255ea5e56988e95e726"
     },
     {
       "path": "SOUL.md",
       "category": "B",
       "target": "workspace/SOUL.md",
-      "url": "https://skills.clawdefi.ai/platform/SOUL.md",
       "sha256": "6732d6a17aa7c52ee91a84768b6b64dc38fedef6bd9ce308b1259fe786f96621"
     },
     {
       "path": "AGENTS.md",
       "category": "B",
       "target": "workspace/AGENTS.md",
-      "url": "https://skills.clawdefi.ai/platform/AGENTS.md",
       "sha256": "924cac6f5ddee9a302644d47b06da2eeab7300f161cb784e80a2beb87b2bf3b4"
     }
   ]

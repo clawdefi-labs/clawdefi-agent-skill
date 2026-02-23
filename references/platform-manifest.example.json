@@ -1,5 +1,5 @@
 {
-  "_comment": "Platform manifest — controls bootstrap/config files on agent VMs. Separate from the skill manifest (clawdefi-agent/manifest.json) which manages SKILL.md + runtime scripts.",
+  "_comment": "Platform manifest — controls bootstrap/config files on agent VMs. Served from the control plane at /internal/platform/manifest.json (authenticated, not public). Scripts construct download URLs as /internal/platform/files/{path}.",
   "version": "0.1.0",
   "published_at": "2026-02-23T00:00:00Z",
   "files": [
@@ -8,7 +8,6 @@
       "path": "openclaw.json",
       "category": "A",
       "target": "config/openclaw.json",
-      "url": "https://skills.clawdefi.ai/platform/openclaw.json",
       "sha256": "replace-with-sha256"
     },
     {
@@ -16,7 +15,6 @@
       "path": "HEARTBEAT.md",
       "category": "A",
       "target": "workspace/HEARTBEAT.md",
-      "url": "https://skills.clawdefi.ai/platform/HEARTBEAT.md",
       "sha256": "replace-with-sha256"
     },
     {
@@ -24,7 +22,6 @@
       "path": "TOOLS.md",
       "category": "B",
       "target": "workspace/TOOLS.md",
-      "url": "https://skills.clawdefi.ai/platform/TOOLS.md",
       "sha256": "replace-with-sha256"
     },
     {
@@ -32,7 +29,6 @@
       "path": "SOUL.md",
       "category": "B",
       "target": "workspace/SOUL.md",
-      "url": "https://skills.clawdefi.ai/platform/SOUL.md",
       "sha256": "replace-with-sha256"
     },
     {
@@ -40,7 +36,6 @@
       "path": "AGENTS.md",
       "category": "B",
       "target": "workspace/AGENTS.md",
-      "url": "https://skills.clawdefi.ai/platform/AGENTS.md",
       "sha256": "replace-with-sha256"
     }
   ]
