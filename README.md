@@ -4,9 +4,9 @@ Distributable skill definition for local OpenClaw-compatible agents.
 
 ## Purpose
 Teach local agents how to:
-- ask first: "Does this machine/agent already have a configured wallet that can sign transactions locally (without sharing any private key or seed phrase)?",
-- if yes, connect the existing user-custodied signer,
-- if no, offer the approved swappable wallet module (`local-siwe-wallet`) and state that more wallet options will be available in future ClawDeFi releases,
+- first check canonical wallet path `~/.openclaw/wallets/clawdefi-wallet.json`,
+- if present, default to connecting existing user-custodied signer and ask only whether to create an additional wallet,
+- if absent, offer the approved swappable wallet module (`local-siwe-wallet`) and state that more wallet options will be available in future ClawDeFi releases,
 - capture user risk profile,
 - query ClawDeFi MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
 - perform permissionless DeFi actions (swap, perps, options, yield, and future modules) with guardrails,
