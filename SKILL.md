@@ -249,7 +249,7 @@ Notes:
 
 ### wallet-create-new-wallet
 - Priority: P0.
-- Status: active in MVP (implemented as local bundled module).
+- Status: active.
 - Module ID: `wallet-create-new-wallet`.
 - Purpose: create a new local signer file using deterministic wallet path policy.
 - Implementation path: `scripts/create-wallet.js`.
@@ -261,10 +261,12 @@ Notes:
 - Execution policy:
   - check canonical wallet file first,
   - create additional wallet by default when canonical exists,
-  - only overwrite canonical when user explicitly requests overwrite and `--force` is passed.
+  - only overwrite canonical when user explicitly requests overwrite and `--force` is passed,
+  - before any `--force` execution, show irreversible-risk warning and require explicit confirmation (`are you sure?`) in the same session.
 - Safety rule:
   - treat command output as secret,
-  - never paste private key material into chat logs.
+  - never paste private key material into chat logs,
+  - remind user that losing/overwriting wallet key material can make funds unrecoverable.
 
 ### query-chain-registry
 - Priority: P0.
