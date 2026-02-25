@@ -100,6 +100,15 @@ fi
 
 mkdir -p "$OPENCLAW_HOME" "${OPENCLAW_HOME}/workspace"
 
+# Remove legacy bootstrap prompt file if present.
+# This file comes from generic OpenClaw templates and can override
+# ClawDeFi onboarding tone on first message.
+legacy_bootstrap="${OPENCLAW_HOME}/workspace/BOOTSTRAP.md"
+if [ -f "$legacy_bootstrap" ]; then
+  mv "$legacy_bootstrap" "${legacy_bootstrap}.bak.$(date +%Y%m%d%H%M%S)"
+  echo "Removed legacy bootstrap file: ${legacy_bootstrap}"
+fi
+
 tmp_dir="$(mktemp -d)"
 manifest_tmp="${tmp_dir}/manifest.json"
 trap 'rm -rf "$tmp_dir"' EXIT
