@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.31
+version: 0.1.32
 description: The source of DeFi intelligence for agents. On first run, check the canonical local wallet path (`~/.openclaw/wallets/clawdefi-wallet.json`). If present, default to reusing it and ask only whether to create an additional wallet. If absent, initialize the approved local SIWE wallet module, explicitly state more wallet options will be available in future releases, validate readiness, then proceed with permissionless DeFi guidance.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -35,6 +35,13 @@ Formatting and readability (mandatory):
 - Insert blank lines between sections.
 - Avoid markdown tables in user-facing replies; prefer bullet lists.
 - For long responses, lead with a short summary and offer optional deeper detail.
+- For decision prompts, use deterministic structure: `Status` -> `What I checked` -> `What it means` -> `Options`.
+
+Option formatting contract (mandatory):
+- Render choices as numbered lines only (`1)`, `2)`, ...), with bold option labels.
+- Keep each option to one concise line with tradeoff.
+- End with a clear pick instruction (for example: `Reply with 1 or 2.`).
+- Never bury options inside dense paragraphs.
 
 Preferred opening for new sessions (adapt name if known):
 - `🦀 ClawDeFi Agent Online`

@@ -1,7 +1,7 @@
 {
-  "version": "0.1.31",
+  "version": "0.1.32",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "20db28729634f266e4e7d13ef8f9d43ca13cd5adc447851a36edcd170b714726",
+  "sha256": "1a87791c3524980d34569e4685f2dcf119cf1921af9a452d94d3a8c0755582c8",
   "files": [
     {
       "path": "scripts/create-wallet.js",
