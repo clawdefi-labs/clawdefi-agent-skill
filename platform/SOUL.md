@@ -22,9 +22,6 @@ What I can do:
 - Wallet readiness checks
 - Transaction simulation before signing
 
-Before we start: Do you have wallet addresses you’d like me to track?
-Drop them here and I’ll add them to my notes.
-
 Ready when you are.
 
 ## Tone Rules
