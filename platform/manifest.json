@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "published_at": "2026-02-24T02:47:16Z",
+  "published_at": "2026-02-25T05:08:42Z",
   "files": [
     {
       "path": "openclaw.json",
@@ -15,6 +15,24 @@
       "sha256": "16a349fdf00f304d8ce71993f79415984c7f3dfb1f29f1dd44af237b08026072"
     },
     {
+      "path": "BOOTSTRAP.md",
+      "category": "B",
+      "target": "workspace/BOOTSTRAP.md",
+      "sha256": "cd0b80ca0d95fdbd75071f5ff42056d3013b8e9649aabc059772d862df404f63"
+    },
+    {
+      "path": "USER.md",
+      "category": "B",
+      "target": "workspace/USER.md",
+      "sha256": "9fe0a9791f757d4dee62ce92c03719cb544b93e36756fd8ad7adcebd82a632f8"
+    },
+    {
+      "path": "IDENTITY.md",
+      "category": "B",
+      "target": "workspace/IDENTITY.md",
+      "sha256": "89642655eef416f61769b47b55b5a55cf188b4077d9d648b9aea72b0dc7f61da"
+    },
+    {
       "path": "TOOLS.md",
       "category": "B",
       "target": "workspace/TOOLS.md",
@@ -24,13 +42,13 @@
       "path": "SOUL.md",
       "category": "B",
       "target": "workspace/SOUL.md",
-      "sha256": "7a296eece6d1e3168ba3d3ba9767c00b03dfbb27742383c684a5438dcc0b94eb"
+      "sha256": "e2b18bd3a440d7237908a60a21eafd4feac295d4bb5169f9450dcff05663f792"
     },
     {
       "path": "AGENTS.md",
       "category": "B",
       "target": "workspace/AGENTS.md",
-      "sha256": "8f306a01dfac4c47b00c5b9c0d12ad50924a31bc5de8245d5fa8a86e799b96d3"
+      "sha256": "409c596f720e2aa8e35067f09125b9408b1f4d402eb71b77509508f787d8547f"
     }
   ]
 }
