@@ -215,7 +215,7 @@ Execution policy:
   - recommended command: `node scripts/simulate-transaction.js --to <target> --data <calldata> --json`
 15. When action requires ERC20 approvals, run `wallet-allowance-manager` before tx build/sign.
 16. For swap actions, run `swap` (1inch-first routing) and keep `simulate-transaction` as a hard pre-sign gate.
-17. For perp actions, run `trade-perp` with local Python Avantis SDK flow (no MCP required in MVP), and handle TP/SL explicitly (execute+verify or return `tp_sl_not_configured`).
+17. For perp actions, use protocol-generic MCP perps tools (`perps_fetch_*`, `perps_build_*`, `perps_simulate_intent`, `perps_execute_intent`) with explicit `protocolSlug` selection; keep signing strictly inside MCP signer-runtime boundary.
 18. Run `build-unwind-plan` and show fallback path before execution confirmation.
 19. Run `subscribe-alerts` (poll-mode MVP), then use `poll-alert-events` and `close-alert-subscription` as needed.
 20. Present recommendation with expected yield band, key risks, safety warnings, and exact interaction path.
@@ -555,11 +555,12 @@ Notes:
 
 ### trade-perp
 - Priority: P0.
-- Status: active in MVP (Avantis-first, local Python runtime, no MCP required).
+- Status: active (protocol-generic MCP signer-boundary path).
 - Module ID: `trade-perp`.
-- Purpose: execute perp actions (market open, limit open, position checks, close, and limit-cancel) with Avantis SDK.
-- Scope boundary (MVP): TP/SL is not treated as guaranteed unless the runtime explicitly supports and confirms TP/SL order placement with receipts/order IDs.
-- Implementation path: local Python module using `avantis-trader-sdk` from `https://sdk.avantisfi.com/`.
+- Purpose: execute perp actions through generic MCP perps tools with explicit `protocolSlug` selection.
+- Scope boundary: TP/SL is not treated as guaranteed unless runtime explicitly supports and confirms TP/SL placement with receipts/order IDs.
+- Implementation path: `plugin -> MCP perps_* -> signer-runtime sign -> protocol adapter submit`.
+- Legacy note: local Python Avantis SDK direct-signing path is deprecated for boundary-safe flows.
 - Requirements:
   - Python runtime on the local machine/agent (recommend Python 3.10+),
   - package install: `pip install avantis-trader-sdk`,
