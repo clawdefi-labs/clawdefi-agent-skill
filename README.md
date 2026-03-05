@@ -4,9 +4,9 @@ Distributable skill definition for local OpenClaw-compatible agents.
 
 ## Purpose
 Teach local agents how to:
-- first check canonical wallet path `~/.openclaw/wallets/clawdefi-wallet.json`,
-- if present, default to connecting existing user-custodied signer and ask only whether to create an additional wallet,
-- if absent, offer the approved swappable wallet module (`local-siwe-wallet`) and state that more wallet options will be available in future ClawDeFi releases,
+- first check MCP signer directory via `list_wallets`,
+- if wallets exist, default to reusing signer-boundary wallet handles and ask only whether to create an additional wallet,
+- if none exist, offer the approved swappable wallet module (`local-siwe-wallet`) and state that more wallet options will be available in future ClawDeFi releases,
 - capture user risk profile,
 - query ClawDeFi MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
 - perform permissionless DeFi actions (swap, perps, options, yield, and future modules) with guardrails,
@@ -30,7 +30,7 @@ bash scripts/install-raw.sh
 
 Raw one-liner (manual style):
 ```bash
-mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/create-wallet.js -o ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/wallet-readiness-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/token-balance-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/token-balance-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/allowance-manager.js -o ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/simulate-transaction.js -o ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/swap-1inch.js -o ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-protocol.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-coingecko.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-avantis.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-avantis.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-pyth.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-pyth.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-contract-verification.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-contract-verification.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/create-wallet.js ~/.openclaw/skills/clawdefi-agent/scripts/wallet-readiness-check.js ~/.openclaw/skills/clawdefi-agent/scripts/token-balance-check.js ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js ~/.openclaw/skills/clawdefi-agent/scripts/query-avantis.js ~/.openclaw/skills/clawdefi-agent/scripts/query-pyth.js ~/.openclaw/skills/clawdefi-agent/scripts/query-contract-verification.js
+mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/token-balance-check.js -o ~/.openclaw/skills/clawdefi-agent/scripts/token-balance-check.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/allowance-manager.js -o ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/simulate-transaction.js -o ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/swap-1inch.js -o ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-protocol.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-coingecko.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-avantis.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-avantis.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-pyth.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-pyth.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-contract-verification.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-contract-verification.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/token-balance-check.js ~/.openclaw/skills/clawdefi-agent/scripts/allowance-manager.js ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js ~/.openclaw/skills/clawdefi-agent/scripts/query-avantis.js ~/.openclaw/skills/clawdefi-agent/scripts/query-pyth.js ~/.openclaw/skills/clawdefi-agent/scripts/query-contract-verification.js
 ```
 
 ## Update Channels
@@ -53,8 +53,6 @@ Cron example (every 6 hours):
 - `SKILL.md`: main behavioral and workflow instructions.
 - `scripts/install-raw.sh`: raw installer script.
 - `scripts/update-from-manifest.sh`: checksum-verified raw updater script.
-- `scripts/create-wallet.js`: bundled local EVM wallet bootstrap script for `local-siwe-wallet`.
-- `scripts/wallet-readiness-check.js`: bundled signer readiness verifier (RPC/chain/balance/nonce/signature roundtrip).
 - `scripts/token-balance-check.js`: bundled wallet balance checker for native and ERC20 assets.
 - `scripts/allowance-manager.js`: bundled IERC20 allowance planner (safe exact-allowance default, revoke/unlimited with explicit policy).
 - `scripts/simulate-transaction.js`: bundled pre-sign simulation module (`eth_call` + `estimateGas`) with revert decoding and slippage policy checks.
@@ -71,8 +69,6 @@ Local development notes:
 - signer credentials stay local; never pass private key material to `clawdefi-core`.
 - wallet module remains swappable; never force one provider for every user.
 - additional wallet modules will be added in future releases; current default module is `local-siwe-wallet`.
-- `scripts/create-wallet.js` requires: `npm install ethers`.
-- `scripts/wallet-readiness-check.js` requires: `npm install ethers` and local signer env values (`RPC_URL`, `CHAIN_ID`, `PRIVATE_KEY`, optional `WALLET_ADDRESS`).
 - `scripts/token-balance-check.js` requires: `npm install ethers` and local chain/query inputs (`RPC_URL`, `CHAIN_ID`, `WALLET_ADDRESS`, `TOKEN_ADDRESS`).
 - `scripts/allowance-manager.js` requires: `npm install ethers` and token+spender context (`RPC_URL`, `CHAIN_ID`, `TOKEN_ADDRESS`, `SPENDER_ADDRESS`, owner wallet context).
 - `scripts/simulate-transaction.js` requires: `npm install ethers` and transaction context (`RPC_URL`, `CHAIN_ID`, `TX_TO`, optional `TX_DATA`, sender context, and optional slippage bounds).
@@ -82,4 +78,3 @@ Local development notes:
 - `scripts/query-avantis.js` requires: Avantis socket/core/feed endpoints reachable from local runtime (defaults provided; override via env/flags when needed).
 - `scripts/query-pyth.js` requires: Pyth feed IDs for `latest`/`stream` mode and optional `PYTH_PRO_ACCESS_TOKEN` for pro endpoint auth metadata.
 - `scripts/query-contract-verification.js` requires: user-managed `ETHERSCAN_API_KEY` in local env plus `CHAIN_ID` and `CONTRACT_ADDRESS`.
-- `scripts/create-wallet.js --managed` stores plaintext private key JSON at rest; local development only (not production).
