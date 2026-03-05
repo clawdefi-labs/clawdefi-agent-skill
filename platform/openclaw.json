@@ -5,5 +5,20 @@
         "primary": "openai/gpt-5-mini"
       }
     }
+  },
+  "plugins": {
+    "entries": {
+      "clawdefi-plugin": {
+        "enabled": true,
+        "config": {
+          "mcpBaseUrl": "https://api.clawdefi.ai/mcp",
+          "mcpTokenEnvVar": "MCP_AUTH_TOKEN",
+          "timeoutMs": 10000,
+          "toolPrefix": false,
+          "prefix": "cdf_",
+          "requirePrincipal": true
+        }
+      }
+    }
   }
 }

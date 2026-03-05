@@ -23,7 +23,7 @@ VERSION_FILE="${OPENCLAW_HOME}/.installed-platform-version"
 LOCK_FILE="${OPENCLAW_HOME}/.platform-update.lock"
 
 # Per-agent keys preserved during openclaw.json merge
-AGENT_KEYS=("agent_id" "gateway_url" "control_plane_url" "agent_token")
+AGENT_KEYS=("agent_id" "gateway_url" "control_plane_url" "agent_token" "plugins")
 
 auth_curl() {
   curl -fsSL -H "Authorization: Bearer ${AGENT_TOKEN}" -H "X-Agent-Id: ${AGENT_ID}" "$@"
