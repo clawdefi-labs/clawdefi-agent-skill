@@ -6,7 +6,7 @@ Distributable skill definition for local OpenClaw-compatible agents.
 Teach local agents how to:
 - first check MCP signer directory via `list_wallets`,
 - if wallets exist, default to reusing signer-boundary wallet handles and ask only whether to create an additional wallet,
-- if none exist, offer the approved swappable wallet module (`local-siwe-wallet`) and state that more wallet options will be available in future ClawDeFi releases,
+- if none exist and user asks to create now, create a signer-runtime generated wallet via MCP (`create_wallet`),
 - capture user risk profile,
 - query ClawDeFi MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
 - perform permissionless DeFi actions (swap, perps, options, yield, and future modules) with guardrails,
@@ -68,7 +68,7 @@ Local development notes:
 - raw installer scripts sync required runtime files only and do not install `references/`.
 - signer credentials stay local; never pass private key material to `clawdefi-core`.
 - wallet module remains swappable; never force one provider for every user.
-- additional wallet modules will be added in future releases; current default module is `local-siwe-wallet`.
+- wallet provider labels are internal; user-facing replies should say "signer-runtime wallet" and avoid internal module IDs.
 - `scripts/token-balance-check.js` requires: `npm install ethers` and local chain/query inputs (`RPC_URL`, `CHAIN_ID`, `WALLET_ADDRESS`, `TOKEN_ADDRESS`).
 - `scripts/allowance-manager.js` requires: `npm install ethers` and token+spender context (`RPC_URL`, `CHAIN_ID`, `TOKEN_ADDRESS`, `SPENDER_ADDRESS`, owner wallet context).
 - `scripts/simulate-transaction.js` requires: `npm install ethers` and transaction context (`RPC_URL`, `CHAIN_ID`, `TX_TO`, optional `TX_DATA`, sender context, and optional slippage bounds).

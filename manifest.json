@@ -1,7 +1,7 @@
 {
-  "version": "0.1.45",
+  "version": "0.1.46",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "b6d624f2160318f01f7f04575092e037ac9dd7fe2c133bc1a9ee52a91aaaff5f",
+  "sha256": "71ff0017660cc51f21eeb5a9faaea19bba5ce454eaf5605e6e9de29c4f2c25e3",
   "files": [
     {
       "path": "scripts/allowance-manager.js",
