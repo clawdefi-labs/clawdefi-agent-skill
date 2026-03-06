@@ -18,6 +18,17 @@
           "prefix": "cdf_",
           "requirePrincipal": true
         }
+      },
+      "plugin": {
+        "enabled": true,
+        "config": {
+          "mcpBaseUrl": "https://api.clawdefi.ai/mcp",
+          "mcpTokenEnvVar": "MCP_AUTH_TOKEN",
+          "timeoutMs": 10000,
+          "toolPrefix": false,
+          "prefix": "cdf_",
+          "requirePrincipal": true
+        }
       }
     }
   }

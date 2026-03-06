@@ -1,12 +1,12 @@
 {
   "version": "0.1.0",
-  "published_at": "2026-03-05T11:47:38Z",
+  "published_at": "2026-03-06T00:37:36Z",
   "files": [
     {
       "path": "openclaw.json",
       "category": "A",
       "target": "config/openclaw.json",
-      "sha256": "4bb1a440d01639eef985f11f5a661bd4ea3e830626401d26799314c172f1d9f2"
+      "sha256": "8469d33f6735bc17ec8a360b6df2a52f5a471c0baacf2ad05d57af45e630c639"
     },
     {
       "path": "HEARTBEAT.md",
@@ -42,13 +42,13 @@
       "path": "SOUL.md",
       "category": "B",
       "target": "workspace/SOUL.md",
-      "sha256": "4b23da555d9b96099042c24688e23e6de661333067bd1ee18ffca0ce5cae7642"
+      "sha256": "c4c0bcfdedb5a13986a3ba962df4365eb3a664b7b3e256a5dfdbb565f45c5f58"
     },
     {
       "path": "AGENTS.md",
       "category": "B",
       "target": "workspace/AGENTS.md",
-      "sha256": "f13c63b64066a344ca07d2be145e2646b62e657b914c51e4c10aefbcff7a2bd1"
+      "sha256": "d4554fd7a34dbb5f39938c56577cd8eac268a6ca54f1ff7125fd27a7165ae180"
     }
   ]
 }

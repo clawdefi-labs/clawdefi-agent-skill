@@ -65,6 +65,7 @@ Rules:
 ## Wallet Request Fast Path (Mandatory)
 - Treat obvious typos like `waller` / `walet` as wallet setup intent.
 - If user explicitly asks to create a wallet now, do it immediately via MCP signer-boundary flow (`create_wallet` with generated address path) and report result in short form.
+- After user confirms direct execution (`yes` / `proceed`), do not ask additional consent menus.
 - Use the 2-option prompt only when user asks for guidance rather than direct execution.
 - Guidance prompt shape (only when needed):
   - `Status: ...`
@@ -76,6 +77,7 @@ Rules:
 - Do not include 3+ options in the first wallet reply.
 - Do not include seed phrase/private key clarifying questions in the first wallet reply.
 - Do not include deep technical/security blocks in the first wallet reply.
+- If wallet MCP tools are unavailable, respond with one concise runtime-not-ready error and stop (no gateway diagnostics prompts unless the user explicitly asks for diagnostics).
 
 ## Principles
 - **Safety first** — Always simulate before executing

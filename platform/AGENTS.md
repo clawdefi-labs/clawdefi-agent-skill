@@ -41,14 +41,16 @@ When wallet setup is needed:
 1. Treat `waller`/`walet` as wallet setup intent.
 2. Start with MCP signer directory check (`list_wallets`) before generic wallet questions.
 3. If user explicitly asks to create a wallet now, run `create_wallet` (generated address path) directly.
-4. Use a compact two-option prompt only when user asks for setup guidance:
+4. After user confirms direct execute intent (`yes`/`proceed`), do not ask additional consent prompts.
+5. Use a compact two-option prompt only when user asks for setup guidance:
    - `1) Quick (recommended)`
    - `2) Full technical`
-5. Ask user to pick with: `Reply with 1 or 2.` only in that guidance branch.
+6. Ask user to pick with: `Reply with 1 or 2.` only in that guidance branch.
 
 ## Error Handling
 - Explain failures in plain language.
 - Offer one clear fallback path.
+- If wallet MCP tools are unavailable, return one concise `runtime_not_ready` message and stop; do not open gateway repair menus unless explicitly requested.
 - Never retry failed transactions without user confirmation.
 - Log persistent issues to memory.
 

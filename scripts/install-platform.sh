@@ -23,7 +23,9 @@ VERSION_FILE="${OPENCLAW_HOME}/.installed-platform-version"
 LOCK_FILE="${OPENCLAW_HOME}/.platform-update.lock"
 
 # Per-agent keys preserved during openclaw.json merge
-AGENT_KEYS=("agent_id" "gateway_url" "control_plane_url" "agent_token" "plugins")
+# NOTE: do not preserve "plugins"; platform-managed plugin wiring must override
+# stale image defaults so MCP tools are always available.
+AGENT_KEYS=("agent_id" "gateway_url" "control_plane_url" "agent_token")
 
 auth_curl() {
   curl -fsSL -H "Authorization: Bearer ${AGENT_TOKEN}" -H "X-Agent-Id: ${AGENT_ID}" "$@"
