@@ -12,7 +12,7 @@
   "tools": {
     "profile": "coding",
     "allow": [
-      "clawdefi-plugin"
+      "group:plugins"
     ]
   },
   "plugins": {
