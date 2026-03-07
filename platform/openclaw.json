@@ -10,15 +10,9 @@
     }
   },
   "tools": {
-    "profile": "coding",
-    "allow": [
-      "clawdefi-plugin"
-    ]
+    "profile": "coding"
   },
   "plugins": {
-    "allow": [
-      "clawdefi-plugin"
-    ],
     "entries": {
       "clawdefi-plugin": {
         "enabled": true,
