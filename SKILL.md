@@ -208,27 +208,41 @@ npm i -g @clawdefi/mcp-server@0.0.101
 openclaw plugins install @clawdefi/plugin@0.0.101
 openclaw plugins enable clawdefi-plugin
 
-# 2) ensure runtime env has MCP auth token for plugin
+# 2) start local signer-runtime + local MCP
+export MCP_AUTH_TOKEN='<local-mcp-auth-token>'
+export SIGNER_RUNTIME_AUTH_TOKEN='<local-signer-auth-token>'
+export INTERNAL_SERVICE_TOKEN='<internal-service-token-placeholder>'
+export CORE_API_BASE_URL='<core-api-base-url-placeholder>'
+export SIGNER_RUNTIME_MODE='http'
+export SIGNER_RUNTIME_BASE_URL='http://127.0.0.1:8091'
+export SIGNER_KEYSTORE_BACKEND='file_encrypted'
+export SIGNER_MASTER_KEY='<local-signer-master-key>'
+export MCP_SIGNER_SEED='<local-signer-seed>'
+node "$(npm root -g)/@clawdefi/mcp-server/dist/signer/server.js" &
+node "$(npm root -g)/@clawdefi/mcp-server/dist/server.js" &
+
+# 3) ensure plugin runtime env has MCP auth token for localhost MCP
 export MCP_AUTH_TOKEN='<mcp-auth-token-placeholder>'
 
-# 3) restart gateway after config/env changes
+# 4) restart gateway after config/env changes
 openclaw gateway restart
 ```
 - MCP environment template (minimum):
   ```bash
-  export MCP_AUTH_TOKEN='<mcp-auth-token-placeholder>'
+  export MCP_AUTH_TOKEN='<local-mcp-auth-token>'
   export INTERNAL_SERVICE_TOKEN='<internal-service-token-placeholder>'
   export CORE_API_BASE_URL='<core-api-base-url-placeholder>'
-  export SIGNER_RUNTIME_MODE='<embedded-or-remote-placeholder>'
-  export SIGNER_RUNTIME_AUTH_TOKEN='<signer-runtime-auth-token-placeholder>'
-  export EMBEDDED_SIGNER_SEED='<embedded-signer-seed-placeholder>'
-  # when remote signer-runtime is used:
-  export SIGNER_RUNTIME_BASE_URL='<signer-runtime-base-url-placeholder>'
+  export SIGNER_RUNTIME_MODE='http'
+  export SIGNER_RUNTIME_BASE_URL='http://127.0.0.1:8091'
+  export SIGNER_RUNTIME_AUTH_TOKEN='<local-signer-auth-token>'
+  export SIGNER_KEYSTORE_BACKEND='file_encrypted'
+  export SIGNER_MASTER_KEY='<local-signer-master-key>'
+  export MCP_SIGNER_SEED='<local-signer-seed>'
   ```
 - Plugin runtime config template (for ClawDeFi plugin):
   ```json
   {
-    "mcpBaseUrl": "<mcp-base-url-placeholder>",
+    "mcpBaseUrl": "http://127.0.0.1:8090",
     "mcpTokenEnvVar": "MCP_AUTH_TOKEN",
     "timeoutMs": 10000,
     "toolPrefix": false,
@@ -245,7 +259,8 @@ openclaw gateway restart
 Process map (authoritative sequence):
 1. **MCP service bootstrap**
 - install/start ClawDeFi MCP runtime package,
-- set required env (`MCP_AUTH_TOKEN`, `INTERNAL_SERVICE_TOKEN`, signer-runtime auth/seed, core URLs),
+- start local signer-runtime first,
+- set required env (`MCP_AUTH_TOKEN`, `INTERNAL_SERVICE_TOKEN`, local signer auth/seed, core URLs),
 - verify MCP `healthz` and `readyz` endpoints return healthy/ready.
 
 2. **Plugin bootstrap in OpenClaw**
@@ -254,7 +269,7 @@ Process map (authoritative sequence):
 - ensure plugin tools register and are discoverable by the agent.
 
 3. **Signer-boundary bootstrap**
-- confirm signer-runtime path (embedded or remote) is reachable,
+- confirm local signer-runtime is reachable on loopback,
 - verify `create_wallet` / `list_wallets` / `get_policy` calls succeed,
 - enforce policy defaults before execution paths are exposed.
 

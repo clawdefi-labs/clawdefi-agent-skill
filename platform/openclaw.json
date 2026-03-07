@@ -14,18 +14,7 @@
       "clawdefi-plugin": {
         "enabled": true,
         "config": {
-          "mcpBaseUrl": "https://api.clawdefi.ai/mcp",
-          "mcpTokenEnvVar": "MCP_AUTH_TOKEN",
-          "timeoutMs": 10000,
-          "toolPrefix": false,
-          "prefix": "cdf_",
-          "requirePrincipal": true
-        }
-      },
-      "plugin": {
-        "enabled": true,
-        "config": {
-          "mcpBaseUrl": "https://api.clawdefi.ai/mcp",
+          "mcpBaseUrl": "http://127.0.0.1:8090",
           "mcpTokenEnvVar": "MCP_AUTH_TOKEN",
           "timeoutMs": 10000,
           "toolPrefix": false,
