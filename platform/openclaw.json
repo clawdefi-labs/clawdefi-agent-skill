@@ -9,7 +9,16 @@
       }
     }
   },
+  "tools": {
+    "profile": "full",
+    "allow": [
+      "clawdefi-plugin"
+    ]
+  },
   "plugins": {
+    "allow": [
+      "clawdefi-plugin"
+    ],
     "entries": {
       "clawdefi-plugin": {
         "enabled": true,
