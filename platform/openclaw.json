@@ -11,6 +11,9 @@
   },
   "tools": {
     "profile": "coding",
+    "alsoAllow": [
+      "clawdefi-plugin"
+    ],
     "allow": [
       "clawdefi-plugin"
     ]
