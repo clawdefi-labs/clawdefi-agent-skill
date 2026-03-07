@@ -10,7 +10,7 @@
     }
   },
   "tools": {
-    "profile": "full",
+    "profile": "coding",
     "allow": [
       "clawdefi-plugin"
     ]
