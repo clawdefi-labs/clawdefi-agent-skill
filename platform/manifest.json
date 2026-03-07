@@ -1,12 +1,12 @@
 {
   "version": "0.1.0",
-  "published_at": "2026-03-07T09:54:38Z",
+  "published_at": "2026-03-07T10:12:36Z",
   "files": [
     {
       "path": "openclaw.json",
       "category": "A",
       "target": "config/openclaw.json",
-      "sha256": "e6ff370f2089071de80a94fd518525f5925ff13558355d59b200ebc61887c831"
+      "sha256": "6350857e0b85dd65567b4c44e53168c3cd21736b3cb71bb41c5a5682fc83fba3"
     },
     {
       "path": "HEARTBEAT.md",
