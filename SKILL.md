@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.51
+version: 0.1.52
 description: The source of DeFi intelligence for agents. Use MCP signer-boundary wallet discovery first (`list_wallets`), then create or reuse wallets via `create_wallet` and gate execution with `wallet_readiness_check` before DeFi actions.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -192,10 +192,9 @@ Execution policy:
 ## 4) OpenClaw Runtime Onboarding (Plugin + MCP) (Mandatory before production)
 Use this setup map when ClawDeFi tools are not yet wired in a fresh OpenClaw runtime.
 
-Package coordinates (current published release tuple):
-- MCP package: `@clawdefi/mcp-server@0.0.101`
-- Plugin package: `@clawdefi/plugin@0.0.101`
-- Current pre-image-bake candidate adds source-level MCP hotfix at commit `7f7c9f8` (tx-hydration/openPrice determinism) and must be pinned by compatibility matrix SHA until next npm publish.
+Package coordinates (next release tuple; publish before use):
+- MCP package: `@clawdefi/mcp-server@0.0.102`
+- Plugin package: `@clawdefi/plugin@0.0.102`
 - Optional independent pinning: keep MCP and plugin on the same release tuple unless a compatibility matrix explicitly approves a mixed pair.
 
 
@@ -203,9 +202,9 @@ Concrete config skeleton (placeholders; plugin config shape is exact):
 
 Deterministic bootstrap commands (recommended for independent/local operators):
 ```bash
-# 1) install MCP + plugin
-npm i -g @clawdefi/mcp-server@0.0.101
-openclaw plugins install @clawdefi/plugin@0.0.101
+# 1) install exact runtime package versions
+npm i -g @clawdefi/mcp-server@0.0.102 @clawdefi/plugin@0.0.102
+openclaw plugins install @clawdefi/plugin@0.0.102
 openclaw plugins enable clawdefi-plugin
 
 # 2) start local signer-runtime + local MCP
@@ -226,6 +225,18 @@ export MCP_AUTH_TOKEN='<mcp-auth-token-placeholder>'
 
 # 4) restart gateway after config/env changes
 openclaw gateway restart
+```
+
+For ClawDeFi VM-runtime based deployments, use the controlled updater instead of ad hoc package commands:
+```bash
+cat >/tmp/clawdefi-runtime-release.json <<'EOF_RELEASE'
+{
+  "pluginVersion": "0.0.102",
+  "mcpVersion": "0.0.102"
+}
+EOF_RELEASE
+
+/opt/openclaw/bin/upgrade-clawdefi --manifest /tmp/clawdefi-runtime-release.json
 ```
 - MCP environment template (minimum):
   ```bash
