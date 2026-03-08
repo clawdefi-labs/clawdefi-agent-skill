@@ -10,7 +10,6 @@
     }
   },
   "tools": {
-    "profile": "coding",
     "allow": [
       "group:plugins"
     ]
