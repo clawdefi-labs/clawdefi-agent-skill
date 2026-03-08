@@ -87,8 +87,12 @@ Wallet tool contract (mandatory, user-manual level):
 - create/register wallets only via `create_wallet`.
 - readiness gate only via `wallet_readiness_check`.
 - if user directly asks to create wallet now, execute `create_wallet` immediately (no options menu detour).
+- if user confirms `yes/proceed`, run `create_wallet` in the very next turn (no extra consent loop).
 - if wallet tools are unavailable in-session, return one concise `runtime_not_ready` response and stop.
+- never claim "I can’t call tools from this chat/runtime" when plugin tools are present.
+- never offer sub-agent/manual-command fallback for normal wallet creation turns.
 - never fabricate tool outcomes or request IDs; report only MCP-returned values.
+- if a tool call fails, return the exact tool error text/code.
 
 Required first-sight behavior (exact policy, no paraphrase):
 - first check MCP signer directory via `list_wallets`.
