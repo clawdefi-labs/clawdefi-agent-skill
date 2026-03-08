@@ -109,14 +109,14 @@ trap 'rm -rf "$tmp_dir"' EXIT
 # ── Download manifest ─────────────────────────────────────────
 echo "Downloading platform manifest from ${MANIFEST_URL}"
 if ! auth_curl "$MANIFEST_URL" -o "$manifest_tmp"; then
-  echo "WARNING: failed to download platform manifest; continuing without platform files" >&2
-  exit 0
+  echo "ERROR: failed to download platform manifest" >&2
+  exit 1
 fi
 
 remote_version="$(jq -r '.version' "$manifest_tmp")"
 if [ -z "$remote_version" ] || [ "$remote_version" = "null" ]; then
-  echo "WARNING: manifest missing version field" >&2
-  exit 0
+  echo "ERROR: manifest missing version field" >&2
+  exit 1
 fi
 
 file_count="$(jq '.files | length' "$manifest_tmp")"
@@ -143,18 +143,18 @@ for i in $(seq 0 $(( file_count - 1 ))); do
 
   # Download file (authenticated)
   if ! auth_curl "$file_url" -o "$file_tmp"; then
-    echo "  WARNING: failed to download ${file_path}; skipping" >&2
-    skipped_files+=("${file_path}=download_failed")
-    continue
+    echo "  ERROR: failed to download ${file_path}" >&2
+    exit 1
   fi
 
   # Verify checksum
   if [ -n "$file_sha256" ] && [ "$file_sha256" != "null" ]; then
     actual_sha256="$(sha256_file "$file_tmp")"
     if [ "$actual_sha256" != "$file_sha256" ]; then
-      echo "  WARNING: checksum mismatch for ${file_path}; skipping" >&2
-      skipped_files+=("${file_path}=checksum_mismatch")
-      continue
+      echo "  ERROR: checksum mismatch for ${file_path}" >&2
+      echo "  expected=${file_sha256}" >&2
+      echo "  actual=${actual_sha256}" >&2
+      exit 1
     fi
   fi
 
