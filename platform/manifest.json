@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "published_at": "2026-03-09T13:03:31Z",
+  "published_at": "2026-03-09T13:13:48Z",
   "files": [
     {
       "path": "openclaw.json",
@@ -36,7 +36,7 @@
       "path": "TOOLS.md",
       "category": "B",
       "target": "workspace/TOOLS.md",
-      "sha256": "f1651ad51d01fb6d8c755c68fac2dc6cc5cd9726a9a8e255ea5e56988e95e726"
+      "sha256": "8cd26dc0b48ddd9c791d993890019b26b4de2cdc8622ee626e7b443a27479ee4"
     },
     {
       "path": "SOUL.md",
