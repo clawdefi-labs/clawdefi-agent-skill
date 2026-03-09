@@ -457,6 +457,12 @@ Naming rule:
 - role split:
   - canonical plugin tools:
     - `query_coingecko`
+    - `query_token_audit`
+    - `query_token_info`
+    - `query_address_info`
+    - `crypto_market_rank`
+    - `trading_signal`
+    - `meme_rush`
     - `query_pyth`
     - `query_pyth_stream_open`
     - `query_pyth_stream_poll`
@@ -475,6 +481,12 @@ Naming rule:
     - `query_contract_verification`
     - `query_avantis`
 - `query_coingecko`
+- `query_token_audit`
+- `query_token_info`
+- `query_address_info`
+- `crypto_market_rank`
+- `trading_signal`
+- `meme_rush`
 - `query_pyth`
 - `query_pyth_stream_open`
 - `query_pyth_stream_poll`
@@ -1141,6 +1153,117 @@ Unwind/fallback:
 - Safety rule:
   - never use CoinGecko as sole execution authority; reconcile all execution-critical fields with `clawdefi-core`,
   - never use CoinGecko as authoritative source for perp liquidation/PnL monitoring.
+
+### query_token_audit
+- Priority: P1.
+- Status: active in MVP (plugin/MCP path).
+- Module ID: `query_token_audit`.
+- Purpose: fetch Binance Web3 token security/audit intel (scam, honeypot, tax, verification, supported-result flags).
+- Implementation path: `plugin -> MCP /tools/query_token_audit`.
+- Supported chains:
+  - Ethereum (`1` / `ethereum` / `ethereum-mainnet`),
+  - BSC (`56` / `bsc` / `bsc-mainnet`),
+  - Base (`8453` / `base` / `base-mainnet`),
+  - Solana (`CT_501` / `solana` / `solana-mainnet`).
+- Required inputs:
+  - `contractAddress`,
+  - `chainSlug` or `chainId`.
+- Output contract:
+  - provider metadata + Binance Web3 audit payload.
+- Safety rule:
+  - for unknown or meme tokens, run this before suggesting user entry,
+  - treat `hasResult=false` or `isSupported=false` as unresolved, not safe.
+
+### query_token_info
+- Priority: P1.
+- Status: active in MVP (plugin/MCP path).
+- Module ID: `query_token_info`.
+- Purpose: fetch Binance Web3 token search, metadata, dynamic market info, and kline/candle intel.
+- Implementation path: `plugin -> MCP /tools/query_token_info`.
+- Supported modes:
+  - `search` -> token search across supported chain ids,
+  - `metadata` -> token metadata/social details by contract,
+  - `dynamic` -> live market metrics by contract,
+  - `kline` -> kline/candle data.
+- Chain constraints:
+  - `search`: chain ids may be supplied directly,
+  - `metadata` / `dynamic`: Ethereum, BSC, Base, Solana,
+  - `kline`: Ethereum, BSC, Base, Solana platform mapping.
+- Safety rule:
+  - treat token metadata and market stats as advisory intel,
+  - do not treat Binance token info as canonical execution contract metadata.
+
+### query_address_info
+- Priority: P1.
+- Status: active in MVP (plugin/MCP path).
+- Module ID: `query_address_info`.
+- Purpose: fetch Binance Web3 wallet/address holdings intel.
+- Implementation path: `plugin -> MCP /tools/query_address_info`.
+- Supported chains:
+  - BSC (`56`),
+  - Base (`8453`),
+  - Solana (`CT_501`).
+- Required inputs:
+  - `address`,
+  - `chainSlug` or `chainId`.
+- Optional inputs:
+  - `offset`.
+- Output contract:
+  - provider metadata + holdings/position payload for the address.
+
+### crypto_market_rank
+- Priority: P1.
+- Status: active in MVP (plugin/MCP path).
+- Module ID: `crypto_market_rank`.
+- Purpose: fetch ranked market-discovery feeds from Binance Web3.
+- Implementation path: `plugin -> MCP /tools/crypto_market_rank`.
+- Supported modes:
+  - `social_hype`,
+  - `unified_rank`,
+  - `smart_money_inflow`,
+  - `meme_rank`,
+  - `address_pnl_rank`.
+- Coverage constraints:
+  - `smart_money_inflow`: BSC and Solana only,
+  - `meme_rank`: BSC only,
+  - `address_pnl_rank`: BSC and Solana only,
+  - other modes depend on Binance Web3 chain coverage.
+- Safety rule:
+  - treat rankings as discovery inputs, not endorsement or execution authority.
+
+### trading_signal
+- Priority: P1.
+- Status: active in MVP (plugin/MCP path).
+- Module ID: `trading_signal`.
+- Purpose: fetch Binance Web3 smart-money buy/sell signal feeds.
+- Implementation path: `plugin -> MCP /tools/trading_signal`.
+- Supported chains:
+  - BSC (`56`),
+  - Solana (`CT_501`).
+- Required inputs:
+  - `smartSignalType` (`BUY` or `SELL`),
+  - `chainSlug` or `chainId`.
+- Optional inputs:
+  - `page`,
+  - `pageSize`.
+- Safety rule:
+  - signals are research input only; do not describe them as guaranteed alpha.
+
+### meme_rush
+- Priority: P1.
+- Status: active in MVP (plugin/MCP path).
+- Module ID: `meme_rush`.
+- Purpose: fetch Binance Web3 meme-launch and topic-rush discovery feeds.
+- Implementation path: `plugin -> MCP /tools/meme_rush`.
+- Supported chains:
+  - BSC (`56`),
+  - Solana (`CT_501`).
+- Supported modes:
+  - `meme_rank_list`,
+  - `topic_rush_rank_list`.
+- Safety rule:
+  - treat meme/token-rush results as high-volatility discovery only,
+  - combine with `query_token_audit` before any execution recommendation.
 
 ### query_avantis
 - Priority: P0.

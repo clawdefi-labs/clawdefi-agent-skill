@@ -1,7 +1,7 @@
 {
   "version": "0.1.51",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "19a049d6d02aa651264a016bbcb10dbe80d6f5407b5e0aab260509d626058460",
+  "sha256": "7b322dc6990b349414b9a8edc0e2ccbe31a45973c857a890814a78184e80f3d4",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
