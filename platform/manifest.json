@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "published_at": "2026-03-09T12:41:42Z",
+  "published_at": "2026-03-09T13:03:31Z",
   "files": [
     {
       "path": "openclaw.json",
@@ -42,7 +42,7 @@
       "path": "SOUL.md",
       "category": "B",
       "target": "workspace/SOUL.md",
-      "sha256": "c4c0bcfdedb5a13986a3ba962df4365eb3a664b7b3e256a5dfdbb565f45c5f58"
+      "sha256": "95a48e4397a64481dd1cf7a5c3e1e7e06d8ef71dc7e3db681cc79e0ef71caa76"
     },
     {
       "path": "AGENTS.md",
