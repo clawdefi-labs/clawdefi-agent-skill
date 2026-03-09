@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "published_at": "2026-03-08T02:13:21Z",
+  "published_at": "2026-03-09T12:07:43Z",
   "files": [
     {
       "path": "openclaw.json",
@@ -12,7 +12,7 @@
       "path": "HEARTBEAT.md",
       "category": "A",
       "target": "workspace/HEARTBEAT.md",
-      "sha256": "16a349fdf00f304d8ce71993f79415984c7f3dfb1f29f1dd44af237b08026072"
+      "sha256": "dac422286075ba178e9bae58154cc0ae8749a66854e438c9c58e8eb91f22c126"
     },
     {
       "path": "BOOTSTRAP.md",
