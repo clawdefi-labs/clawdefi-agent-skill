@@ -195,8 +195,8 @@ Execution policy:
 Use this setup map when ClawDeFi tools are not yet wired in a fresh OpenClaw runtime.
 
 Package coordinates (next release tuple; publish before use):
-- MCP package: `@clawdefi/mcp-server@0.0.102`
-- Plugin package: `@clawdefi/plugin@0.0.102`
+- MCP package: `@clawdefi/mcp-server@0.0.103`
+- Plugin package: `@clawdefi/plugin@0.0.103`
 - Optional independent pinning: keep MCP and plugin on the same release tuple unless a compatibility matrix explicitly approves a mixed pair.
 
 
@@ -205,8 +205,8 @@ Concrete config skeleton (placeholders; plugin config shape is exact):
 Deterministic bootstrap commands (recommended for independent/local operators):
 ```bash
 # 1) install exact runtime package versions
-npm i -g @clawdefi/mcp-server@0.0.102 @clawdefi/plugin@0.0.102
-openclaw plugins install @clawdefi/plugin@0.0.102
+npm i -g @clawdefi/mcp-server@0.0.103 @clawdefi/plugin@0.0.103
+openclaw plugins install @clawdefi/plugin@0.0.103
 openclaw plugins enable clawdefi-plugin
 
 # 2) start local signer-runtime + local MCP
@@ -233,8 +233,8 @@ For ClawDeFi VM-runtime based deployments, use the controlled updater instead of
 ```bash
 cat >/tmp/clawdefi-runtime-release.json <<'EOF_RELEASE'
 {
-  "pluginVersion": "0.0.102",
-  "mcpVersion": "0.0.102"
+  "pluginVersion": "0.0.103",
+  "mcpVersion": "0.0.103"
 }
 EOF_RELEASE
 
@@ -386,9 +386,9 @@ Canonical installation/update channels:
 
 1. Package path for independent/local operators:
 - install exact runtime packages:
-  - `npm i -g @clawdefi/mcp-server@0.0.102 @clawdefi/plugin@0.0.102`
+  - `npm i -g @clawdefi/mcp-server@0.0.103 @clawdefi/plugin@0.0.103`
 - install/enable plugin:
-  - `openclaw plugins install @clawdefi/plugin@0.0.102`
+  - `openclaw plugins install @clawdefi/plugin@0.0.103`
   - `openclaw plugins enable clawdefi-plugin`
 
 2. Controlled updater path for ClawDeFi VM-runtime deployments:
