@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "published_at": "2026-03-09T12:07:43Z",
+  "published_at": "2026-03-09T12:16:47Z",
   "files": [
     {
       "path": "openclaw.json",
@@ -30,7 +30,7 @@
       "path": "IDENTITY.md",
       "category": "B",
       "target": "workspace/IDENTITY.md",
-      "sha256": "89642655eef416f61769b47b55b5a55cf188b4077d9d648b9aea72b0dc7f61da"
+      "sha256": "8d67efd8ca46493dff8f6ec91a1c0a2ab461d6fb30700cf5efae3a3f3ede92b9"
     },
     {
       "path": "TOOLS.md",
