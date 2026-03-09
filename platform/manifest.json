@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "published_at": "2026-03-09T12:16:47Z",
+  "published_at": "2026-03-09T12:36:28Z",
   "files": [
     {
       "path": "openclaw.json",
@@ -18,7 +18,7 @@
       "path": "BOOTSTRAP.md",
       "category": "B",
       "target": "workspace/BOOTSTRAP.md",
-      "sha256": "cd0b80ca0d95fdbd75071f5ff42056d3013b8e9649aabc059772d862df404f63"
+      "sha256": "6f5ba3680093b521bd1bd14c1baad8c74c51be58b04a46fb1a1a6fef0bb19ec0"
     },
     {
       "path": "USER.md",
