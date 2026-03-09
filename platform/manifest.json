@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "published_at": "2026-03-09T13:13:48Z",
+  "published_at": "2026-03-09T14:36:10Z",
   "files": [
     {
       "path": "openclaw.json",
@@ -48,7 +48,7 @@
       "path": "AGENTS.md",
       "category": "B",
       "target": "workspace/AGENTS.md",
-      "sha256": "d4554fd7a34dbb5f39938c56577cd8eac268a6ca54f1ff7125fd27a7165ae180"
+      "sha256": "2a8221112c3b5b638f3b6ef2ff8ff1d19c8c64e51548321a3b4296447bf3ff29"
     }
   ]
 }
