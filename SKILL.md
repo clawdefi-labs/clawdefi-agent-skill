@@ -429,14 +429,15 @@ Routing rule:
 - prefer plugin/MCP tools first,
 - use local script modules as explicit fallback when MCP wrapper capability is intentionally narrower.
 
-### Plugin Tool Surface by Category (authoritative runtime list)
-The tool list below is the plugin runtime source of truth for this skill.
+### Mirrored Category Inventory
+Use this as the menu contract between `SKILL.md` and the plugin runtime.
 
 Naming rule:
 - tool names below are canonical unprefixed names,
 - when plugin `toolPrefix=true`, runtime can expose them as `cdf_<tool_name>`.
 
 `wallet_management`:
+- plugin status: active
 - `list_wallets`
 - `create_wallet`
 - `wallet_readiness_check`
@@ -446,8 +447,14 @@ Naming rule:
 - `sign_intent`
 - `wallet_build_transfer`
 - `wallet_execute_transfer`
+- skill-local modules:
+  - `wallet-create-new-wallet`
+  - `wallet-readiness-check`
+  - `wallet-token-balance-check`
+  - `wallet-allowance-manager`
 
 `perps`:
+- plugin status: active
 - `perps_fetch_open_positions`
 - `perps_fetch_pending_orders`
 - `perps_fetch_market_state`
@@ -458,25 +465,68 @@ Naming rule:
 - `perps_simulate_intent`
 - `perps_execute_intent`
 - Avantis mapping in this deployment: run perps tools with `protocolSlug=avantis`.
+- skill-local modules:
+  - `trade-perp`
 
 `market_intel`:
+- plugin status: active
 - `query_coingecko`
 - `query_pyth`
 - `query_pyth_stream_open`
 - `query_pyth_stream_poll`
 - `query_pyth_stream_close`
+- skill-local modules:
+  - `query-chain-registry`
+  - `query-protocol`
+  - `query-action-spec`
+  - `query-integration-endpoint`
 
-`policy` / pre-execution guard helpers:
+`policy`:
+- plugin status: active
 - `evaluate_risk`
 - `build_unwind_plan`
 - `simulate_transaction`
+- skill-local modules:
+  - `build-unwind-plan`
+  - `simulate-transaction`
+  - `subscribe-alerts`
+  - `poll-alert-events`
+  - `close-alert-subscription`
+  - `contract-trust-check` (placeholder)
+  - `position-health-check` (placeholder)
+
+`swap`:
+- plugin status: placeholder
+- plugin tools: placeholder
+- skill-local modules:
+  - `swap`
+
+`prediction`:
+- plugin status: placeholder
+- plugin tools: placeholder
+- skill-local modules:
+  - placeholder
+
+`lending`:
+- plugin status: placeholder
+- plugin tools: placeholder
+- skill-local modules:
+  - placeholder
+
+`yield`:
+- plugin status: placeholder
+- plugin tools: placeholder
+- skill-local modules:
+  - placeholder
+
+`options`:
+- plugin status: placeholder
+- plugin tools: placeholder
+- skill-local modules:
+  - `trade-options` (placeholder)
 
 Operator diagnostics (non-user-facing):
 - `plugin_runtime_telemetry`
-
-`swap` category note:
-- plugin swap-specific tools are not yet exposed in the current runtime tool surface,
-- use `swap-1inch` module path (with simulation gate) until plugin swap tools are published.
 
 ### wallet-create-new-wallet
 - Priority: P0.
