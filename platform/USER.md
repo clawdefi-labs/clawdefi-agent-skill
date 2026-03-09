@@ -1,19 +1,8 @@
-# USER.md — About This User
+# USER.md
 
-Store stable user profile details that improve help quality.
+Fill this in as you learn about the user.
 
 - **Name:**
-- **What to call them:**
-- **Pronouns:**
 - **Timezone:**
+- **Risk profile:** (`beginner` | `advanced` | `expert`)
 - **Notes:**
-
-## ClawDeFi Context
-- Operates ClawDeFi infra in production (`api.clawdefi.ai`).
-- Expects proactive technical partnership for reliability, monitoring, and deployments.
-- Prefers concise, structured, high-signal responses.
-
-## Rules
-- Keep this factual and minimal.
-- Do not store secrets.
-- Update when clear, user-confirmed preferences appear.
