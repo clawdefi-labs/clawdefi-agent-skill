@@ -2,7 +2,10 @@
 
 const {
   deriveAddresses,
+  chainToFamily,
+  defaultChainForFamily,
   fail,
+  normalizeFamily,
   parseArgs,
   parseIndex,
   printJson,
@@ -16,6 +19,12 @@ const {
     const env = await readEnvMap()
     const selection = await readSelection()
     const index = parseIndex(args.index, selection.index)
+    const family = args.family
+      ? normalizeFamily(args.family)
+      : args.chain
+        ? chainToFamily(args.chain)
+        : selection.family
+    const chain = args.chain || defaultChainForFamily(family)
 
     if (!env.WDK_SEED) {
       printJson({
@@ -23,7 +32,8 @@ const {
         action: 'wallet_discover',
         configured: false,
         selection: {
-          chain: args.chain || selection.chain,
+          family,
+          chain,
           index
         },
         addresses: {}
@@ -32,7 +42,8 @@ const {
     }
 
     const nextSelection = {
-      chain: args.chain || selection.chain,
+      family,
+      chain,
       index
     }
 

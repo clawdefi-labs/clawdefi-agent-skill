@@ -4,8 +4,10 @@ const fs = require('node:fs/promises')
 
 const {
   deriveAddresses,
+  defaultChainForFamily,
   fail,
   loadWalletModules,
+  normalizeFamily,
   parseArgs,
   parseIndex,
   printJson,
@@ -25,6 +27,7 @@ async function readStdin () {
   try {
     const args = parseArgs(process.argv.slice(2))
     const index = parseIndex(args.index, 0)
+    const family = normalizeFamily(args.family || 'evm')
 
     let seedPhrase = ''
     if (args.seed) {
@@ -46,7 +49,8 @@ async function readStdin () {
 
     await writeEnvValue('WDK_SEED', seedPhrase)
     const selection = await writeSelection({
-      chain: args.chain || 'ethereum',
+      family,
+      chain: args.chain || defaultChainForFamily(family),
       index
     })
 

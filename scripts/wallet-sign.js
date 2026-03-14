@@ -1,7 +1,9 @@
 'use strict'
 
 const {
+  chainToFamily,
   fail,
+  normalizeFamily,
   parseArgs,
   parseIndex,
   printJson,
@@ -21,9 +23,14 @@ const {
     const seed = await requireSeed()
     const selection = await readSelection()
     const chain = args.chain || selection.chain
+    const family = args.family
+      ? normalizeFamily(args.family)
+      : args.chain
+        ? chainToFamily(args.chain)
+        : selection.family
     const index = parseIndex(args.index, selection.index)
 
-    const result = await withAccount(chain, index, seed, async ({ account }) => {
+    const result = await withAccount(family, index, seed, async ({ account }) => {
       const address = await account.getAddress()
       const signature = await account.sign(message)
       const readOnly = await account.toReadOnlyAccount()
@@ -38,7 +45,7 @@ const {
     printJson({
       ok: true,
       action: 'wallet_sign',
-      selection: { chain, index },
+      selection: { family, chain: family === 'solana' ? 'solana' : chain, index },
       message,
       ...result
     })

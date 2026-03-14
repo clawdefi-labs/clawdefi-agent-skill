@@ -1,8 +1,10 @@
 'use strict'
 
 const {
+  chainToFamily,
+  defaultChainForFamily,
   fail,
-  normalizeChain,
+  normalizeFamily,
   parseArgs,
   parseIndex,
   printJson,
@@ -14,8 +16,14 @@ const {
   try {
     const args = parseArgs(process.argv.slice(2))
     const current = await readSelection()
+    const family = args.family
+      ? normalizeFamily(args.family)
+      : args.chain
+        ? chainToFamily(args.chain)
+        : current.family
     const selection = await writeSelection({
-      chain: normalizeChain(args.chain || current.chain),
+      family,
+      chain: args.chain || (family === current.family ? current.chain : defaultChainForFamily(family)),
       index: parseIndex(args.index, current.index)
     })
 

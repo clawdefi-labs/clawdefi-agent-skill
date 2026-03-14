@@ -1,6 +1,7 @@
 'use strict'
 
 const {
+  chainToFamily,
   fail,
   getTokenList,
   parseArgs,
@@ -48,7 +49,7 @@ const {
     printJson({
       ok: true,
       action: 'wallet_balance',
-      selection: { chain, index },
+      selection: { family: chainToFamily(chain), chain, index },
       ...result
     })
   } catch (error) {

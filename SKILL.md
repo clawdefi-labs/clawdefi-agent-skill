@@ -67,6 +67,13 @@ Wallet actions should support both:
 - creating a new dedicated local wallet,
 - importing an existing dedicated seed phrase.
 
+Wallet identity is family-based:
+- `evm`
+- `solana`
+
+Execution chain is separate from wallet identity.
+Use execution chains like `ethereum`, `base`, or `bsc` only when reading balances or executing EVM transactions.
+
 Primary wallet scripts:
 
 #### Discover Wallet
@@ -97,10 +104,10 @@ printf '%s' "$WDK_SEED" | node {baseDir}/scripts/wallet-import.js --stdin
 ```
 
 #### Select Wallet
-Use to change the active chain and wallet index.
+Use to change the active wallet family, execution chain, and wallet index.
 
 ```bash
-node {baseDir}/scripts/wallet-select.js --chain ethereum --index 0
+node {baseDir}/scripts/wallet-select.js --family evm --chain ethereum --index 0
 ```
 
 #### Query Address And Balances

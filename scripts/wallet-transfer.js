@@ -1,6 +1,7 @@
 'use strict'
 
 const {
+  chainToFamily,
   fail,
   parseAmountBaseUnits,
   parseArgs,
@@ -118,7 +119,7 @@ const {
     printJson({
       ok: true,
       action: 'wallet_transfer',
-      selection: { chain, index },
+      selection: { family: chainToFamily(chain), chain, index },
       recipient,
       amount: String(amount),
       token,

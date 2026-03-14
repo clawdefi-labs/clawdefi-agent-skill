@@ -11,27 +11,47 @@ const MCP_DIR = path.join(CLAWDEFI_DIR, 'wdk-mcp')
 const ENV_FILE = path.join(MCP_DIR, '.env')
 const SELECTION_FILE = path.join(CLAWDEFI_DIR, 'wallet-selection.json')
 
-const CHAIN_CONFIG = {
+const FAMILY_CONFIG = {
+  evm: {
+    managerType: 'evm',
+    config: {
+      provider: 'https://rpc.mevblocker.io/fast'
+    }
+  },
+  solana: {
+    managerType: 'solana',
+    config: {
+      rpcUrl: 'https://api.mainnet-beta.solana.com',
+      commitment: 'confirmed'
+    }
+  }
+}
+
+const EXECUTION_CHAIN_CONFIG = {
   ethereum: {
     family: 'evm',
+    managerType: 'evm',
     config: {
       provider: 'https://rpc.mevblocker.io/fast'
     }
   },
   base: {
     family: 'evm',
+    managerType: 'evm',
     config: {
       provider: 'https://mainnet.base.org'
     }
   },
   bsc: {
     family: 'evm',
+    managerType: 'evm',
     config: {
       provider: 'https://bsc-dataseed.binance.org'
     }
   },
   solana: {
     family: 'solana',
+    managerType: 'solana',
     config: {
       rpcUrl: 'https://api.mainnet-beta.solana.com',
       commitment: 'confirmed'
@@ -52,12 +72,48 @@ function fail (message, extra = {}) {
   process.exit(1)
 }
 
+function normalizeFamily (value) {
+  const family = String(value || 'evm').toLowerCase()
+  if (!FAMILY_CONFIG[family]) {
+    throw new Error(`Unsupported wallet family: ${family}`)
+  }
+  return family
+}
+
 function normalizeChain (value) {
   const chain = String(value || 'ethereum').toLowerCase()
-  if (!CHAIN_CONFIG[chain]) {
-    throw new Error(`Unsupported chain: ${chain}`)
+  if (!EXECUTION_CHAIN_CONFIG[chain]) {
+    throw new Error(`Unsupported execution chain: ${chain}`)
   }
   return chain
+}
+
+function chainToFamily (chain) {
+  return EXECUTION_CHAIN_CONFIG[normalizeChain(chain)].family
+}
+
+function defaultChainForFamily (family) {
+  const normalizedFamily = normalizeFamily(family)
+  return normalizedFamily === 'solana' ? 'solana' : 'ethereum'
+}
+
+function resolveSelectionInput (input = {}) {
+  const family = input.family
+    ? normalizeFamily(input.family)
+    : input.chain
+      ? chainToFamily(input.chain)
+      : 'evm'
+  const chain = input.chain
+    ? normalizeChain(input.chain)
+    : defaultChainForFamily(family)
+  if (chainToFamily(chain) !== family) {
+    throw new Error(`Execution chain ${chain} does not belong to wallet family ${family}`)
+  }
+  return {
+    family,
+    chain,
+    index: Number(input.index || 0)
+  }
 }
 
 function parseArgs (argv) {
@@ -180,43 +236,38 @@ async function requireSeed () {
 
 async function readSelection () {
   if (!(await fileExists(SELECTION_FILE))) {
-    return { chain: 'ethereum', index: 0 }
+    return { family: 'evm', chain: 'ethereum', index: 0 }
   }
   const raw = JSON.parse(await fs.readFile(SELECTION_FILE, 'utf8'))
-  return {
-    chain: normalizeChain(raw.chain || 'ethereum'),
-    index: Number(raw.index || 0)
-  }
+  return resolveSelectionInput(raw)
 }
 
 async function writeSelection (selection) {
-  const next = {
-    chain: normalizeChain(selection.chain),
-    index: Number(selection.index || 0)
-  }
+  const next = resolveSelectionInput(selection)
   await fs.mkdir(path.dirname(SELECTION_FILE), { recursive: true })
   await fs.writeFile(SELECTION_FILE, `${JSON.stringify(next, null, 2)}\n`)
   return next
 }
 
-async function buildManager (chain, seed) {
-  const normalizedChain = normalizeChain(chain)
+async function buildManager (target, seed) {
   const { WalletManagerEvm, WalletManagerSolana } = await loadWalletModules()
-  const chainConfig = CHAIN_CONFIG[normalizedChain]
+  const managerConfig = FAMILY_CONFIG[target]
+    ? FAMILY_CONFIG[normalizeFamily(target)]
+    : EXECUTION_CHAIN_CONFIG[normalizeChain(target)]
 
-  if (chainConfig.family === 'evm') {
-    return new WalletManagerEvm(seed, chainConfig.config)
+  if (managerConfig.managerType === 'evm') {
+    return new WalletManagerEvm(seed, managerConfig.config)
   }
 
-  if (chainConfig.family === 'solana') {
-    return new WalletManagerSolana(seed, chainConfig.config)
+  if (managerConfig.managerType === 'solana') {
+    return new WalletManagerSolana(seed, managerConfig.config)
   }
 
-  throw new Error(`Unsupported chain family for ${normalizedChain}`)
+  throw new Error(`Unsupported wallet target: ${target}`)
 }
 
-async function withAccount (chain, index, seed, callback) {
-  const manager = await buildManager(chain, seed)
+async function withAccount (target, index, seed, callback) {
+  const manager = await buildManager(target, seed)
   try {
     const account = await manager.getAccount(index)
     return await callback({ manager, account })
@@ -229,8 +280,8 @@ async function withAccount (chain, index, seed, callback) {
 
 async function deriveAddresses (seed, index = 0) {
   const addresses = {}
-  for (const chain of Object.keys(CHAIN_CONFIG)) {
-    addresses[chain] = await withAccount(chain, index, seed, async ({ account }) => account.getAddress())
+  for (const family of Object.keys(FAMILY_CONFIG)) {
+    addresses[family] = await withAccount(family, index, seed, async ({ account }) => account.getAddress())
   }
   return addresses
 }
@@ -267,16 +318,20 @@ function parseAmountBaseUnits (value) {
 }
 
 module.exports = {
-  CHAIN_CONFIG,
-  MCP_DIR,
   ENV_FILE,
+  EXECUTION_CHAIN_CONFIG,
+  FAMILY_CONFIG,
+  MCP_DIR,
   SELECTION_FILE,
   buildManager,
+  chainToFamily,
+  defaultChainForFamily,
   deriveAddresses,
   fail,
   getTokenList,
   loadWalletModules,
   normalizeChain,
+  normalizeFamily,
   parseAmountBaseUnits,
   parseArgs,
   parseIndex,
@@ -284,6 +339,7 @@ module.exports = {
   readEnvMap,
   readSelection,
   requireSeed,
+  resolveSelectionInput,
   withAccount,
   writeEnvValue,
   writeSelection

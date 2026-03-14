@@ -2,8 +2,10 @@
 
 const {
   deriveAddresses,
+  defaultChainForFamily,
   fail,
   loadWalletModules,
+  normalizeFamily,
   parseArgs,
   parseIndex,
   printJson,
@@ -20,12 +22,14 @@ const {
     }
 
     const index = parseIndex(args.index, 0)
+    const family = normalizeFamily(args.family || 'evm')
     const { WalletManagerEvm } = await loadWalletModules()
     const seedPhrase = WalletManagerEvm.getRandomSeedPhrase(wordCount)
 
     await writeEnvValue('WDK_SEED', seedPhrase)
     const selection = await writeSelection({
-      chain: args.chain || 'ethereum',
+      family,
+      chain: args.chain || defaultChainForFamily(family),
       index
     })
 

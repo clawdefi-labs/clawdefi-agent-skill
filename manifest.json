@@ -1,7 +1,7 @@
 {
   "version": "0.1.54",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "5d2a744a06d0c30c88cac654cb81bc8908d37e4330da8738f19e0f82f59645d3",
+  "sha256": "8c04222b5d722b29ec0dd2b5353963d0c5a577f085d75b9ec060287ab09dae95",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -37,35 +37,35 @@
     },
     {
       "path": "scripts/wallet-common.js",
-      "sha256": "93a65aa392d9e7a2fb4fa71bccf096291c4f712a844765b78d405fe502c2c479"
+      "sha256": "3d41132aefb67ac12263173c43ca90fc5d768e28ac0e42be411b590754378dcf"
     },
     {
       "path": "scripts/wallet-create.js",
-      "sha256": "cc2c36c6b8393a8fcebf454e1a724c26de455d0f506970ba4f6e630b2921642a"
+      "sha256": "aea9f60f8e0d0b2c8a47340551318807ea89ee39f56945696f3ad4204d0a24ea"
     },
     {
       "path": "scripts/wallet-import.js",
-      "sha256": "45483bb98ffcbd6dac9f0338cbc017c9dc10107d3525f44215628806445a0b1c"
+      "sha256": "8555a8126337d21cf788d4255db99038bb8b858fbf249f5f6dca72c06a1c7426"
     },
     {
       "path": "scripts/wallet-discover.js",
-      "sha256": "4ed7bb215e4cd4297d8dac8f4ea82b7e10baf989b5cd4ba9acb0be5384d604ad"
+      "sha256": "2f3b66cf22a7a7cf81e66e78f0905b221bbbc665ef00202b46c5b8d3a645da9a"
     },
     {
       "path": "scripts/wallet-select.js",
-      "sha256": "992841048ebe3bd9280b4109b69dc1b327799bde72e90417fd165871006c9d8a"
+      "sha256": "c1bda7866d7787012d2b779d0a7150d882a1a2866d9fa76a59f4363feb53c4ee"
     },
     {
       "path": "scripts/wallet-balance.js",
-      "sha256": "4bd7eb238e54663ec5cba340274f39affabc9580d6c080f90ded0c896679bc38"
+      "sha256": "7250ce2259d5f8a30f4fb3bc28a0df3cff9a436dd7cef738c412c8b2325da7cf"
     },
     {
       "path": "scripts/wallet-sign.js",
-      "sha256": "3c59d63825f23200214e83af0e47ed47f51878849c70bd6797054de542a2748a"
+      "sha256": "6ea0693aca246f047a04f7ead0f75792b73fbf4517098d34fdedf184855a9734"
     },
     {
       "path": "scripts/wallet-transfer.js",
-      "sha256": "8f8c437814f68f6fb8265ba801cdef57404ed3275721436230ea2a54397655e0"
+      "sha256": "ecb5971e1d1f6c82d23f0c3f71bb6a2d790a5b5f06fe584dd7c8fa0fcb10d2fb"
     },
     {
       "path": "scripts/update.sh",
