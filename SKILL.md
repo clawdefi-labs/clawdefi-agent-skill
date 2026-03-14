@@ -113,6 +113,10 @@ node {baseDir}/scripts/wallet-select.js --family evm --chain base-mainnet --inde
 #### Query Address And Balances
 Use to read the active wallet address, native balance, and optional token balances.
 
+Note:
+- this currently performs direct local wallet/RPC reads,
+- later this should be replaced by ClawDeFi intelligence data fetches.
+
 ```bash
 node {baseDir}/scripts/wallet-balance.js --chain base-mainnet --index 0
 ```
