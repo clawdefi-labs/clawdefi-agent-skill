@@ -20,8 +20,8 @@ require_bin() {
 check_node_version() {
   local major
   major="$(node -p "process.versions.node.split('.')[0]")"
-  if [ "$major" -lt 20 ]; then
-    echo "ERROR: Node.js 20+ is required. Found: $(node -v)" >&2
+  if [ "$major" -lt 22 ]; then
+    echo "ERROR: Node.js 22+ is required. Found: $(node -v)" >&2
     exit 1
   fi
 }
@@ -141,7 +141,7 @@ install_dependencies() {
   npm --prefix "$MCP_DIR" install \
     @modelcontextprotocol/sdk \
     @tetherto/wdk \
-    @tetherto/wdk-mcp-toolkit \
+    github:tetherto/wdk-mcp-toolkit \
     @tetherto/wdk-wallet-evm \
     @tetherto/wdk-wallet-solana
 }

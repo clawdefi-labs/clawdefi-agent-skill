@@ -1,7 +1,7 @@
 {
   "version": "0.1.54",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "56be83eabda8ef6335472120e5c08808f36d7e08956f8396dbb02142a2307b37",
+  "sha256": "4f194596bc403a8b9a75d94c3216e3c6b517723bce539db240b5bef999833a26",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -33,7 +33,7 @@
     },
     {
       "path": "scripts/onboard.sh",
-      "sha256": "b8ab0fb68a5d67afde8fbb27b5961c3d44542fda9c366b84cbc95ba98b13bd67"
+      "sha256": "002c6b428c0b0b4bf47384091d1ceac57acea62bb13d4d656eb61c99c30034f8"
     },
     {
       "path": "scripts/wallet-common.js",
