@@ -44,7 +44,7 @@ const {
         nativeBalance: String(nativeBalance),
         tokenBalances
       }
-    })
+    }, { intent: 'read' })
 
     printJson({
       ok: true,

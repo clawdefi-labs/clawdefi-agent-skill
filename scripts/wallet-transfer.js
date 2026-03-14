@@ -114,7 +114,7 @@ const {
         hash: sendResult.hash,
         fee: String(sendResult.fee)
       }
-    })
+    }, { intent: dryRun ? 'simulate' : 'broadcast' })
 
     printJson({
       ok: true,

@@ -14,49 +14,30 @@ const SELECTION_FILE = path.join(CLAWDEFI_DIR, 'wallet-selection.json')
 const FAMILY_CONFIG = {
   evm: {
     managerType: 'evm',
-    config: {
-      provider: 'https://rpc.mevblocker.io/fast'
-    }
+    config: {}
   },
   solana: {
     managerType: 'solana',
     config: {
-      rpcUrl: 'https://api.mainnet-beta.solana.com',
+      rpcUrl: process.env.CLAWDEFI_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com',
       commitment: 'confirmed'
     }
   }
 }
 
-const EXECUTION_CHAIN_CONFIG = {
-  ethereum: {
-    family: 'evm',
-    managerType: 'evm',
-    config: {
-      provider: 'https://rpc.mevblocker.io/fast'
-    }
-  },
-  base: {
-    family: 'evm',
-    managerType: 'evm',
-    config: {
-      provider: 'https://mainnet.base.org'
-    }
-  },
-  bsc: {
-    family: 'evm',
-    managerType: 'evm',
-    config: {
-      provider: 'https://bsc-dataseed.binance.org'
-    }
-  },
-  solana: {
-    family: 'solana',
-    managerType: 'solana',
-    config: {
-      rpcUrl: 'https://api.mainnet-beta.solana.com',
-      commitment: 'confirmed'
-    }
-  }
+const CHAIN_ALIASES = {
+  eth: 'ethereum-mainnet',
+  ethereum: 'ethereum-mainnet',
+  base: 'base-mainnet',
+  bsc: 'bnb-smart-chain',
+  bnb: 'bnb-smart-chain',
+  arb: 'arbitrum-one',
+  arbitrum: 'arbitrum-one',
+  op: 'optimism-mainnet',
+  optimism: 'optimism-mainnet',
+  polygon: 'polygon-pos',
+  matic: 'polygon-pos',
+  avax: 'avax-mainnet'
 }
 
 function printJson (payload) {
@@ -73,28 +54,61 @@ function fail (message, extra = {}) {
 }
 
 function normalizeFamily (value) {
-  const family = String(value || 'evm').toLowerCase()
+  const family = String(value || 'evm').trim().toLowerCase()
   if (!FAMILY_CONFIG[family]) {
     throw new Error(`Unsupported wallet family: ${family}`)
   }
   return family
 }
 
-function normalizeChain (value) {
-  const chain = String(value || 'ethereum').toLowerCase()
-  if (!EXECUTION_CHAIN_CONFIG[chain]) {
-    throw new Error(`Unsupported execution chain: ${chain}`)
-  }
-  return chain
+function normalizeApiBaseUrl (value) {
+  return String(value || process.env.CLAWDEFI_API_BASE_URL || process.env.CORE_API_BASE_URL || 'https://api.clawdefi.ai')
+    .trim()
+    .replace(/\/+$/, '')
 }
 
-function chainToFamily (chain) {
-  return EXECUTION_CHAIN_CONFIG[normalizeChain(chain)].family
+function parseChainSelector (value) {
+  const raw = String(value || '').trim().toLowerCase()
+  if (!raw) {
+    return null
+  }
+  if (/^\d+$/.test(raw)) {
+    return {
+      chainId: Number(raw),
+      input: raw
+    }
+  }
+  return {
+    chainSlug: CHAIN_ALIASES[raw] || raw,
+    input: raw
+  }
+}
+
+function normalizeChain (value) {
+  const selector = parseChainSelector(value)
+  if (!selector) {
+    return 'ethereum-mainnet'
+  }
+  if (selector.chainId) {
+    return String(selector.chainId)
+  }
+  return selector.chainSlug
 }
 
 function defaultChainForFamily (family) {
   const normalizedFamily = normalizeFamily(family)
-  return normalizedFamily === 'solana' ? 'solana' : 'ethereum'
+  return normalizedFamily === 'solana' ? 'solana' : 'ethereum-mainnet'
+}
+
+function chainToFamily (chain) {
+  const normalized = String(chain || '').trim().toLowerCase()
+  if (!normalized) {
+    return 'evm'
+  }
+  if (normalized === 'solana') {
+    return 'solana'
+  }
+  return 'evm'
 }
 
 function resolveSelectionInput (input = {}) {
@@ -106,8 +120,11 @@ function resolveSelectionInput (input = {}) {
   const chain = input.chain
     ? normalizeChain(input.chain)
     : defaultChainForFamily(family)
-  if (chainToFamily(chain) !== family) {
-    throw new Error(`Execution chain ${chain} does not belong to wallet family ${family}`)
+  if (family === 'solana' && chain !== 'solana') {
+    throw new Error(`Execution chain ${chain} does not belong to wallet family solana`)
+  }
+  if (family === 'evm' && chain === 'solana') {
+    throw new Error('Execution chain solana does not belong to wallet family evm')
   }
   return {
     family,
@@ -236,7 +253,7 @@ async function requireSeed () {
 
 async function readSelection () {
   if (!(await fileExists(SELECTION_FILE))) {
-    return { family: 'evm', chain: 'ethereum', index: 0 }
+    return { family: 'evm', chain: 'ethereum-mainnet', index: 0 }
   }
   const raw = JSON.parse(await fs.readFile(SELECTION_FILE, 'utf8'))
   return resolveSelectionInput(raw)
@@ -249,25 +266,93 @@ async function writeSelection (selection) {
   return next
 }
 
-async function buildManager (target, seed) {
-  const { WalletManagerEvm, WalletManagerSolana } = await loadWalletModules()
-  const managerConfig = FAMILY_CONFIG[target]
-    ? FAMILY_CONFIG[normalizeFamily(target)]
-    : EXECUTION_CHAIN_CONFIG[normalizeChain(target)]
-
-  if (managerConfig.managerType === 'evm') {
-    return new WalletManagerEvm(seed, managerConfig.config)
+async function callChainRegistry (selector, intent = 'read') {
+  const baseUrl = normalizeApiBaseUrl()
+  const params = new URLSearchParams()
+  params.set('intent', intent)
+  if (typeof selector.chainId === 'number') {
+    params.set('chainId', String(selector.chainId))
+  } else if (selector.chainSlug) {
+    params.set('chainSlug', selector.chainSlug)
+  } else {
+    throw new Error('Missing chain selector.')
   }
 
-  if (managerConfig.managerType === 'solana') {
+  const response = await fetch(`${baseUrl}/api/v1/chains/registry?${params.toString()}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json'
+    }
+  })
+
+  const bodyText = await response.text()
+  const body = bodyText ? JSON.parse(bodyText) : null
+
+  if (!response.ok || !body || body.error) {
+    const detail = body && (body.message || body.error)
+      ? `${body.message || body.error}`
+      : `HTTP ${response.status}`
+    throw new Error(`Unable to resolve chain from ClawDeFi registry: ${detail}`)
+  }
+
+  if (!body.recommendedRpc || !body.recommendedRpc.rpcUrl) {
+    throw new Error(`No recommended RPC available for chain ${body.chainSlug || selector.chainSlug || selector.chainId}`)
+  }
+
+  return {
+    family: 'evm',
+    chainSlug: body.chainSlug,
+    chainId: body.chainId,
+    rpcUrl: body.recommendedRpc.rpcUrl,
+    nativeSymbol: body.nativeSymbol || null,
+    name: body.name || null,
+    raw: body
+  }
+}
+
+async function resolveExecutionContext (chain, intent = 'read') {
+  const normalized = String(chain || '').trim().toLowerCase()
+  if (!normalized || normalized === 'solana') {
+    return {
+      family: 'solana',
+      chainSlug: 'solana',
+      chainId: null,
+      rpcUrl: process.env.CLAWDEFI_SOLANA_RPC_URL || 'https://api.mainnet-beta.solana.com',
+      nativeSymbol: 'SOL',
+      name: 'Solana'
+    }
+  }
+
+  const selector = parseChainSelector(normalized)
+  return callChainRegistry(selector, intent)
+}
+
+async function buildManager (target, seed, options = {}) {
+  const { WalletManagerEvm, WalletManagerSolana } = await loadWalletModules()
+
+  if (FAMILY_CONFIG[target]) {
+    const managerConfig = FAMILY_CONFIG[normalizeFamily(target)]
+    if (managerConfig.managerType === 'evm') {
+      return new WalletManagerEvm(seed, managerConfig.config)
+    }
     return new WalletManagerSolana(seed, managerConfig.config)
   }
 
-  throw new Error(`Unsupported wallet target: ${target}`)
+  const execution = await resolveExecutionContext(target, options.intent || 'read')
+  if (execution.family === 'solana') {
+    return new WalletManagerSolana(seed, {
+      rpcUrl: execution.rpcUrl,
+      commitment: 'confirmed'
+    })
+  }
+
+  return new WalletManagerEvm(seed, {
+    provider: execution.rpcUrl
+  })
 }
 
-async function withAccount (target, index, seed, callback) {
-  const manager = await buildManager(target, seed)
+async function withAccount (target, index, seed, callback, options = {}) {
+  const manager = await buildManager(target, seed, options)
   try {
     const account = await manager.getAccount(index)
     return await callback({ manager, account })
@@ -319,26 +404,29 @@ function parseAmountBaseUnits (value) {
 
 module.exports = {
   ENV_FILE,
-  EXECUTION_CHAIN_CONFIG,
   FAMILY_CONFIG,
   MCP_DIR,
   SELECTION_FILE,
   buildManager,
+  callChainRegistry,
   chainToFamily,
   defaultChainForFamily,
   deriveAddresses,
   fail,
   getTokenList,
   loadWalletModules,
+  normalizeApiBaseUrl,
   normalizeChain,
   normalizeFamily,
   parseAmountBaseUnits,
   parseArgs,
+  parseChainSelector,
   parseIndex,
   printJson,
   readEnvMap,
   readSelection,
   requireSeed,
+  resolveExecutionContext,
   resolveSelectionInput,
   withAccount,
   writeEnvValue,

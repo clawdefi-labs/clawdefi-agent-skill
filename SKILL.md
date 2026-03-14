@@ -72,7 +72,7 @@ Wallet identity is family-based:
 - `solana`
 
 Execution chain is separate from wallet identity.
-Use execution chains like `ethereum`, `base`, or `bsc` only when reading balances or executing EVM transactions.
+Use chain registry slugs like `ethereum-mainnet`, `base-mainnet`, or `bnb-smart-chain` only when reading balances or executing EVM transactions.
 
 Primary wallet scripts:
 
@@ -107,18 +107,18 @@ printf '%s' "$WDK_SEED" | node {baseDir}/scripts/wallet-import.js --stdin
 Use to change the active wallet family, execution chain, and wallet index.
 
 ```bash
-node {baseDir}/scripts/wallet-select.js --family evm --chain ethereum --index 0
+node {baseDir}/scripts/wallet-select.js --family evm --chain base-mainnet --index 0
 ```
 
 #### Query Address And Balances
 Use to read the active wallet address, native balance, and optional token balances.
 
 ```bash
-node {baseDir}/scripts/wallet-balance.js --chain base --index 0
+node {baseDir}/scripts/wallet-balance.js --chain base-mainnet --index 0
 ```
 
 ```bash
-node {baseDir}/scripts/wallet-balance.js --chain ethereum --tokens 0xdAC17F958D2ee523a2206206994597C13D831ec7
+node {baseDir}/scripts/wallet-balance.js --chain ethereum-mainnet --tokens 0xdAC17F958D2ee523a2206206994597C13D831ec7
 ```
 
 #### Sign Message
@@ -134,7 +134,7 @@ Amounts must be passed in base units.
 Quote only:
 
 ```bash
-node {baseDir}/scripts/wallet-transfer.js --chain ethereum --recipient 0xabc --amount 1000000000000000 --dry-run
+node {baseDir}/scripts/wallet-transfer.js --chain ethereum-mainnet --recipient 0xabc --amount 1000000000000000 --dry-run
 ```
 
 Execute:
@@ -146,7 +146,7 @@ node {baseDir}/scripts/wallet-transfer.js --chain solana --recipient <pubkey> --
 Token transfer:
 
 ```bash
-node {baseDir}/scripts/wallet-transfer.js --chain ethereum --token 0xdAC17F958D2ee523a2206206994597C13D831ec7 --recipient 0xabc --amount 1000000
+node {baseDir}/scripts/wallet-transfer.js --chain ethereum-mainnet --token 0xdAC17F958D2ee523a2206206994597C13D831ec7 --recipient 0xabc --amount 1000000
 ```
 
 Wallet rules:
