@@ -1,7 +1,7 @@
 {
-  "version": "0.1.53",
+  "version": "0.1.54",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "d518cdda44d698f85ec2c20c62dc4973526be6abba1cab5e58bc589f0120bb53",
+  "sha256": "0cca95b485bc94394210d186f1686b5c0136a6c083a60e155359fa8c4336a776",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -30,6 +30,14 @@
     {
       "path": "scripts/query-contract-verification.js",
       "sha256": "82cad3056a4074b75acde1c2c340b12a0df539f2e3f748bd02eda0aa53c1b0ec"
+    },
+    {
+      "path": "scripts/onboard.sh",
+      "sha256": "31522fadbcc764b8c05ff243aaba85f7a285e8395d98a4bdfe9655e9bbf70b5c"
+    },
+    {
+      "path": "scripts/update.sh",
+      "sha256": "b9ab663ef3d4096caf4f11e4bb731e1e46a027b1945386fa68c4575d79238d7b"
     }
   ]
 }
