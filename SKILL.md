@@ -8,7 +8,30 @@ metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.cl
 
 # ClawDeFi Agent Skill
 
-## Onboarding
+## A. What ClawDeFi Is
+
+ClawDeFi is the source of DeFi intelligence for AI agents.
+
+It helps local agents:
+- manage local wallets safely,
+- access market intelligence,
+- inspect tokens, memes, and signals,
+- prepare swaps, perps, and other DeFi actions through the ClawDeFi intelligence layer.
+
+ClawDeFi is local-first:
+- wallet custody stays local,
+- signing stays local,
+- ClawDeFi backend provides intelligence, data, and routing support.
+
+## B. Disclaimer
+
+ClawDeFi provides analytics and agentic workflows, not financial advice.
+AI agents are powerful but still experimental. Their outputs can be wrong, incomplete, or unsafe if used carelessly.
+DeFi carries risks including smart contract failure, oracle failure, and liquidation.
+You are solely responsible for wallet custody and transaction signing.
+Using this skill means you accept these risks and proceed at your own risk.
+
+## C. Onboarding
 
 If ClawDeFi has not been installed locally yet, run:
 
@@ -20,8 +43,108 @@ This onboarding path:
 - checks `node`, `npm`, and `openclaw`,
 - creates a local WDK MCP runtime at `~/.openclaw/clawdefi/wdk-mcp`,
 - installs `@tetherto/wdk`, `@tetherto/wdk-wallet-evm`, `@tetherto/wdk-wallet-solana`, `@tetherto/wdk-mcp-toolkit`, and `@modelcontextprotocol/sdk`,
-- prompts for a dedicated WDK seed phrase and stores it locally in `~/.openclaw/clawdefi/wdk-mcp/.env`,
 - scaffolds a local stdio MCP server with EVM, Solana, and pricing tools,
-- verifies that the local MCP server can boot.
+- writes local config templates only,
+- verifies that the local environment is ready.
+
+Wallet creation or seed import should happen later inside the wallet modules, not during onboarding.
+
+Wallet flow should support both:
+- creating a new dedicated local wallet,
+- importing an existing dedicated seed phrase.
 
 Use a dedicated wallet seed for ClawDeFi. Do not use a main wallet seed phrase.
+
+## D. Updating
+
+## E. Skill Action Model
+
+### I. Wallet Management
+
+Use deterministic local scripts for wallet actions. Do not improvise wallet logic in chat.
+
+Wallet actions should support both:
+- creating a new dedicated local wallet,
+- importing an existing dedicated seed phrase.
+
+Primary wallet scripts:
+
+#### Discover Wallet
+Use to check whether a local wallet is already configured and to derive current addresses.
+
+```bash
+node {baseDir}/scripts/wallet-discover.js
+```
+
+#### Create Wallet
+Use to generate a fresh dedicated seed locally and configure the wallet runtime.
+
+```bash
+node {baseDir}/scripts/wallet-create.js
+```
+
+#### Import Wallet
+Use to import an existing dedicated seed phrase into the local wallet runtime.
+
+Examples:
+
+```bash
+node {baseDir}/scripts/wallet-import.js --seed-file /path/to/seed.txt
+```
+
+```bash
+printf '%s' "$WDK_SEED" | node {baseDir}/scripts/wallet-import.js --stdin
+```
+
+#### Select Wallet
+Use to change the active chain and wallet index.
+
+```bash
+node {baseDir}/scripts/wallet-select.js --chain ethereum --index 0
+```
+
+#### Query Address And Balances
+Use to read the active wallet address, native balance, and optional token balances.
+
+```bash
+node {baseDir}/scripts/wallet-balance.js --chain base --index 0
+```
+
+```bash
+node {baseDir}/scripts/wallet-balance.js --chain ethereum --tokens 0xdAC17F958D2ee523a2206206994597C13D831ec7
+```
+
+#### Sign Message
+Use to sign and verify a message with the active wallet.
+
+```bash
+node {baseDir}/scripts/wallet-sign.js --message "hello from clawdefi"
+```
+
+#### Transfer Or Quote Transfer
+Amounts must be passed in base units.
+
+Quote only:
+
+```bash
+node {baseDir}/scripts/wallet-transfer.js --chain ethereum --recipient 0xabc --amount 1000000000000000 --dry-run
+```
+
+Execute:
+
+```bash
+node {baseDir}/scripts/wallet-transfer.js --chain solana --recipient <pubkey> --amount 1000000
+```
+
+Token transfer:
+
+```bash
+node {baseDir}/scripts/wallet-transfer.js --chain ethereum --token 0xdAC17F958D2ee523a2206206994597C13D831ec7 --recipient 0xabc --amount 1000000
+```
+
+Wallet rules:
+- wallet custody stays local,
+- do not ask users to paste seed phrases into chat,
+- do not fabricate wallet addresses, balances, hashes, or signatures,
+- prefer quote paths before fund-impacting execution,
+- use a dedicated wallet seed for ClawDeFi, not a main wallet seed.

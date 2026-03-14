@@ -5,6 +5,7 @@ STATE_DIR="${OPENCLAW_STATE_DIR:-$HOME/.openclaw}"
 CLAWDEFI_DIR="${STATE_DIR}/clawdefi"
 MCP_DIR="${CLAWDEFI_DIR}/wdk-mcp"
 ENV_FILE="${MCP_DIR}/.env"
+ENV_EXAMPLE_FILE="${MCP_DIR}/.env.example"
 PACKAGE_FILE="${MCP_DIR}/package.json"
 INDEX_FILE="${MCP_DIR}/index.mjs"
 RUN_FILE="${MCP_DIR}/run.sh"
@@ -23,39 +24,6 @@ check_node_version() {
     echo "ERROR: Node.js 20+ is required. Found: $(node -v)" >&2
     exit 1
   fi
-}
-
-prompt_seed() {
-  if [ -n "${WDK_SEED:-}" ]; then
-    printf '%s' "$WDK_SEED"
-    return 0
-  fi
-
-  if [ -f "$ENV_FILE" ] && grep -q '^WDK_SEED=' "$ENV_FILE"; then
-    sed -n 's/^WDK_SEED=//p' "$ENV_FILE"
-    return 0
-  fi
-
-  local seed
-  printf 'Enter a dedicated WDK seed phrase (12 or 24 words): ' >&2
-  stty -echo
-  IFS= read -r seed
-  stty echo
-  printf '\n' >&2
-
-  if [ -z "$seed" ]; then
-    echo "ERROR: seed phrase is required." >&2
-    exit 1
-  fi
-
-  local words
-  words="$(printf '%s' "$seed" | awk '{print NF}')"
-  if [ "$words" -ne 12 ] && [ "$words" -ne 24 ]; then
-    echo "ERROR: seed phrase must be 12 or 24 words." >&2
-    exit 1
-  fi
-
-  printf '%s' "$seed"
 }
 
 write_package_json() {
@@ -128,12 +96,11 @@ console.error('Registered chains:', server.getChains())
 EOF
 }
 
-write_env() {
-  local seed="$1"
+write_env_files() {
   umask 077
-  {
-    printf 'WDK_SEED=%q\n' "$seed"
-    cat <<'EOF'
+  cat >"$ENV_FILE" <<'EOF'
+# Set this later during wallet setup.
+# WDK_SEED='twelve or twenty four word seed phrase here'
 CLAWDEFI_EVM_RPC_URL=https://rpc.mevblocker.io/fast
 CLAWDEFI_BASE_RPC_URL=https://mainnet.base.org
 CLAWDEFI_BSC_RPC_URL=https://bsc-dataseed.binance.org
@@ -141,8 +108,18 @@ CLAWDEFI_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
 # Optional:
 # WDK_INDEXER_API_KEY=
 EOF
-  } >"$ENV_FILE"
   chmod 600 "$ENV_FILE"
+
+  cat >"$ENV_EXAMPLE_FILE" <<'EOF'
+WDK_SEED='twelve or twenty four word seed phrase here'
+CLAWDEFI_EVM_RPC_URL=https://rpc.mevblocker.io/fast
+CLAWDEFI_BASE_RPC_URL=https://mainnet.base.org
+CLAWDEFI_BSC_RPC_URL=https://bsc-dataseed.binance.org
+CLAWDEFI_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+# Optional:
+# WDK_INDEXER_API_KEY=
+EOF
+  chmod 600 "$ENV_EXAMPLE_FILE"
 }
 
 write_runner() {
@@ -170,21 +147,7 @@ install_dependencies() {
 }
 
 boot_check() {
-  (
-    set -a
-    . "$ENV_FILE"
-    set +a
-    cd "$MCP_DIR"
-    node index.mjs >/dev/null 2>&1 &
-    local pid=$!
-    sleep 2
-    if ! kill -0 "$pid" >/dev/null 2>&1; then
-      wait "$pid"
-      return 1
-    fi
-    kill "$pid" >/dev/null 2>&1 || true
-    wait "$pid" 2>/dev/null || true
-  )
+  [ -f "$RUN_FILE" ] && [ -f "$INDEX_FILE" ] && [ -f "$ENV_FILE" ] && [ -f "$PACKAGE_FILE" ]
 }
 
 main() {
@@ -195,12 +158,9 @@ main() {
 
   mkdir -p "$MCP_DIR"
 
-  local seed
-  seed="$(prompt_seed)"
-
   write_package_json
   write_index
-  write_env "$seed"
+  write_env_files
   write_runner
 
   install_dependencies
@@ -219,8 +179,9 @@ Local runtime:
 Local launcher:
   $RUN_FILE
 
-Next step:
-  point your local MCP client at: $RUN_FILE
+Next steps:
+  1. Complete wallet setup later by adding WDK_SEED to: $ENV_FILE
+  2. Point your local MCP client at: $RUN_FILE
 EOF
 }
 

@@ -1,7 +1,7 @@
 {
   "version": "0.1.54",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "0cca95b485bc94394210d186f1686b5c0136a6c083a60e155359fa8c4336a776",
+  "sha256": "5d2a744a06d0c30c88cac654cb81bc8908d37e4330da8738f19e0f82f59645d3",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -33,7 +33,39 @@
     },
     {
       "path": "scripts/onboard.sh",
-      "sha256": "31522fadbcc764b8c05ff243aaba85f7a285e8395d98a4bdfe9655e9bbf70b5c"
+      "sha256": "b8ab0fb68a5d67afde8fbb27b5961c3d44542fda9c366b84cbc95ba98b13bd67"
+    },
+    {
+      "path": "scripts/wallet-common.js",
+      "sha256": "93a65aa392d9e7a2fb4fa71bccf096291c4f712a844765b78d405fe502c2c479"
+    },
+    {
+      "path": "scripts/wallet-create.js",
+      "sha256": "cc2c36c6b8393a8fcebf454e1a724c26de455d0f506970ba4f6e630b2921642a"
+    },
+    {
+      "path": "scripts/wallet-import.js",
+      "sha256": "45483bb98ffcbd6dac9f0338cbc017c9dc10107d3525f44215628806445a0b1c"
+    },
+    {
+      "path": "scripts/wallet-discover.js",
+      "sha256": "4ed7bb215e4cd4297d8dac8f4ea82b7e10baf989b5cd4ba9acb0be5384d604ad"
+    },
+    {
+      "path": "scripts/wallet-select.js",
+      "sha256": "992841048ebe3bd9280b4109b69dc1b327799bde72e90417fd165871006c9d8a"
+    },
+    {
+      "path": "scripts/wallet-balance.js",
+      "sha256": "4bd7eb238e54663ec5cba340274f39affabc9580d6c080f90ded0c896679bc38"
+    },
+    {
+      "path": "scripts/wallet-sign.js",
+      "sha256": "3c59d63825f23200214e83af0e47ed47f51878849c70bd6797054de542a2748a"
+    },
+    {
+      "path": "scripts/wallet-transfer.js",
+      "sha256": "8f8c437814f68f6fb8265ba801cdef57404ed3275721436230ea2a54397655e0"
     },
     {
       "path": "scripts/update.sh",
