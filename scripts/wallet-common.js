@@ -402,6 +402,16 @@ function parseAmountBaseUnits (value) {
   return BigInt(String(value))
 }
 
+function parseOptionalBigInt (value, fieldName) {
+  if (value == null || value === '') {
+    return undefined
+  }
+  if (!/^\d+$/.test(String(value))) {
+    throw new Error(`${fieldName} must be an integer string in base units.`)
+  }
+  return BigInt(String(value))
+}
+
 module.exports = {
   ENV_FILE,
   FAMILY_CONFIG,
@@ -422,6 +432,7 @@ module.exports = {
   parseArgs,
   parseChainSelector,
   parseIndex,
+  parseOptionalBigInt,
   printJson,
   readEnvMap,
   readSelection,

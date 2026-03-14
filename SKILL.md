@@ -128,6 +128,21 @@ Use to sign and verify a message with the active wallet.
 node {baseDir}/scripts/wallet-sign.js --message "hello from clawdefi"
 ```
 
+#### Sign And Broadcast Native Transaction
+Use to sign and broadcast a native transaction with the active wallet.
+
+EVM:
+
+```bash
+node {baseDir}/scripts/wallet-sign-broadcast.js --chain base-mainnet --recipient 0xabc --amount 1000000000000000
+```
+
+Solana:
+
+```bash
+node {baseDir}/scripts/wallet-sign-broadcast.js --chain solana --recipient <pubkey> --amount 1000000
+```
+
 #### Transfer Or Quote Transfer
 Amounts must be passed in base units.
 
