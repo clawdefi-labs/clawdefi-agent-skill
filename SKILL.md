@@ -25,6 +25,3 @@ This onboarding path:
 - verifies that the local MCP server can boot.
 
 Use a dedicated wallet seed for ClawDeFi. Do not use a main wallet seed phrase.
-
-Reference backup:
-- `SKILL.md.bak`
