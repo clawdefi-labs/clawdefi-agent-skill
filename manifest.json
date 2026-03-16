@@ -1,7 +1,7 @@
 {
-  "version": "0.1.67",
+  "version": "0.1.68",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "53506a1e200bbac2626264742e414229254248e309dddee6a2f43d86edb7494d",
+  "sha256": "3624494ccaefa627749ade0f61ba52ad60e46052d9610b6290e509f9a77d6d14",
   "files": [
     {
       "path": "scripts/crypto-market-rank.js",
@@ -334,6 +334,18 @@
     {
       "path": "scripts/wallet-transfer.js",
       "sha256": "252fda849f663921efce419c9bc8fe5c0839cb528859f5646d6c1e412a2f5b7d"
+    },
+    {
+      "path": "scripts/yield-adapter-pendle.js",
+      "sha256": "33fa0c8dd22712e4e6d38bb582e3cbd740e834f8286f8141daabfacbdb06e6e9"
+    },
+    {
+      "path": "scripts/yield-common.js",
+      "sha256": "3040ba9e7bffe71d14878709948e10b67410783a080ada7f586754840bfeb70b"
+    },
+    {
+      "path": "scripts/yield-opportunities.js",
+      "sha256": "db901b96c26660226d15b35664910b8b3e1d17e736378ee20ce200ef09be9e23"
     }
   ]
 }
