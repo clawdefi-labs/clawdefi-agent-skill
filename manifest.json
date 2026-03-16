@@ -1,7 +1,7 @@
 {
-  "version": "0.1.64",
+  "version": "0.1.66",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "671d33c60976ca5973a1433d1de76e49f4edff58e902bba60b4c7d38ab9ee2e9",
+  "sha256": "46f6acdc7e5c345b0a32984ea7b28cc7ea5e57f56f0b267fc4044115653d3b83",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -141,7 +141,7 @@
     },
     {
       "path": "scripts/perps-adapter-avantis.js",
-      "sha256": "edef710103a665f8ed0eb069720ef63a339a379d1c4a41385fb2a30275df7b4c"
+      "sha256": "0cebe4278d946db0f02e5eac7c8bfc59ecb2c3cdf28ea044568fefd31878b68d"
     },
     {
       "path": "scripts/perps-tx-action-common.js",
@@ -278,6 +278,30 @@
     {
       "path": "scripts/lending-execute.js",
       "sha256": "9ed682af836db474a1c3fa03db004e4668faceaff8187965857a0f605ea39fbe"
+    },
+    {
+      "path": "scripts/swap-common.js",
+      "sha256": "fe92a5038afcf3f13001df4a5ebab72e8e0a0c228b798f9aeef055ba145db7a7"
+    },
+    {
+      "path": "scripts/swap-action-helpers.js",
+      "sha256": "cea3f85c11bec31fa814b0986ffdc5be36cf69e617a0679ba5ad49e496d2d3de"
+    },
+    {
+      "path": "scripts/swap-quote.js",
+      "sha256": "1e61241ea9a9499c621b2b625965f3b0a08ee10d1d9359b9c00c065c4563fcd5"
+    },
+    {
+      "path": "scripts/swap-build.js",
+      "sha256": "79c361eae6358f6f3258d6341b344a9644bd5a099a4f77ef6fd07d1c4ec41027"
+    },
+    {
+      "path": "scripts/swap-simulate.js",
+      "sha256": "ac9cccfca90e655ce832f187264ead65b29a33629be474a702cd2160f2a017c8"
+    },
+    {
+      "path": "scripts/swap-execute.js",
+      "sha256": "38e4e835cd3b5f5b18f21f7498f657d00a4c142f348b5e4b379f70f631bc64e4"
     }
   ]
 }

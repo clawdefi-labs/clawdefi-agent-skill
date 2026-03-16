@@ -15,15 +15,33 @@ const CORE_API_BASE_URL = (process.env.AVANTIS_CORE_API_BASE_URL || 'https://cor
 const SOCKET_API_URL = process.env.AVANTIS_SOCKET_API_URL || 'https://socket-api-pub.avantisfi.com/socket-api/v1/data'
 const DEFAULT_TIMEOUT_MS = Number.parseInt(String(process.env.AVANTIS_TIMEOUT_MS || '10000'), 10)
 const BASE_RPC_FALLBACK = process.env.CLAWDEFI_BASE_RPC_URL || process.env.AVANTIS_RPC_URL || 'https://mainnet.base.org'
+const DEFAULT_CLAWDEFI_FEE_RECIPIENT = '0x25Aa761B02C45D2B57bBb54Dd04D42772afdd291'
 const REFERRAL_ABI_MIN = [
   'function getTraderReferralInfo(address _account) view returns (bytes32,address)',
   'function setTraderReferralCodeByUser(bytes32 _code)'
 ]
-const REFERRAL_DISCLOSURE = {
-  traderBenefit: 'Benefit to you: trading fee discount (depends on Avantis referral tier).',
-  clawdefiBenefit: 'Benefit to ClawDeFi: referral fee rebate.',
-  note: 'Referral discounts apply on fixed-fee trades per Avantis docs.',
-  consentRequired: true
+
+function normalizeAddressOrNull (value) {
+  const raw = String(value || '').trim()
+  if (!raw) return null
+  if (!/^0x[a-fA-F0-9]{40}$/.test(raw)) return null
+  return raw.toLowerCase()
+}
+
+const CLAWDEFI_REFERRAL_RECIPIENT = normalizeAddressOrNull(
+  process.env.CLAWDEFI_AVANTIS_REFERRER_ADDRESS ||
+  process.env.CLAWDEFI_FEE_RECIPIENT ||
+  DEFAULT_CLAWDEFI_FEE_RECIPIENT
+)
+
+function buildReferralDisclosure () {
+  return {
+    traderBenefit: 'Benefit to you: trading fee discount (depends on Avantis referral tier).',
+    clawdefiBenefit: 'Benefit to ClawDeFi: referral fee rebate.',
+    note: 'Referral discounts apply on fixed-fee trades per Avantis docs.',
+    consentRequired: true,
+    clawdefiReferralRecipient: CLAWDEFI_REFERRAL_RECIPIENT
+  }
 }
 
 function normalizeMarketSymbol (input) {
@@ -1129,8 +1147,12 @@ async function getReferralInfo ({ chain, walletAddress }) {
       codeBytes32: String(codeBytes32),
       referrer
     },
+    clawdefiReferralRecipient: CLAWDEFI_REFERRAL_RECIPIENT,
+    referralRecipientMatch: CLAWDEFI_REFERRAL_RECIPIENT
+      ? String(referrer || '').toLowerCase() === CLAWDEFI_REFERRAL_RECIPIENT
+      : null,
     hasReferralCode: Boolean(code),
-    disclosure: REFERRAL_DISCLOSURE,
+    disclosure: buildReferralDisclosure(),
     warnings: []
   }
 }
@@ -1196,10 +1218,11 @@ async function buildSetReferralCode ({ chain, walletAddress, referralCode }) {
       referrer: currentReferrer
     },
     targetReferralCode: code,
+    clawdefiReferralRecipient: CLAWDEFI_REFERRAL_RECIPIENT,
     txRequest,
     intent,
     intentHash: computeIntentHash(intent),
-    disclosure: REFERRAL_DISCLOSURE,
+    disclosure: buildReferralDisclosure(),
     warnings: []
   }
 }

@@ -76,5 +76,6 @@ Local development notes:
 - `scripts/query-protocol.js` requires: reachable `CORE_API_BASE_URL` (default `http://127.0.0.1:8080`) and read query inputs (`slug`, `chainSlug`, action key by mode).
 - `scripts/query-coingecko.js` requires: CoinGecko API access (`demo` or `pro` plan) and optional `COINGECKO_API_KEY` in local env.
 - `scripts/query-avantis.js` requires: Avantis socket/core/feed endpoints reachable from local runtime (defaults provided; override via env/flags when needed).
+- Avantis referral modules expose `clawdefiReferralRecipient` (defaults to `0x25Aa761B02C45D2B57bBb54Dd04D42772afdd291`; override via `CLAWDEFI_AVANTIS_REFERRER_ADDRESS` or `CLAWDEFI_FEE_RECIPIENT`).
 - `scripts/query-pyth.js` requires: Pyth feed IDs for `latest`/`stream` mode and optional `PYTH_PRO_ACCESS_TOKEN` for pro endpoint auth metadata.
 - `scripts/query-contract-verification.js` requires: user-managed `ETHERSCAN_API_KEY` in local env plus `CHAIN_ID` and `CONTRACT_ADDRESS`.
