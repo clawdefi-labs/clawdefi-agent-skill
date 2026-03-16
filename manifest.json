@@ -1,19 +1,207 @@
 {
-  "version": "0.1.66",
+  "version": "0.1.67",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "46f6acdc7e5c345b0a32984ea7b28cc7ea5e57f56f0b267fc4044115653d3b83",
+  "sha256": "53506a1e200bbac2626264742e414229254248e309dddee6a2f43d86edb7494d",
   "files": [
     {
-      "path": "scripts/simulate-transaction.js",
-      "sha256": "83e383e744687d4d63ce62df98ddba63dedd70af26b31e17048de0fb90a78a8a"
+      "path": "scripts/crypto-market-rank.js",
+      "sha256": "2d2f9baba99fc45ef8e7f9678732f52d8b47d76fb81ac849b04d8facb0750746"
     },
     {
-      "path": "scripts/swap-1inch.js",
-      "sha256": "3d9af5c1b2e730354ea6e8070847199d4155316a2a70c67b635456ebedf45535"
+      "path": "scripts/lending-action-helpers.js",
+      "sha256": "a4b5ef49de81e95087f00fb9cd81e290309dee5515ea128acb9831c5b1155a56"
     },
     {
-      "path": "scripts/query-protocol.js",
-      "sha256": "d08b1f2e740c7af0ff6273b69eeba69d4f34af4e374d711f75159be10f8d3ae6"
+      "path": "scripts/lending-adapter-aave.js",
+      "sha256": "5876f94ef6e60c451a132cb4578bcb3ddac81c0fe4a3726482e1930e0e01e0e3"
+    },
+    {
+      "path": "scripts/lending-build.js",
+      "sha256": "c0364b68a57dc8961c023c0e43f0a45b9d83265202fb398df148f04492f4dce7"
+    },
+    {
+      "path": "scripts/lending-common.js",
+      "sha256": "763cad71414a2c21dcf7a2e6127b6cf984a81a4e70419d827cd5e840ae8135fe"
+    },
+    {
+      "path": "scripts/lending-execute.js",
+      "sha256": "9ed682af836db474a1c3fa03db004e4668faceaff8187965857a0f605ea39fbe"
+    },
+    {
+      "path": "scripts/lending-markets.js",
+      "sha256": "2a852e7a94b10b304c07e2bfd0ba39973bde3fa798f49e6abb5f6161fe14c9c8"
+    },
+    {
+      "path": "scripts/lending-quote.js",
+      "sha256": "b98f1a6fbedca5e54207603ce95ee45b77b21d7add0137ac7abe36e0f576472d"
+    },
+    {
+      "path": "scripts/lending-simulate.js",
+      "sha256": "dc9259d8839e9fe8debe919a3b7ab350d93f70d49b747ca7a54804c4649ba384"
+    },
+    {
+      "path": "scripts/market-intel-common.js",
+      "sha256": "1945ba945f78c35d84a1c9a41e8c362a0a57b02caefa343a1acd6da378ecd148"
+    },
+    {
+      "path": "scripts/meme-rush.js",
+      "sha256": "55dfab7710ff13e5de3cc32a4ba5e4052c0b0fd4693e3c040760ff9a53a71c2b"
+    },
+    {
+      "path": "scripts/onboard.sh",
+      "sha256": "5f072a6b485ee0232c1b2086d41c22230576cf027909370823d375c60a350c36"
+    },
+    {
+      "path": "scripts/perps-action-helpers.js",
+      "sha256": "c7eb025af9d17b31acb4e4dd404a1bf94bffecaf860dacaa563cc0442db464c9"
+    },
+    {
+      "path": "scripts/perps-adapter-avantis.js",
+      "sha256": "0cebe4278d946db0f02e5eac7c8bfc59ecb2c3cdf28ea044568fefd31878b68d"
+    },
+    {
+      "path": "scripts/perps-cancel-order-build.js",
+      "sha256": "811554fc71170448ce3af2ab24ef8b8a3ae9f00862f6847fe847010f3bdf4a57"
+    },
+    {
+      "path": "scripts/perps-cancel-order-execute.js",
+      "sha256": "831aed0213b305d9ce6bb5bcac521de2d17c157f2613bc5c227d95b3d61c2c23"
+    },
+    {
+      "path": "scripts/perps-cancel-order-simulate.js",
+      "sha256": "889daba0560b5339d4379a783d25e10c44f27c9820811a4bfcdbd141e0383f72"
+    },
+    {
+      "path": "scripts/perps-close-build.js",
+      "sha256": "71687635b0cc2f5f440a22541fc5b2f8d7d3fda7f957fd732f09c298b329f281"
+    },
+    {
+      "path": "scripts/perps-close-execute.js",
+      "sha256": "76a09783a275e90851bc26fa4ef42c366acbfa4ac11dc88ef192929a8e20d614"
+    },
+    {
+      "path": "scripts/perps-close-quote.js",
+      "sha256": "c98e57316d670159a4a4a5ec12dee484bfbe9f5ea502bcc05baf5d5d0ce2f6fd"
+    },
+    {
+      "path": "scripts/perps-close-simulate.js",
+      "sha256": "b0b1e34a050a8da1e2eb1a1a75c68e224609f199871971fe5f285157392d5c3f"
+    },
+    {
+      "path": "scripts/perps-common.js",
+      "sha256": "cdc69f4c8d4d5706c71332c4009160054cf31a78326ea10f732928cc7a887529"
+    },
+    {
+      "path": "scripts/perps-market-context.js",
+      "sha256": "4dfc2af172cb32a90cb9309aae9fc1b301329c53ea5db87c7ad0dddd64b8e808"
+    },
+    {
+      "path": "scripts/perps-modify-position-build.js",
+      "sha256": "1a769ba30534d18ea34a24180adadc497bf2f36b3bc001bb5ee875ec75ad2c75"
+    },
+    {
+      "path": "scripts/perps-modify-position-execute.js",
+      "sha256": "f0f6d439e8b4f8d3607e1edeb164c7fef4b01f606978b4dd4519d71b4355fd86"
+    },
+    {
+      "path": "scripts/perps-modify-position-simulate.js",
+      "sha256": "b3eeccbc7f20cdfe91dea284759c232c4f2260217c86b3191c33bb5ee7953d6c"
+    },
+    {
+      "path": "scripts/perps-open-build.js",
+      "sha256": "23f220dc98e5edb0c108333d305acfef6fd1ce60d0df5558355aca3fe37cf528"
+    },
+    {
+      "path": "scripts/perps-open-execute.js",
+      "sha256": "c5aa2644e05a5e6bc4a5069dac37a0dccc0c9fc12388f2bef9dc5591ae350a64"
+    },
+    {
+      "path": "scripts/perps-open-quote.js",
+      "sha256": "b2288ba28cbb601d7bc08a68372c256d4b1fe77ac36eb9f69c6380b660654318"
+    },
+    {
+      "path": "scripts/perps-open-simulate.js",
+      "sha256": "e76f890ac7789510a1bb84e33b1b264a2ff2843fd8473f1ccd0041baddb246a6"
+    },
+    {
+      "path": "scripts/perps-pending-orders.js",
+      "sha256": "3e91c5aaab473d88edf5b876bcbe1eb6a19b512d8b6f2e2c26d58b67799c57bd"
+    },
+    {
+      "path": "scripts/perps-position-list.js",
+      "sha256": "37ab57d73892a0fb569eb0b8779ef7510ba1eaab316b7741bb80776ce0ee34da"
+    },
+    {
+      "path": "scripts/perps-referral-bind-build.js",
+      "sha256": "c8c32c29efa4908bb2a78c9a7653d6c644fcea9c67d2a9af306b92e32d478208"
+    },
+    {
+      "path": "scripts/perps-referral-bind-execute.js",
+      "sha256": "bba6f424fa444892b0e42b7f22a794e69c39aca7e9c57ee3c3327577cee5e70f"
+    },
+    {
+      "path": "scripts/perps-referral-bind-simulate.js",
+      "sha256": "2ab4ff82f69191254d3052c0800f4d96bb0919f94a981207b8417445a2996a6a"
+    },
+    {
+      "path": "scripts/perps-referral-info.js",
+      "sha256": "f766e6b4f31116f5c2bb3147ab7943756cafb6bc77bf7b07d3c820512a8cfc28"
+    },
+    {
+      "path": "scripts/perps-risk-orders-build.js",
+      "sha256": "c90c396e2ae09148c130b9bdba816b192bec9fb309d3d038cdcde6948e81671b"
+    },
+    {
+      "path": "scripts/perps-risk-orders-execute.js",
+      "sha256": "b8c6bc88789b721a6e8b33dd65321be0c54702fcf05977341f9c6ee4565065d7"
+    },
+    {
+      "path": "scripts/perps-risk-orders-simulate.js",
+      "sha256": "512410f971784aec0bdb5f272d4345d3e24d33efe6aab0f65e34f623b147eaf6"
+    },
+    {
+      "path": "scripts/perps-tx-action-common.js",
+      "sha256": "d737fa2f83cee1742628bfc0236b8b38bdc85283a5cd2b84988f1191332d006c"
+    },
+    {
+      "path": "scripts/predictions-action-helpers.js",
+      "sha256": "ecb7885a778f3b7aa3c7f966f696f8aae280df29b0073975b0104b205b11d237"
+    },
+    {
+      "path": "scripts/predictions-adapter-polymarket.js",
+      "sha256": "d3043896fd19850b46c7ae56986133211521cda07e115608d7d86da8e563fc21"
+    },
+    {
+      "path": "scripts/predictions-build.js",
+      "sha256": "d48aa7bbeada6485beb00bf028a17dcdc6706c292a1b57434a9c7d04fe5240b8"
+    },
+    {
+      "path": "scripts/predictions-common.js",
+      "sha256": "bd8e3d0e94654a0b1cb5f59f027e31268866bc88f303aa5b4a2731d18ab7d097"
+    },
+    {
+      "path": "scripts/predictions-execute.js",
+      "sha256": "b0ac354575aca0b1a56b387b69b777912712e370b1b4c0187e5dd8420f664982"
+    },
+    {
+      "path": "scripts/predictions-markets.js",
+      "sha256": "3b4543594cc4c641209efe6d1844f9513051f23ba709627c4c5b5299fd92bfb7"
+    },
+    {
+      "path": "scripts/predictions-quote.js",
+      "sha256": "361312d094803ca3c6f9bcabae3560781357054e1d5313115a5f72da47179b83"
+    },
+    {
+      "path": "scripts/predictions-simulate.js",
+      "sha256": "54badf398bbc47daa01ae947654e510d15b3e8bbf338626177f035e952842925"
+    },
+    {
+      "path": "scripts/query-address-info.js",
+      "sha256": "cddef4a8cf70f60ce24bc6cee7a5afd3bdbb27daa63d6d8bfe181ff9a8cafbbe"
+    },
+    {
+      "path": "scripts/query-avantis.js",
+      "sha256": "ec9040125dfa2ea4d3fde8663ae6951de5a4216a5bec20a194b11a8aa68fd9c3"
     },
     {
       "path": "scripts/query-chain-registry.js",
@@ -24,44 +212,16 @@
       "sha256": "45ba0f9a35aeb9ee2e228d82185e034a9bbfebfb9a5c14e99dd8b443631c20f9"
     },
     {
-      "path": "scripts/query-avantis.js",
-      "sha256": "ec9040125dfa2ea4d3fde8663ae6951de5a4216a5bec20a194b11a8aa68fd9c3"
-    },
-    {
-      "path": "scripts/query-pyth.js",
-      "sha256": "56de1ade085c4cf18f327a076877348274e9a9d9aa5d21a435fd68a9f48789f2"
-    },
-    {
       "path": "scripts/query-contract-verification.js",
       "sha256": "82cad3056a4074b75acde1c2c340b12a0df539f2e3f748bd02eda0aa53c1b0ec"
     },
     {
-      "path": "scripts/market-intel-common.js",
-      "sha256": "1945ba945f78c35d84a1c9a41e8c362a0a57b02caefa343a1acd6da378ecd148"
+      "path": "scripts/query-protocol.js",
+      "sha256": "d08b1f2e740c7af0ff6273b69eeba69d4f34af4e374d711f75159be10f8d3ae6"
     },
     {
-      "path": "scripts/query-token-info.js",
-      "sha256": "97a3103208d9c51b2079a1e7057f7ecc7e0c61e6205dedb65ade22cad17f4cec"
-    },
-    {
-      "path": "scripts/query-address-info.js",
-      "sha256": "cddef4a8cf70f60ce24bc6cee7a5afd3bdbb27daa63d6d8bfe181ff9a8cafbbe"
-    },
-    {
-      "path": "scripts/crypto-market-rank.js",
-      "sha256": "2d2f9baba99fc45ef8e7f9678732f52d8b47d76fb81ac849b04d8facb0750746"
-    },
-    {
-      "path": "scripts/trading-signal.js",
-      "sha256": "15459148f492b65dcf23459183d373b55f49d1d6e963900a601ec1f0cb73aa6c"
-    },
-    {
-      "path": "scripts/meme-rush.js",
-      "sha256": "55dfab7710ff13e5de3cc32a4ba5e4052c0b0fd4693e3c040760ff9a53a71c2b"
-    },
-    {
-      "path": "scripts/query-token-audit.js",
-      "sha256": "c112201bdc645d68c0412384a260d076080b62a92448f00c55d3a0dac7c438f8"
+      "path": "scripts/query-pyth-stream-close.js",
+      "sha256": "40827a92cf9d02273b91a4d86bb67cd43bac3675a753e678c49613a07d835a5f"
     },
     {
       "path": "scripts/query-pyth-stream-open.js",
@@ -76,44 +236,88 @@
       "sha256": "75fb08550f00c578a1daaec2707d20e9a0615c74d114f1579f10705d59019ff4"
     },
     {
-      "path": "scripts/query-pyth-stream-close.js",
-      "sha256": "40827a92cf9d02273b91a4d86bb67cd43bac3675a753e678c49613a07d835a5f"
+      "path": "scripts/query-pyth.js",
+      "sha256": "56de1ade085c4cf18f327a076877348274e9a9d9aa5d21a435fd68a9f48789f2"
     },
     {
-      "path": "scripts/onboard.sh",
-      "sha256": "3bc0307afe86f7127ef5616d5c1e47b4973409b116e754da66e25eb3c99545e2"
+      "path": "scripts/query-token-audit.js",
+      "sha256": "c112201bdc645d68c0412384a260d076080b62a92448f00c55d3a0dac7c438f8"
     },
     {
-      "path": "scripts/wallet-common.js",
-      "sha256": "7a465b96a632a47a52abc97cbf699f41012e959b61db3d2615c31cf1d2541755"
+      "path": "scripts/query-token-info.js",
+      "sha256": "97a3103208d9c51b2079a1e7057f7ecc7e0c61e6205dedb65ade22cad17f4cec"
     },
     {
-      "path": "scripts/wallet-create.js",
-      "sha256": "aea9f60f8e0d0b2c8a47340551318807ea89ee39f56945696f3ad4204d0a24ea"
+      "path": "scripts/simulate-transaction.js",
+      "sha256": "83e383e744687d4d63ce62df98ddba63dedd70af26b31e17048de0fb90a78a8a"
     },
     {
-      "path": "scripts/wallet-import.js",
-      "sha256": "8555a8126337d21cf788d4255db99038bb8b858fbf249f5f6dca72c06a1c7426"
+      "path": "scripts/swap-1inch.js",
+      "sha256": "3d9af5c1b2e730354ea6e8070847199d4155316a2a70c67b635456ebedf45535"
     },
     {
-      "path": "scripts/wallet-discover.js",
-      "sha256": "2f3b66cf22a7a7cf81e66e78f0905b221bbbc665ef00202b46c5b8d3a645da9a"
+      "path": "scripts/swap-action-helpers.js",
+      "sha256": "cea3f85c11bec31fa814b0986ffdc5be36cf69e617a0679ba5ad49e496d2d3de"
     },
     {
-      "path": "scripts/wallet-select.js",
-      "sha256": "c1bda7866d7787012d2b779d0a7150d882a1a2866d9fa76a59f4363feb53c4ee"
+      "path": "scripts/swap-build.js",
+      "sha256": "79c361eae6358f6f3258d6341b344a9644bd5a099a4f77ef6fd07d1c4ec41027"
+    },
+    {
+      "path": "scripts/swap-common.js",
+      "sha256": "fe92a5038afcf3f13001df4a5ebab72e8e0a0c228b798f9aeef055ba145db7a7"
+    },
+    {
+      "path": "scripts/swap-execute.js",
+      "sha256": "38e4e835cd3b5f5b18f21f7498f657d00a4c142f348b5e4b379f70f631bc64e4"
+    },
+    {
+      "path": "scripts/swap-quote.js",
+      "sha256": "1e61241ea9a9499c621b2b625965f3b0a08ee10d1d9359b9c00c065c4563fcd5"
+    },
+    {
+      "path": "scripts/swap-simulate.js",
+      "sha256": "ac9cccfca90e655ce832f187264ead65b29a33629be474a702cd2160f2a017c8"
+    },
+    {
+      "path": "scripts/trading-signal.js",
+      "sha256": "15459148f492b65dcf23459183d373b55f49d1d6e963900a601ec1f0cb73aa6c"
+    },
+    {
+      "path": "scripts/update.sh",
+      "sha256": "7f0ec42a99e6961dda5fc265c67f649f97db33fe4dd3f6d7b9d77bdfde4e2be1"
     },
     {
       "path": "scripts/wallet-balance.js",
       "sha256": "91f835bc7a0049beb4d1b544eee37da451c7f62b69dbf50ef1431ad4ccb8c342"
     },
     {
-      "path": "scripts/wallet-sign.js",
-      "sha256": "6ea0693aca246f047a04f7ead0f75792b73fbf4517098d34fdedf184855a9734"
+      "path": "scripts/wallet-common.js",
+      "sha256": "6c7380e5ac51b0358d894224316965dbfaf7d8f5df9037dd5f1d41939433fec1"
+    },
+    {
+      "path": "scripts/wallet-create.js",
+      "sha256": "aea9f60f8e0d0b2c8a47340551318807ea89ee39f56945696f3ad4204d0a24ea"
+    },
+    {
+      "path": "scripts/wallet-discover.js",
+      "sha256": "2f3b66cf22a7a7cf81e66e78f0905b221bbbc665ef00202b46c5b8d3a645da9a"
+    },
+    {
+      "path": "scripts/wallet-import.js",
+      "sha256": "8555a8126337d21cf788d4255db99038bb8b858fbf249f5f6dca72c06a1c7426"
+    },
+    {
+      "path": "scripts/wallet-select.js",
+      "sha256": "c1bda7866d7787012d2b779d0a7150d882a1a2866d9fa76a59f4363feb53c4ee"
     },
     {
       "path": "scripts/wallet-sign-broadcast.js",
       "sha256": "39baacfc348c883a908142532ffb349d3ed68ea2417c0a793e1a5846295d58ba"
+    },
+    {
+      "path": "scripts/wallet-sign.js",
+      "sha256": "6ea0693aca246f047a04f7ead0f75792b73fbf4517098d34fdedf184855a9734"
     },
     {
       "path": "scripts/wallet-token-allowance-check.js",
@@ -124,184 +328,12 @@
       "sha256": "0cf7999a216c8e61bc651fa498c9e21e4113aac0b08817eb0d1104c4e1f70da1"
     },
     {
-      "path": "scripts/wallet-transfer.js",
-      "sha256": "252fda849f663921efce419c9bc8fe5c0839cb528859f5646d6c1e412a2f5b7d"
-    },
-    {
       "path": "scripts/wallet-total-portfolio.js",
       "sha256": "0aabe89bee9e16d45c178def48b40344cde8fdaca35a4746b5d09fe9935e2557"
     },
     {
-      "path": "scripts/update.sh",
-      "sha256": "2d9b3b08c1d15f2bcac2dadc4032f97c18f1cfe18d8bb4ec9b115c1bb8064ad2"
-    },
-    {
-      "path": "scripts/perps-common.js",
-      "sha256": "cdc69f4c8d4d5706c71332c4009160054cf31a78326ea10f732928cc7a887529"
-    },
-    {
-      "path": "scripts/perps-adapter-avantis.js",
-      "sha256": "0cebe4278d946db0f02e5eac7c8bfc59ecb2c3cdf28ea044568fefd31878b68d"
-    },
-    {
-      "path": "scripts/perps-tx-action-common.js",
-      "sha256": "d737fa2f83cee1742628bfc0236b8b38bdc85283a5cd2b84988f1191332d006c"
-    },
-    {
-      "path": "scripts/perps-market-context.js",
-      "sha256": "4dfc2af172cb32a90cb9309aae9fc1b301329c53ea5db87c7ad0dddd64b8e808"
-    },
-    {
-      "path": "scripts/perps-position-list.js",
-      "sha256": "37ab57d73892a0fb569eb0b8779ef7510ba1eaab316b7741bb80776ce0ee34da"
-    },
-    {
-      "path": "scripts/perps-open-quote.js",
-      "sha256": "b2288ba28cbb601d7bc08a68372c256d4b1fe77ac36eb9f69c6380b660654318"
-    },
-    {
-      "path": "scripts/perps-open-build.js",
-      "sha256": "23f220dc98e5edb0c108333d305acfef6fd1ce60d0df5558355aca3fe37cf528"
-    },
-    {
-      "path": "scripts/perps-open-simulate.js",
-      "sha256": "e76f890ac7789510a1bb84e33b1b264a2ff2843fd8473f1ccd0041baddb246a6"
-    },
-    {
-      "path": "scripts/perps-open-execute.js",
-      "sha256": "c5aa2644e05a5e6bc4a5069dac37a0dccc0c9fc12388f2bef9dc5591ae350a64"
-    },
-    {
-      "path": "scripts/perps-close-quote.js",
-      "sha256": "c98e57316d670159a4a4a5ec12dee484bfbe9f5ea502bcc05baf5d5d0ce2f6fd"
-    },
-    {
-      "path": "scripts/perps-close-build.js",
-      "sha256": "71687635b0cc2f5f440a22541fc5b2f8d7d3fda7f957fd732f09c298b329f281"
-    },
-    {
-      "path": "scripts/perps-close-simulate.js",
-      "sha256": "b0b1e34a050a8da1e2eb1a1a75c68e224609f199871971fe5f285157392d5c3f"
-    },
-    {
-      "path": "scripts/perps-close-execute.js",
-      "sha256": "76a09783a275e90851bc26fa4ef42c366acbfa4ac11dc88ef192929a8e20d614"
-    },
-    {
-      "path": "scripts/perps-action-helpers.js",
-      "sha256": "c7eb025af9d17b31acb4e4dd404a1bf94bffecaf860dacaa563cc0442db464c9"
-    },
-    {
-      "path": "scripts/perps-pending-orders.js",
-      "sha256": "3e91c5aaab473d88edf5b876bcbe1eb6a19b512d8b6f2e2c26d58b67799c57bd"
-    },
-    {
-      "path": "scripts/perps-referral-info.js",
-      "sha256": "f766e6b4f31116f5c2bb3147ab7943756cafb6bc77bf7b07d3c820512a8cfc28"
-    },
-    {
-      "path": "scripts/perps-referral-bind-build.js",
-      "sha256": "c8c32c29efa4908bb2a78c9a7653d6c644fcea9c67d2a9af306b92e32d478208"
-    },
-    {
-      "path": "scripts/perps-referral-bind-simulate.js",
-      "sha256": "2ab4ff82f69191254d3052c0800f4d96bb0919f94a981207b8417445a2996a6a"
-    },
-    {
-      "path": "scripts/perps-referral-bind-execute.js",
-      "sha256": "bba6f424fa444892b0e42b7f22a794e69c39aca7e9c57ee3c3327577cee5e70f"
-    },
-    {
-      "path": "scripts/perps-risk-orders-build.js",
-      "sha256": "c90c396e2ae09148c130b9bdba816b192bec9fb309d3d038cdcde6948e81671b"
-    },
-    {
-      "path": "scripts/perps-risk-orders-simulate.js",
-      "sha256": "512410f971784aec0bdb5f272d4345d3e24d33efe6aab0f65e34f623b147eaf6"
-    },
-    {
-      "path": "scripts/perps-risk-orders-execute.js",
-      "sha256": "b8c6bc88789b721a6e8b33dd65321be0c54702fcf05977341f9c6ee4565065d7"
-    },
-    {
-      "path": "scripts/perps-modify-position-build.js",
-      "sha256": "1a769ba30534d18ea34a24180adadc497bf2f36b3bc001bb5ee875ec75ad2c75"
-    },
-    {
-      "path": "scripts/perps-modify-position-simulate.js",
-      "sha256": "b3eeccbc7f20cdfe91dea284759c232c4f2260217c86b3191c33bb5ee7953d6c"
-    },
-    {
-      "path": "scripts/perps-modify-position-execute.js",
-      "sha256": "f0f6d439e8b4f8d3607e1edeb164c7fef4b01f606978b4dd4519d71b4355fd86"
-    },
-    {
-      "path": "scripts/perps-cancel-order-build.js",
-      "sha256": "811554fc71170448ce3af2ab24ef8b8a3ae9f00862f6847fe847010f3bdf4a57"
-    },
-    {
-      "path": "scripts/perps-cancel-order-simulate.js",
-      "sha256": "889daba0560b5339d4379a783d25e10c44f27c9820811a4bfcdbd141e0383f72"
-    },
-    {
-      "path": "scripts/perps-cancel-order-execute.js",
-      "sha256": "831aed0213b305d9ce6bb5bcac521de2d17c157f2613bc5c227d95b3d61c2c23"
-    },
-    {
-      "path": "scripts/lending-common.js",
-      "sha256": "763cad71414a2c21dcf7a2e6127b6cf984a81a4e70419d827cd5e840ae8135fe"
-    },
-    {
-      "path": "scripts/lending-action-helpers.js",
-      "sha256": "a4b5ef49de81e95087f00fb9cd81e290309dee5515ea128acb9831c5b1155a56"
-    },
-    {
-      "path": "scripts/lending-adapter-aave.js",
-      "sha256": "5876f94ef6e60c451a132cb4578bcb3ddac81c0fe4a3726482e1930e0e01e0e3"
-    },
-    {
-      "path": "scripts/lending-markets.js",
-      "sha256": "2a852e7a94b10b304c07e2bfd0ba39973bde3fa798f49e6abb5f6161fe14c9c8"
-    },
-    {
-      "path": "scripts/lending-build.js",
-      "sha256": "c0364b68a57dc8961c023c0e43f0a45b9d83265202fb398df148f04492f4dce7"
-    },
-    {
-      "path": "scripts/lending-quote.js",
-      "sha256": "b98f1a6fbedca5e54207603ce95ee45b77b21d7add0137ac7abe36e0f576472d"
-    },
-    {
-      "path": "scripts/lending-simulate.js",
-      "sha256": "dc9259d8839e9fe8debe919a3b7ab350d93f70d49b747ca7a54804c4649ba384"
-    },
-    {
-      "path": "scripts/lending-execute.js",
-      "sha256": "9ed682af836db474a1c3fa03db004e4668faceaff8187965857a0f605ea39fbe"
-    },
-    {
-      "path": "scripts/swap-common.js",
-      "sha256": "fe92a5038afcf3f13001df4a5ebab72e8e0a0c228b798f9aeef055ba145db7a7"
-    },
-    {
-      "path": "scripts/swap-action-helpers.js",
-      "sha256": "cea3f85c11bec31fa814b0986ffdc5be36cf69e617a0679ba5ad49e496d2d3de"
-    },
-    {
-      "path": "scripts/swap-quote.js",
-      "sha256": "1e61241ea9a9499c621b2b625965f3b0a08ee10d1d9359b9c00c065c4563fcd5"
-    },
-    {
-      "path": "scripts/swap-build.js",
-      "sha256": "79c361eae6358f6f3258d6341b344a9644bd5a099a4f77ef6fd07d1c4ec41027"
-    },
-    {
-      "path": "scripts/swap-simulate.js",
-      "sha256": "ac9cccfca90e655ce832f187264ead65b29a33629be474a702cd2160f2a017c8"
-    },
-    {
-      "path": "scripts/swap-execute.js",
-      "sha256": "38e4e835cd3b5f5b18f21f7498f657d00a4c142f348b5e4b379f70f631bc64e4"
+      "path": "scripts/wallet-transfer.js",
+      "sha256": "252fda849f663921efce419c9bc8fe5c0839cb528859f5646d6c1e412a2f5b7d"
     }
   ]
 }
