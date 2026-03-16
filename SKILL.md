@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.60
+version: 0.1.62
 description: The source of DeFi intelligence for AI agents. Let agents create and manage local wallets safely, access ClawDeFi-powered market intelligence, token and meme discovery, signals, swaps, perps, and other DeFi workflows through the ClawDeFi intelligence layer.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -42,7 +42,7 @@ bash {baseDir}/scripts/onboard.sh
 This onboarding path:
 - checks `node`, `npm`, and `openclaw`,
 - creates a local WDK MCP runtime at `~/.openclaw/clawdefi/wdk-mcp`,
-- installs `@tetherto/wdk`, `@tetherto/wdk-wallet-evm`, `@tetherto/wdk-wallet-solana`, WDK MCP toolkit (GitHub source), and `@modelcontextprotocol/sdk`,
+- installs `@tetherto/wdk`, `@tetherto/wdk-wallet-evm`, `@tetherto/wdk-wallet-solana`, WDK MCP toolkit (GitHub source), `@modelcontextprotocol/sdk`, and `avantis-trader-sdk`,
 - scaffolds a local stdio MCP server with EVM, Solana, and pricing tools,
 - writes local config templates only,
 - preserves existing local `~/.openclaw/clawdefi/wdk-mcp/.env` if already present,
@@ -344,3 +344,137 @@ node {baseDir}/scripts/meme-rush.js --mode rank-list --chain-id CT_501 --rank-ty
 ```bash
 node {baseDir}/scripts/query-token-audit.js --chain-id 56 --contract-address 0x55d398326f99059ff775485246999027b3197955
 ```
+
+### III. Perps (Local Execution, Modular Adapters)
+
+Perps execution is local-first:
+- market context and quotes use adapter data,
+- transaction build returns deterministic intent + tx request,
+- signing/simulation/broadcast stays local through WDK.
+
+Do not use backend custody/signing for perps execution.
+
+Adapter model:
+- each venue is an adapter (`--adapter <slug>`),
+- current adapter: `avantis`,
+- future venues should implement the same action contracts without changing wallet/signing flow.
+
+Current venue support:
+- `avantis` on `base-mainnet`.
+
+#### perps_market_context
+```bash
+node {baseDir}/scripts/perps-market-context.js --adapter avantis --chain base-mainnet --market ETH/USD
+```
+
+#### perps_position_list
+Use active selected local wallet:
+
+```bash
+node {baseDir}/scripts/perps-position-list.js --adapter avantis --chain base-mainnet
+```
+
+Use explicit address:
+
+```bash
+node {baseDir}/scripts/perps-position-list.js --adapter avantis --address 0xabc --chain base-mainnet
+```
+
+#### perps_pending_orders
+```bash
+node {baseDir}/scripts/perps-pending-orders.js --adapter avantis --chain base-mainnet
+```
+
+#### perps_open_quote
+```bash
+node {baseDir}/scripts/perps-open-quote.js --adapter avantis --chain base-mainnet --market ETH/USD --side long --collateral-usd 100 --leverage 3
+```
+
+#### perps_open_build
+```bash
+node {baseDir}/scripts/perps-open-build.js --adapter avantis --chain base-mainnet --market ETH/USD --side long --collateral-usd 100 --leverage 3 --take-profit 2400 --stop-loss 1700
+```
+
+#### perps_open_simulate
+```bash
+node {baseDir}/scripts/perps-open-simulate.js --adapter avantis --chain base-mainnet --market ETH/USD --side long --collateral-usd 100 --leverage 3 --take-profit 2400 --stop-loss 1700
+```
+
+#### perps_open_execute
+```bash
+node {baseDir}/scripts/perps-open-execute.js --adapter avantis --chain base-mainnet --market ETH/USD --side long --collateral-usd 100 --leverage 3 --take-profit 2400 --stop-loss 1700
+```
+
+#### perps_close_quote
+```bash
+node {baseDir}/scripts/perps-close-quote.js --adapter avantis --chain base-mainnet --position-id 12:0 --size-percent 50
+```
+
+#### perps_close_build
+```bash
+node {baseDir}/scripts/perps-close-build.js --adapter avantis --chain base-mainnet --position-id 12:0 --size-percent 50
+```
+
+#### perps_close_simulate
+```bash
+node {baseDir}/scripts/perps-close-simulate.js --adapter avantis --chain base-mainnet --position-id 12:0 --size-percent 50
+```
+
+#### perps_close_execute
+```bash
+node {baseDir}/scripts/perps-close-execute.js --adapter avantis --chain base-mainnet --position-id 12:0 --size-percent 50
+```
+
+#### perps_risk_orders_build
+```bash
+node {baseDir}/scripts/perps-risk-orders-build.js --adapter avantis --chain base-mainnet --position-id 12:0 --take-profit 2600 --stop-loss 1700
+```
+
+#### perps_risk_orders_simulate
+```bash
+node {baseDir}/scripts/perps-risk-orders-simulate.js --adapter avantis --chain base-mainnet --position-id 12:0 --take-profit 2600 --stop-loss 1700
+```
+
+#### perps_risk_orders_execute
+```bash
+node {baseDir}/scripts/perps-risk-orders-execute.js --adapter avantis --chain base-mainnet --position-id 12:0 --take-profit 2600 --stop-loss 1700
+```
+
+#### perps_modify_position_build
+```bash
+node {baseDir}/scripts/perps-modify-position-build.js --adapter avantis --chain base-mainnet --position-id 12:0 --update-type deposit --margin-delta-usd 25
+```
+
+#### perps_modify_position_simulate
+```bash
+node {baseDir}/scripts/perps-modify-position-simulate.js --adapter avantis --chain base-mainnet --position-id 12:0 --update-type withdraw --margin-delta-usd 10
+```
+
+#### perps_modify_position_execute
+```bash
+node {baseDir}/scripts/perps-modify-position-execute.js --adapter avantis --chain base-mainnet --position-id 12:0 --update-type deposit --margin-delta-usd 25
+```
+
+#### perps_cancel_order_build
+```bash
+node {baseDir}/scripts/perps-cancel-order-build.js --adapter avantis --chain base-mainnet --order-id 12:1
+```
+
+#### perps_cancel_order_simulate
+```bash
+node {baseDir}/scripts/perps-cancel-order-simulate.js --adapter avantis --chain base-mainnet --order-id 12:1
+```
+
+#### perps_cancel_order_execute
+```bash
+node {baseDir}/scripts/perps-cancel-order-execute.js --adapter avantis --chain base-mainnet --order-id 12:1
+```
+
+Perps rules:
+- EVM only for now,
+- run simulate before execute for any fund-impacting action,
+- require explicit user intent before broadcasting,
+- use adapter-built tx requests only (do not handcraft tx payloads in chat),
+- signed intent and tx request must remain WDK-compatible (`to`, `data`, and bigint-safe value/fees),
+- position/order actions require a real open position or pending order; use `perps_position_list` / `perps_pending_orders` first,
+- never request seed phrase/private key in chat.

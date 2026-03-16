@@ -1,7 +1,7 @@
 {
-  "version": "0.1.60",
+  "version": "0.1.62",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "075623223dd0328d2c51f379fb216ca92e117ef38513c7e0654b16ad896c19fe",
+  "sha256": "8c7d8d03b7e1856b80b0e3fb838cf8d0c345cc39f605d62091a157ae35d21adc",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -81,7 +81,7 @@
     },
     {
       "path": "scripts/onboard.sh",
-      "sha256": "ecbed2d18bee098739efb4e040814b0699e335a63b6db3e1c9a0f569c859b212"
+      "sha256": "3bc0307afe86f7127ef5616d5c1e47b4973409b116e754da66e25eb3c99545e2"
     },
     {
       "path": "scripts/wallet-common.js",
@@ -133,7 +133,103 @@
     },
     {
       "path": "scripts/update.sh",
-      "sha256": "5b99fc1db5dc8f72c768a8886e4b1e30417efbabf60c0760bf3218eb71a2ce54"
+      "sha256": "2d9b3b08c1d15f2bcac2dadc4032f97c18f1cfe18d8bb4ec9b115c1bb8064ad2"
+    },
+    {
+      "path": "scripts/perps-common.js",
+      "sha256": "cdc69f4c8d4d5706c71332c4009160054cf31a78326ea10f732928cc7a887529"
+    },
+    {
+      "path": "scripts/perps-adapter-avantis.js",
+      "sha256": "82e1e82b057b6fbc46f27dff6cdf3f6243503a543dddc6c1f6f20a68a4a18463"
+    },
+    {
+      "path": "scripts/perps-tx-action-common.js",
+      "sha256": "d737fa2f83cee1742628bfc0236b8b38bdc85283a5cd2b84988f1191332d006c"
+    },
+    {
+      "path": "scripts/perps-market-context.js",
+      "sha256": "4dfc2af172cb32a90cb9309aae9fc1b301329c53ea5db87c7ad0dddd64b8e808"
+    },
+    {
+      "path": "scripts/perps-position-list.js",
+      "sha256": "37ab57d73892a0fb569eb0b8779ef7510ba1eaab316b7741bb80776ce0ee34da"
+    },
+    {
+      "path": "scripts/perps-open-quote.js",
+      "sha256": "b2288ba28cbb601d7bc08a68372c256d4b1fe77ac36eb9f69c6380b660654318"
+    },
+    {
+      "path": "scripts/perps-open-build.js",
+      "sha256": "23f220dc98e5edb0c108333d305acfef6fd1ce60d0df5558355aca3fe37cf528"
+    },
+    {
+      "path": "scripts/perps-open-simulate.js",
+      "sha256": "e76f890ac7789510a1bb84e33b1b264a2ff2843fd8473f1ccd0041baddb246a6"
+    },
+    {
+      "path": "scripts/perps-open-execute.js",
+      "sha256": "c5aa2644e05a5e6bc4a5069dac37a0dccc0c9fc12388f2bef9dc5591ae350a64"
+    },
+    {
+      "path": "scripts/perps-close-quote.js",
+      "sha256": "c98e57316d670159a4a4a5ec12dee484bfbe9f5ea502bcc05baf5d5d0ce2f6fd"
+    },
+    {
+      "path": "scripts/perps-close-build.js",
+      "sha256": "71687635b0cc2f5f440a22541fc5b2f8d7d3fda7f957fd732f09c298b329f281"
+    },
+    {
+      "path": "scripts/perps-close-simulate.js",
+      "sha256": "b0b1e34a050a8da1e2eb1a1a75c68e224609f199871971fe5f285157392d5c3f"
+    },
+    {
+      "path": "scripts/perps-close-execute.js",
+      "sha256": "76a09783a275e90851bc26fa4ef42c366acbfa4ac11dc88ef192929a8e20d614"
+    },
+    {
+      "path": "scripts/perps-action-helpers.js",
+      "sha256": "c125bb99a8c99223706ec2b72daa270a4b045b9f2e87562ce928ad58e96ea84a"
+    },
+    {
+      "path": "scripts/perps-pending-orders.js",
+      "sha256": "3e91c5aaab473d88edf5b876bcbe1eb6a19b512d8b6f2e2c26d58b67799c57bd"
+    },
+    {
+      "path": "scripts/perps-risk-orders-build.js",
+      "sha256": "c90c396e2ae09148c130b9bdba816b192bec9fb309d3d038cdcde6948e81671b"
+    },
+    {
+      "path": "scripts/perps-risk-orders-simulate.js",
+      "sha256": "512410f971784aec0bdb5f272d4345d3e24d33efe6aab0f65e34f623b147eaf6"
+    },
+    {
+      "path": "scripts/perps-risk-orders-execute.js",
+      "sha256": "b8c6bc88789b721a6e8b33dd65321be0c54702fcf05977341f9c6ee4565065d7"
+    },
+    {
+      "path": "scripts/perps-modify-position-build.js",
+      "sha256": "1a769ba30534d18ea34a24180adadc497bf2f36b3bc001bb5ee875ec75ad2c75"
+    },
+    {
+      "path": "scripts/perps-modify-position-simulate.js",
+      "sha256": "b3eeccbc7f20cdfe91dea284759c232c4f2260217c86b3191c33bb5ee7953d6c"
+    },
+    {
+      "path": "scripts/perps-modify-position-execute.js",
+      "sha256": "f0f6d439e8b4f8d3607e1edeb164c7fef4b01f606978b4dd4519d71b4355fd86"
+    },
+    {
+      "path": "scripts/perps-cancel-order-build.js",
+      "sha256": "811554fc71170448ce3af2ab24ef8b8a3ae9f00862f6847fe847010f3bdf4a57"
+    },
+    {
+      "path": "scripts/perps-cancel-order-simulate.js",
+      "sha256": "889daba0560b5339d4379a783d25e10c44f27c9820811a4bfcdbd141e0383f72"
+    },
+    {
+      "path": "scripts/perps-cancel-order-execute.js",
+      "sha256": "831aed0213b305d9ce6bb5bcac521de2d17c157f2613bc5c227d95b3d61c2c23"
     }
   ]
 }
