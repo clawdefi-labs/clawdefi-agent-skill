@@ -27,6 +27,7 @@ const {
 const DEFAULT_GAMMA_API_URL = (process.env.POLYMARKET_GAMMA_API_URL || 'https://gamma-api.polymarket.com').replace(/\/+$/, '')
 const DEFAULT_CLOB_API_URL = (process.env.POLYMARKET_CLOB_API_URL || 'https://clob.polymarket.com').replace(/\/+$/, '')
 const DEFAULT_TIMEOUT_MS = Number.parseInt(String(process.env.POLYMARKET_TIMEOUT_MS || '12000'), 10)
+const DEFAULT_API_NONCE = Number.parseInt(String(process.env.POLYMARKET_API_NONCE || '0'), 10)
 
 const FALLBACK_RPC_BY_CHAIN = {
   'polygon-pos': process.env.CLAWDEFI_POLYGON_RPC_URL || 'https://polygon-bor-rpc.publicnode.com',
@@ -955,6 +956,30 @@ function maskSecret (value) {
   return `${raw.slice(0, 4)}***${raw.slice(-4)}`
 }
 
+function isValidApiCreds (value) {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      typeof value.key === 'string' &&
+      value.key &&
+      typeof value.secret === 'string' &&
+      value.secret &&
+      typeof value.passphrase === 'string' &&
+      value.passphrase
+  )
+}
+
+function buildApiNonceCandidates () {
+  const preferred = Number.isInteger(DEFAULT_API_NONCE) && DEFAULT_API_NONCE >= 0 ? DEFAULT_API_NONCE : 0
+  const candidates = [preferred]
+  for (const fallback of [0, 1, 2, 3, 4, 5]) {
+    if (!candidates.includes(fallback)) {
+      candidates.push(fallback)
+    }
+  }
+  return candidates
+}
+
 async function withSuppressedClobLogs (callback) {
   const originalLog = console.log
   const originalError = console.error
@@ -1018,12 +1043,34 @@ async function ensureApiCreds ({
     signatureType,
     funderAddress,
     creds: undefined,
-    throwOnError: true
+    throwOnError: false
   })
 
-  const derived = await bootstrapClient.createOrDeriveApiKey()
-  if (!derived || !derived.key || !derived.secret || !derived.passphrase) {
-    throw new Error('Unable to derive Polymarket API credentials.')
+  let derived = null
+  let source = null
+  const attemptedNonces = []
+  for (const nonce of buildApiNonceCandidates()) {
+    attemptedNonces.push(nonce)
+    const created = await bootstrapClient.createApiKey(nonce)
+    if (isValidApiCreds(created)) {
+      derived = created
+      source = `created_nonce_${nonce}`
+      break
+    }
+
+    const recovered = await bootstrapClient.deriveApiKey(nonce)
+    if (isValidApiCreds(recovered)) {
+      derived = recovered
+      source = `derived_nonce_${nonce}`
+      break
+    }
+  }
+
+  if (!isValidApiCreds(derived)) {
+    throw new Error(
+      `Unable to bootstrap Polymarket API credentials for nonces [${attemptedNonces.join(', ')}]. ` +
+      'If your Polymarket account uses proxy/safe mode, set the correct --signature-type and --funder-address.'
+    )
   }
 
   if (persistApiCreds) {
@@ -1038,7 +1085,7 @@ async function ensureApiCreds ({
 
   return {
     creds: derived,
-    source: 'derived'
+    source: source || 'derived'
   }
 }
 

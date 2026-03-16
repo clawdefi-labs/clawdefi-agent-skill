@@ -169,7 +169,7 @@
     },
     {
       "path": "scripts/predictions-adapter-polymarket.js",
-      "sha256": "d3043896fd19850b46c7ae56986133211521cda07e115608d7d86da8e563fc21"
+      "sha256": "23e7c7872c1ab5b9a60e01d443f96aabcf1e20e05b1c2078aa2c0aac0444b89f"
     },
     {
       "path": "scripts/predictions-build.js",
