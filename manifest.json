@@ -1,7 +1,7 @@
 {
-  "version": "0.1.57",
+  "version": "0.1.59",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "379a57b113f54f190618833045b9eda6f3683e1f19cc9cea606cd871b991eb49",
+  "sha256": "f303d0fe410e4f86148a5905d5cb3641d33e8c44bc9df662c34b6ee66d5db0f4",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -30,6 +30,50 @@
     {
       "path": "scripts/query-contract-verification.js",
       "sha256": "82cad3056a4074b75acde1c2c340b12a0df539f2e3f748bd02eda0aa53c1b0ec"
+    },
+    {
+      "path": "scripts/market-intel-common.js",
+      "sha256": "1945ba945f78c35d84a1c9a41e8c362a0a57b02caefa343a1acd6da378ecd148"
+    },
+    {
+      "path": "scripts/query-token-info.js",
+      "sha256": "97a3103208d9c51b2079a1e7057f7ecc7e0c61e6205dedb65ade22cad17f4cec"
+    },
+    {
+      "path": "scripts/query-address-info.js",
+      "sha256": "cddef4a8cf70f60ce24bc6cee7a5afd3bdbb27daa63d6d8bfe181ff9a8cafbbe"
+    },
+    {
+      "path": "scripts/crypto-market-rank.js",
+      "sha256": "2d2f9baba99fc45ef8e7f9678732f52d8b47d76fb81ac849b04d8facb0750746"
+    },
+    {
+      "path": "scripts/trading-signal.js",
+      "sha256": "15459148f492b65dcf23459183d373b55f49d1d6e963900a601ec1f0cb73aa6c"
+    },
+    {
+      "path": "scripts/meme-rush.js",
+      "sha256": "55dfab7710ff13e5de3cc32a4ba5e4052c0b0fd4693e3c040760ff9a53a71c2b"
+    },
+    {
+      "path": "scripts/query-token-audit.js",
+      "sha256": "c112201bdc645d68c0412384a260d076080b62a92448f00c55d3a0dac7c438f8"
+    },
+    {
+      "path": "scripts/query-pyth-stream-open.js",
+      "sha256": "62eb820247c1287c402f981a315039a4527c551b9b7545500d131c6b100aea3a"
+    },
+    {
+      "path": "scripts/query-pyth-stream-poll.js",
+      "sha256": "d8687d02e969331e38dd40fb96c216ae730961fe67f64ab0b66db2beae3c01dd"
+    },
+    {
+      "path": "scripts/query-pyth-stream-worker.js",
+      "sha256": "75fb08550f00c578a1daaec2707d20e9a0615c74d114f1579f10705d59019ff4"
+    },
+    {
+      "path": "scripts/query-pyth-stream-close.js",
+      "sha256": "40827a92cf9d02273b91a4d86bb67cd43bac3675a753e678c49613a07d835a5f"
     },
     {
       "path": "scripts/onboard.sh",

@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.57
+version: 0.1.59
 description: The source of DeFi intelligence for AI agents. Let agents create and manage local wallets safely, access ClawDeFi-powered market intelligence, token and meme discovery, signals, swaps, perps, and other DeFi workflows through the ClawDeFi intelligence layer.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -222,3 +222,87 @@ Wallet rules:
 - do not fabricate wallet addresses, balances, hashes, or signatures,
 - prefer quote paths before fund-impacting execution,
 - use a dedicated wallet seed for ClawDeFi, not a main wallet seed.
+
+### II. Market Intelligence
+
+Market intel modules are split into two paths:
+- direct local scripts for source-native reads (`query_coingecko`, `query_pyth`, `query_pyth_stream_*`, `query_avantis`, `query_contract_verification`),
+- ClawDeFi backend intel endpoint for Binance/OKX-style reads (`query_token_info`, `query_address_info`, `crypto_market_rank`, `trading_signal`, `meme_rush`, `query_token_audit`).
+
+Do not route these through the old MCP plugin workflow.
+
+Direct local market intel modules:
+
+#### query_coingecko
+```bash
+node {baseDir}/scripts/query-coingecko.js simple-price --ids ethereum,bitcoin --vs-currencies usd --json
+```
+
+#### query_pyth
+```bash
+node {baseDir}/scripts/query-pyth.js latest --feed-ids 0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace --json
+```
+
+#### query_pyth_stream_open
+```bash
+node {baseDir}/scripts/query-pyth-stream-open.js --feed-ids 0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace
+```
+
+#### query_pyth_stream_poll
+```bash
+node {baseDir}/scripts/query-pyth-stream-poll.js --session-id <session_id> --cursor 0 --limit 20
+```
+
+#### query_pyth_stream_close
+```bash
+node {baseDir}/scripts/query-pyth-stream-close.js --session-id <session_id>
+```
+
+Pyth stream behavior note:
+- `query_pyth_stream_open` starts a local background stream collector.
+- `query_pyth_stream_poll` reads buffered events incrementally using `cursor`.
+- This is stream-to-buffer polling (agent pull model), not direct push callbacks into chat.
+
+#### query_avantis
+```bash
+node {baseDir}/scripts/query-avantis.js health --json
+```
+
+#### query_contract_verification
+```bash
+node {baseDir}/scripts/query-contract-verification.js --chain-id 8453 --contract-address 0x940181a94A35A4569E4529A3CDfB74e38FD98631 --json
+```
+
+Backend-routed market intel modules (ClawDeFi endpoint):
+- endpoint: `POST /api/v1/intel/market/query`
+- script wrappers below call ClawDeFi backend directly and return normalized ClawDeFi intel payload.
+
+#### query_token_info
+```bash
+node {baseDir}/scripts/query-token-info.js --mode search --keyword usdc --chain-ids 56,8453,CT_501
+```
+
+#### query_address_info
+```bash
+node {baseDir}/scripts/query-address-info.js --address 0x0000000000000000000000000000000000000001 --chain-id 56 --offset 0
+```
+
+#### crypto_market_rank
+```bash
+node {baseDir}/scripts/crypto-market-rank.js --mode unified --chain-id 56 --rank-type 10 --period 50 --size 20
+```
+
+#### trading_signal
+```bash
+node {baseDir}/scripts/trading-signal.js --chain-id CT_501 --page 1 --page-size 50
+```
+
+#### meme_rush
+```bash
+node {baseDir}/scripts/meme-rush.js --mode rank-list --chain-id CT_501 --rank-type 10 --limit 20
+```
+
+#### query_token_audit
+```bash
+node {baseDir}/scripts/query-token-audit.js --chain-id 56 --contract-address 0x55d398326f99059ff775485246999027b3197955
+```
