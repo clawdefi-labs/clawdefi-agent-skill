@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.62
+version: 0.1.63
 description: The source of DeFi intelligence for AI agents. Let agents create and manage local wallets safely, access ClawDeFi-powered market intelligence, token and meme discovery, signals, swaps, perps, and other DeFi workflows through the ClawDeFi intelligence layer.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -400,6 +400,26 @@ node {baseDir}/scripts/perps-position-list.js --adapter avantis --address 0xabc 
 node {baseDir}/scripts/perps-pending-orders.js --adapter avantis --chain base-mainnet
 ```
 
+#### perps_referral_info
+```bash
+node {baseDir}/scripts/perps-referral-info.js --adapter avantis --chain base-mainnet
+```
+
+#### perps_referral_bind_build
+```bash
+node {baseDir}/scripts/perps-referral-bind-build.js --adapter avantis --chain base-mainnet --referral-code CLAWDEFI
+```
+
+#### perps_referral_bind_simulate
+```bash
+node {baseDir}/scripts/perps-referral-bind-simulate.js --adapter avantis --chain base-mainnet --referral-code CLAWDEFI
+```
+
+#### perps_referral_bind_execute
+```bash
+node {baseDir}/scripts/perps-referral-bind-execute.js --adapter avantis --chain base-mainnet --referral-code CLAWDEFI
+```
+
 #### perps_open_quote
 ```bash
 node {baseDir}/scripts/perps-open-quote.js --adapter avantis --chain base-mainnet --market ETH/USD --side long --collateral-usd 100 --leverage 3
@@ -487,11 +507,17 @@ node {baseDir}/scripts/perps-cancel-order-execute.js --adapter avantis --chain b
 
 Perps rules:
 - EVM only for now,
+- do not auto-bind referral; require explicit user consent before binding or changing referral code,
+- before any referral bind action, explicitly state:
+`Benefit to you: trading fee discount (depends on Avantis referral tier).`
+`Benefit to ClawDeFi: referral fee rebate.`
 - run simulate before execute for any fund-impacting action,
 - require explicit user intent before broadcasting,
 - use adapter-built tx requests only (do not handcraft tx payloads in chat),
 - signed intent and tx request must remain WDK-compatible (`to`, `data`, and bigint-safe value/fees),
 - position/order actions require a real open position or pending order; use `perps_position_list` / `perps_pending_orders` first,
+- use `perps_referral_info` first to check whether referral is already bound for the wallet,
+- referral binding must go through `perps_referral_bind_build` -> `perps_referral_bind_simulate` -> `perps_referral_bind_execute`,
 - never request seed phrase/private key in chat.
 
 ### V. Lending

@@ -1,7 +1,7 @@
 {
-  "version": "0.1.62",
+  "version": "0.1.63",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "36f63d2cad2b4219001831621ad85e15494481af45aeb667b457c2ce6aa02cdc",
+  "sha256": "247fbbaa38b34868a1b24e076c403a463536ffd120d444e40746a2f0eac1f906",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -141,7 +141,7 @@
     },
     {
       "path": "scripts/perps-adapter-avantis.js",
-      "sha256": "82e1e82b057b6fbc46f27dff6cdf3f6243503a543dddc6c1f6f20a68a4a18463"
+      "sha256": "edef710103a665f8ed0eb069720ef63a339a379d1c4a41385fb2a30275df7b4c"
     },
     {
       "path": "scripts/perps-tx-action-common.js",
@@ -189,11 +189,27 @@
     },
     {
       "path": "scripts/perps-action-helpers.js",
-      "sha256": "c125bb99a8c99223706ec2b72daa270a4b045b9f2e87562ce928ad58e96ea84a"
+      "sha256": "c7eb025af9d17b31acb4e4dd404a1bf94bffecaf860dacaa563cc0442db464c9"
     },
     {
       "path": "scripts/perps-pending-orders.js",
       "sha256": "3e91c5aaab473d88edf5b876bcbe1eb6a19b512d8b6f2e2c26d58b67799c57bd"
+    },
+    {
+      "path": "scripts/perps-referral-info.js",
+      "sha256": "f766e6b4f31116f5c2bb3147ab7943756cafb6bc77bf7b07d3c820512a8cfc28"
+    },
+    {
+      "path": "scripts/perps-referral-bind-build.js",
+      "sha256": "c8c32c29efa4908bb2a78c9a7653d6c644fcea9c67d2a9af306b92e32d478208"
+    },
+    {
+      "path": "scripts/perps-referral-bind-simulate.js",
+      "sha256": "2ab4ff82f69191254d3052c0800f4d96bb0919f94a981207b8417445a2996a6a"
+    },
+    {
+      "path": "scripts/perps-referral-bind-execute.js",
+      "sha256": "bba6f424fa444892b0e42b7f22a794e69c39aca7e9c57ee3c3327577cee5e70f"
     },
     {
       "path": "scripts/perps-risk-orders-build.js",

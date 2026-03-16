@@ -58,6 +58,10 @@ Cron example (every 6 hours):
 - `scripts/query-protocol.js`: bundled read-only protocol intelligence query module for `clawdefi-core`.
 - `scripts/query-coingecko.js`: bundled CoinGecko market-data query module (simple price, token price, coin details, search).
 - `scripts/query-avantis.js`: bundled Avantis connectivity + pair-feed query module for perp monitoring preflight.
+- `scripts/perps-referral-info.js`: reads current Avantis referral code/referrer binding for the selected wallet.
+- `scripts/perps-referral-bind-build.js`: builds deterministic Avantis referral bind transaction payload.
+- `scripts/perps-referral-bind-simulate.js`: simulates referral bind transaction locally via WDK wallet runtime.
+- `scripts/perps-referral-bind-execute.js`: executes referral bind transaction locally via WDK wallet runtime.
 - `scripts/query-pyth.js`: bundled Pyth oracle query module (Hermes latest/stream and Pyth Pro WSS endpoint guidance).
 - `scripts/query-contract-verification.js`: bundled Etherscan contract verification query module (`getsourcecode`).
 

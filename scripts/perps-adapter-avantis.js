@@ -15,6 +15,16 @@ const CORE_API_BASE_URL = (process.env.AVANTIS_CORE_API_BASE_URL || 'https://cor
 const SOCKET_API_URL = process.env.AVANTIS_SOCKET_API_URL || 'https://socket-api-pub.avantisfi.com/socket-api/v1/data'
 const DEFAULT_TIMEOUT_MS = Number.parseInt(String(process.env.AVANTIS_TIMEOUT_MS || '10000'), 10)
 const BASE_RPC_FALLBACK = process.env.CLAWDEFI_BASE_RPC_URL || process.env.AVANTIS_RPC_URL || 'https://mainnet.base.org'
+const REFERRAL_ABI_MIN = [
+  'function getTraderReferralInfo(address _account) view returns (bytes32,address)',
+  'function setTraderReferralCodeByUser(bytes32 _code)'
+]
+const REFERRAL_DISCLOSURE = {
+  traderBenefit: 'Benefit to you: trading fee discount (depends on Avantis referral tier).',
+  clawdefiBenefit: 'Benefit to ClawDeFi: referral fee rebate.',
+  note: 'Referral discounts apply on fixed-fee trades per Avantis docs.',
+  consentRequired: true
+}
 
 function normalizeMarketSymbol (input) {
   return String(input || '').trim().replace(/[\s_-]+/g, '/').replace(/\/+/g, '/').toUpperCase()
@@ -143,6 +153,60 @@ function getSdk () {
     throw new Error(
       `avantis-trader-sdk is not installed in local runtime (${MCP_DIR}). Run bash {baseDir}/scripts/onboard.sh again.`
     )
+  }
+}
+
+function getEthers () {
+  const runtimeRequire = getRuntimeRequire()
+  try {
+    return runtimeRequire('ethers')
+  } catch {
+    throw new Error(
+      `ethers is not installed in local runtime (${MCP_DIR}). Run bash {baseDir}/scripts/onboard.sh again.`
+    )
+  }
+}
+
+function parseReferralCode (value) {
+  const referralCode = String(value || '').trim()
+  if (!referralCode) {
+    throw new Error('referralCode is required.')
+  }
+  if (Buffer.byteLength(referralCode, 'utf8') > 31) {
+    throw new Error('referralCode must be <= 31 UTF-8 bytes.')
+  }
+  return referralCode
+}
+
+function decodeBytes32StringSafe (ethersLib, bytes32Value) {
+  if (!bytes32Value || bytes32Value === '0x' || /^0x0{64}$/i.test(String(bytes32Value))) {
+    return ''
+  }
+  try {
+    return ethersLib.decodeBytes32String(bytes32Value)
+  } catch {
+    return ''
+  }
+}
+
+function getReferralContractAddress (sdk) {
+  if (process.env.AVANTIS_REFERRAL_CONTRACT && process.env.AVANTIS_REFERRAL_CONTRACT.trim()) {
+    return process.env.AVANTIS_REFERRAL_CONTRACT.trim()
+  }
+  if (sdk && sdk.CONTRACTS && typeof sdk.CONTRACTS.Referral === 'string' && sdk.CONTRACTS.Referral.trim()) {
+    return sdk.CONTRACTS.Referral
+  }
+  throw new Error('Unable to resolve Avantis referral contract address.')
+}
+
+function getReferralContract ({ sdk, client }) {
+  const ethersLib = getEthers()
+  const referralAddress = getReferralContractAddress(sdk)
+  const contract = new ethersLib.Contract(referralAddress, REFERRAL_ABI_MIN, client.provider)
+  return {
+    contract,
+    referralAddress,
+    ethersLib
   }
 }
 
@@ -1038,6 +1102,108 @@ async function buildCancelOrder (input) {
   }
 }
 
+async function getReferralInfo ({ chain, walletAddress }) {
+  const normalizedChain = normalizeChainSlug(chain)
+  if (normalizedChain !== 'base-mainnet' && normalizedChain !== 'base') {
+    throw new Error('Avantis currently supports base-mainnet only.')
+  }
+
+  const traderAddress = String(walletAddress || '').trim()
+  if (!traderAddress) {
+    throw new Error('walletAddress is required.')
+  }
+
+  const { sdk, client, rpc } = await buildClient(normalizedChain)
+  const { contract, referralAddress, ethersLib } = getReferralContract({ sdk, client })
+  const [codeBytes32, referrer] = await contract.getTraderReferralInfo(traderAddress)
+  const code = decodeBytes32StringSafe(ethersLib, codeBytes32)
+
+  return {
+    provider: 'avantis',
+    chainSlug: rpc.chainSlug,
+    chainId: rpc.chainId,
+    referralContract: referralAddress,
+    walletAddress: traderAddress,
+    referral: {
+      code,
+      codeBytes32: String(codeBytes32),
+      referrer
+    },
+    hasReferralCode: Boolean(code),
+    disclosure: REFERRAL_DISCLOSURE,
+    warnings: []
+  }
+}
+
+async function buildSetReferralCode ({ chain, walletAddress, referralCode }) {
+  const normalizedChain = normalizeChainSlug(chain)
+  if (normalizedChain !== 'base-mainnet' && normalizedChain !== 'base') {
+    throw new Error('Avantis currently supports base-mainnet only.')
+  }
+
+  const traderAddress = String(walletAddress || '').trim()
+  if (!traderAddress) {
+    throw new Error('walletAddress is required.')
+  }
+
+  const code = parseReferralCode(referralCode)
+  const { sdk, client, rpc } = await buildClient(normalizedChain)
+  const { contract, referralAddress, ethersLib } = getReferralContract({ sdk, client })
+  const codeBytes32 = ethersLib.encodeBytes32String(code)
+
+  const [currentCodeBytes32, currentReferrer] = await contract.getTraderReferralInfo(traderAddress)
+  const currentCode = decodeBytes32StringSafe(ethersLib, currentCodeBytes32)
+
+  const txRequest = normalizeTxForOutput({
+    to: referralAddress,
+    data: contract.interface.encodeFunctionData('setTraderReferralCodeByUser', [codeBytes32]),
+    value: 0n
+  })
+
+  const intent = {
+    intentVersion: 'perps.intent.v1',
+    protocolSlug: 'avantis',
+    chainSlug: rpc.chainSlug,
+    action: 'set_referral_code',
+    wallet: {
+      walletAddress: traderAddress
+    },
+    params: {
+      referralCode: code,
+      referralCodeBytes32: codeBytes32,
+      previousCode: currentCode,
+      previousReferrer: currentReferrer
+    },
+    policy: {
+      category: 'perps',
+      amountUsd: 0
+    },
+    createdAt: new Date().toISOString(),
+    metadata: {
+      sourceTool: 'perps_referral_bind_build',
+      adapter: 'avantis'
+    }
+  }
+
+  return {
+    provider: 'avantis',
+    chainSlug: rpc.chainSlug,
+    chainId: rpc.chainId,
+    referralContract: referralAddress,
+    currentReferral: {
+      code: currentCode,
+      codeBytes32: String(currentCodeBytes32),
+      referrer: currentReferrer
+    },
+    targetReferralCode: code,
+    txRequest,
+    intent,
+    intentHash: computeIntentHash(intent),
+    disclosure: REFERRAL_DISCLOSURE,
+    warnings: []
+  }
+}
+
 module.exports = {
   slug: 'avantis',
   marketContext,
@@ -1049,5 +1215,7 @@ module.exports = {
   buildClose,
   buildRiskOrders,
   buildModifyPosition,
-  buildCancelOrder
+  buildCancelOrder,
+  getReferralInfo,
+  buildSetReferralCode
 }

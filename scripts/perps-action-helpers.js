@@ -125,6 +125,18 @@ function parseCancelArgs (args) {
   }
 }
 
+function parseReferralCode (args) {
+  const referralCode = parseStrictString(
+    args['referral-code'] !== undefined ? args['referral-code'] : (args.referralCode || args.code),
+    'referral-code'
+  )
+  const bytes = Buffer.byteLength(referralCode, 'utf8')
+  if (bytes > 31) {
+    throw new Error('--referral-code must be <= 31 UTF-8 bytes for bytes32 encoding.')
+  }
+  return referralCode
+}
+
 function normalizeBuildOutput (buildResult) {
   return stringifyBigInts({
     ...buildResult,
@@ -138,6 +150,7 @@ module.exports = {
   parseCloseArgs,
   parseModifyArgs,
   parseOpenArgs,
+  parseReferralCode,
   parseRiskArgs,
   resolveWalletAddress
 }
