@@ -345,7 +345,22 @@ node {baseDir}/scripts/meme-rush.js --mode rank-list --chain-id CT_501 --rank-ty
 node {baseDir}/scripts/query-token-audit.js --chain-id 56 --contract-address 0x55d398326f99059ff775485246999027b3197955
 ```
 
-### III. Perps (Local Execution, Modular Adapters)
+### III. Swap
+
+Swap module is intentionally scaffolded first and will be expanded in the next pass.
+
+Current placeholder contract:
+- source of route/quote intelligence should come from ClawDeFi intel layer,
+- signing and execution must stay local through WDK wallet runtime,
+- backend must not become the signing/custody boundary.
+
+Planned module placeholders:
+- `swap_quote`
+- `swap_build`
+- `swap_simulate`
+- `swap_execute`
+
+### IV. Perps (Local Execution, Modular Adapters)
 
 Perps execution is local-first:
 - market context and quotes use adapter data,
@@ -478,3 +493,51 @@ Perps rules:
 - signed intent and tx request must remain WDK-compatible (`to`, `data`, and bigint-safe value/fees),
 - position/order actions require a real open position or pending order; use `perps_position_list` / `perps_pending_orders` first,
 - never request seed phrase/private key in chat.
+
+### V. Lending
+
+Lending module is intentionally placeholder-only for now.
+Not implemented yet.
+
+Planned placeholder surface:
+- `lending_markets`
+- `lending_quote`
+- `lending_build`
+- `lending_simulate`
+- `lending_execute`
+
+### VI. Yield
+
+Yield module is intentionally placeholder-only for now.
+Not implemented yet.
+
+Planned placeholder surface:
+- `yield_opportunities`
+- `yield_quote`
+- `yield_build`
+- `yield_simulate`
+- `yield_execute`
+
+### VII. Predictions
+
+Predictions module is intentionally placeholder-only for now.
+Not implemented yet.
+
+Planned placeholder surface:
+- `predictions_markets`
+- `predictions_quote`
+- `predictions_build`
+- `predictions_simulate`
+- `predictions_execute`
+
+### VIII. Options
+
+Options module is intentionally placeholder-only for now.
+Not implemented yet.
+
+Planned placeholder surface:
+- `options_chain`
+- `options_quote`
+- `options_build`
+- `options_simulate`
+- `options_execute`
