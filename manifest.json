@@ -1,7 +1,7 @@
 {
-  "version": "0.1.59",
+  "version": "0.1.60",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "f303d0fe410e4f86148a5905d5cb3641d33e8c44bc9df662c34b6ee66d5db0f4",
+  "sha256": "075623223dd0328d2c51f379fb216ca92e117ef38513c7e0654b16ad896c19fe",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -14,6 +14,10 @@
     {
       "path": "scripts/query-protocol.js",
       "sha256": "d08b1f2e740c7af0ff6273b69eeba69d4f34af4e374d711f75159be10f8d3ae6"
+    },
+    {
+      "path": "scripts/query-chain-registry.js",
+      "sha256": "15f93b58889ece22cd2d1bad051367065335a69823a2ff95a6a68521433eb99b"
     },
     {
       "path": "scripts/query-coingecko.js",
@@ -110,6 +114,14 @@
     {
       "path": "scripts/wallet-sign-broadcast.js",
       "sha256": "39baacfc348c883a908142532ffb349d3ed68ea2417c0a793e1a5846295d58ba"
+    },
+    {
+      "path": "scripts/wallet-token-allowance-check.js",
+      "sha256": "c89d62c0355c51fb8976eb5f4c7f62abc02eadfbeaea9311e639853507559222"
+    },
+    {
+      "path": "scripts/wallet-token-allowance-set.js",
+      "sha256": "0cf7999a216c8e61bc651fa498c9e21e4113aac0b08817eb0d1104c4e1f70da1"
     },
     {
       "path": "scripts/wallet-transfer.js",

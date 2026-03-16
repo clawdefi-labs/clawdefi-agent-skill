@@ -1,6 +1,6 @@
 ---
 name: clawdefi-agent
-version: 0.1.59
+version: 0.1.60
 description: The source of DeFi intelligence for AI agents. Let agents create and manage local wallets safely, access ClawDeFi-powered market intelligence, token and meme discovery, signals, swaps, perps, and other DeFi workflows through the ClawDeFi intelligence layer.
 homepage: https://www.clawdefi.ai
 metadata: {"clawdefi":{"category":"defi-intelligence","api_base":"https://api.clawdefi.ai","distribution":["clawhub","raw"]}}
@@ -216,6 +216,34 @@ Token transfer:
 node {baseDir}/scripts/wallet-transfer.js --chain ethereum-mainnet --token 0xdAC17F958D2ee523a2206206994597C13D831ec7 --recipient 0xabc --amount 1000000
 ```
 
+#### Check Token Allowance (EVM)
+Use to read current ERC20 allowance for spender on selected EVM chain.
+
+```bash
+node {baseDir}/scripts/wallet-token-allowance-check.js --chain base-mainnet --token 0xdAC17F958D2ee523a2206206994597C13D831ec7 --spender 0xabcabcabcabcabcabcabcabcabcabcabcabcabca
+```
+
+#### Set Token Allowance (EVM)
+Use to set allowance via local signing runtime.
+
+Dry-run exact allowance:
+
+```bash
+node {baseDir}/scripts/wallet-token-allowance-set.js --chain base-mainnet --token 0xdAC17F958D2ee523a2206206994597C13D831ec7 --spender 0xabcabcabcabcabcabcabcabcabcabcabcabcabca --mode exact --amount 1000000 --dry-run
+```
+
+Execute revoke:
+
+```bash
+node {baseDir}/scripts/wallet-token-allowance-set.js --chain base-mainnet --token 0xdAC17F958D2ee523a2206206994597C13D831ec7 --spender 0xabcabcabcabcabcabcabcabcabcabcabcabcabca --mode revoke
+```
+
+Execute unlimited (explicit flag required):
+
+```bash
+node {baseDir}/scripts/wallet-token-allowance-set.js --chain base-mainnet --token 0xdAC17F958D2ee523a2206206994597C13D831ec7 --spender 0xabcabcabcabcabcabcabcabcabcabcabcabcabca --mode unlimited --allow-unlimited true
+```
+
 Wallet rules:
 - wallet custody stays local,
 - do not ask users to paste seed phrases into chat,
@@ -225,9 +253,10 @@ Wallet rules:
 
 ### II. Market Intelligence
 
-Market intel modules are split into two paths:
+Market intel modules are split into three paths:
 - direct local scripts for source-native reads (`query_coingecko`, `query_pyth`, `query_pyth_stream_*`, `query_avantis`, `query_contract_verification`),
-- ClawDeFi backend intel endpoint for Binance/OKX-style reads (`query_token_info`, `query_address_info`, `crypto_market_rank`, `trading_signal`, `meme_rush`, `query_token_audit`).
+- ClawDeFi backend intel endpoint for Binance/OKX-style reads (`query_token_info`, `query_address_info`, `crypto_market_rank`, `trading_signal`, `meme_rush`, `query_token_audit`),
+- ClawDeFi backend chain context endpoint for RPC/explorer intelligence (`query_chain_registry`).
 
 Do not route these through the old MCP plugin workflow.
 
@@ -271,6 +300,15 @@ node {baseDir}/scripts/query-avantis.js health --json
 #### query_contract_verification
 ```bash
 node {baseDir}/scripts/query-contract-verification.js --chain-id 8453 --contract-address 0x940181a94A35A4569E4529A3CDfB74e38FD98631 --json
+```
+
+#### query_chain_registry
+```bash
+node {baseDir}/scripts/query-chain-registry.js --chain base-mainnet --intent read
+```
+
+```bash
+node {baseDir}/scripts/query-chain-registry.js --chain-id 8453 --intent simulate
 ```
 
 Backend-routed market intel modules (ClawDeFi endpoint):
