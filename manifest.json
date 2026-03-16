@@ -1,7 +1,7 @@
 {
-  "version": "0.1.63",
+  "version": "0.1.64",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "247fbbaa38b34868a1b24e076c403a463536ffd120d444e40746a2f0eac1f906",
+  "sha256": "671d33c60976ca5973a1433d1de76e49f4edff58e902bba60b4c7d38ab9ee2e9",
   "files": [
     {
       "path": "scripts/simulate-transaction.js",
@@ -246,6 +246,38 @@
     {
       "path": "scripts/perps-cancel-order-execute.js",
       "sha256": "831aed0213b305d9ce6bb5bcac521de2d17c157f2613bc5c227d95b3d61c2c23"
+    },
+    {
+      "path": "scripts/lending-common.js",
+      "sha256": "763cad71414a2c21dcf7a2e6127b6cf984a81a4e70419d827cd5e840ae8135fe"
+    },
+    {
+      "path": "scripts/lending-action-helpers.js",
+      "sha256": "a4b5ef49de81e95087f00fb9cd81e290309dee5515ea128acb9831c5b1155a56"
+    },
+    {
+      "path": "scripts/lending-adapter-aave.js",
+      "sha256": "5876f94ef6e60c451a132cb4578bcb3ddac81c0fe4a3726482e1930e0e01e0e3"
+    },
+    {
+      "path": "scripts/lending-markets.js",
+      "sha256": "2a852e7a94b10b304c07e2bfd0ba39973bde3fa798f49e6abb5f6161fe14c9c8"
+    },
+    {
+      "path": "scripts/lending-build.js",
+      "sha256": "c0364b68a57dc8961c023c0e43f0a45b9d83265202fb398df148f04492f4dce7"
+    },
+    {
+      "path": "scripts/lending-quote.js",
+      "sha256": "b98f1a6fbedca5e54207603ce95ee45b77b21d7add0137ac7abe36e0f576472d"
+    },
+    {
+      "path": "scripts/lending-simulate.js",
+      "sha256": "dc9259d8839e9fe8debe919a3b7ab350d93f70d49b747ca7a54804c4649ba384"
+    },
+    {
+      "path": "scripts/lending-execute.js",
+      "sha256": "9ed682af836db474a1c3fa03db004e4668faceaff8187965857a0f605ea39fbe"
     }
   ]
 }
