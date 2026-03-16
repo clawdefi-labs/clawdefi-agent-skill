@@ -13,11 +13,25 @@ const SUPPORTED_SORT_BY = new Set([
   'name'
 ])
 
+const ERC20_ABI = [
+  'function allowance(address owner, address spender) view returns (uint256)',
+  'function approve(address spender, uint256 amount) returns (bool)'
+]
+
 function normalizeAddressRef (value) {
   const raw = String(value || '').trim()
   if (!raw) return null
   const normalized = raw.includes('-') ? raw.split('-', 2)[1] : raw
   return normalized.toLowerCase()
+}
+
+function normalizeAmountRef (value) {
+  const raw = String(value || '').trim()
+  if (!raw) return '0'
+  if (!/^\d+$/.test(raw)) {
+    throw new Error(`Invalid amount format: ${raw}`)
+  }
+  return raw
 }
 
 function normalizeMarket (market, { chainId, chainSlug }) {
@@ -131,6 +145,220 @@ async function fetchActiveMarkets ({ chainId }) {
   return body.markets
 }
 
+async function fetchConvertQuote ({
+  chainId,
+  tokensIn,
+  amountsIn,
+  tokensOut,
+  receiver,
+  slippage,
+  enableAggregator,
+  aggregators,
+  additionalData
+}) {
+  const url = new URL(`${DEFAULT_API_BASE_URL}/v2/sdk/${chainId}/convert`)
+  url.searchParams.set('tokensIn', tokensIn.join(','))
+  url.searchParams.set('amountsIn', amountsIn.join(','))
+  url.searchParams.set('tokensOut', tokensOut.join(','))
+  url.searchParams.set('receiver', receiver)
+  url.searchParams.set('slippage', String(slippage))
+  if (enableAggregator) {
+    url.searchParams.set('enableAggregator', 'true')
+  }
+  if (aggregators && aggregators.length) {
+    url.searchParams.set('aggregators', aggregators.join(','))
+  }
+  if (additionalData) {
+    url.searchParams.set('additionalData', additionalData)
+  }
+
+  const response = await fetch(url.toString(), {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json'
+    }
+  })
+
+  const bodyText = await response.text()
+  let body = null
+  if (bodyText.trim()) {
+    body = JSON.parse(bodyText)
+  }
+
+  if (!response.ok) {
+    const detail = body && typeof body === 'object'
+      ? (body.message || body.error || JSON.stringify(body))
+      : bodyText
+    throw new Error(`Pendle convert quote failed: HTTP ${response.status} ${String(detail).slice(0, 220)}`)
+  }
+
+  if (!body || !Array.isArray(body.routes)) {
+    throw new Error('Unexpected Pendle convert response shape.')
+  }
+
+  return {
+    data: body,
+    headers: {
+      computingUnit: response.headers.get('x-computing-unit')
+    }
+  }
+}
+
+function normalizeTokenAmount (input) {
+  return {
+    token: normalizeAddressRef(input.token),
+    amount: normalizeAmountRef(input.amount)
+  }
+}
+
+function selectRoute (routes, routeIndex) {
+  const index = Number(routeIndex || 0)
+  if (!Number.isInteger(index) || index < 0) {
+    throw new Error('--route-index must be a non-negative integer.')
+  }
+  if (index >= routes.length) {
+    throw new Error(`--route-index ${index} is out of range (routes=${routes.length}).`)
+  }
+  const selected = routes[index]
+  if (!selected || !selected.tx || typeof selected.tx !== 'object') {
+    throw new Error(`Selected Pendle route ${index} is missing tx payload.`)
+  }
+  return {
+    routeIndex: index,
+    route: selected
+  }
+}
+
+function normalizeRouteSummary (route) {
+  return {
+    method: route.contractParamInfo && route.contractParamInfo.method
+      ? String(route.contractParamInfo.method)
+      : null,
+    outputs: Array.isArray(route.outputs) ? route.outputs.map((entry) => normalizeTokenAmount(entry)) : [],
+    data: route.data || null,
+    tx: {
+      to: normalizeAddressRef(route.tx.to),
+      data: String(route.tx.data || ''),
+      value: normalizeAmountRef(route.tx.value || '0')
+    }
+  }
+}
+
+async function quoteYield (input) {
+  const quote = await fetchConvertQuote({
+    chainId: input.chainId,
+    tokensIn: input.tokensIn,
+    amountsIn: input.amountsIn,
+    tokensOut: input.tokensOut,
+    receiver: input.receiver,
+    slippage: input.slippage,
+    enableAggregator: input.enableAggregator,
+    aggregators: input.aggregators,
+    additionalData: input.additionalData
+  })
+
+  const requiredApprovals = Array.isArray(quote.data.requiredApprovals)
+    ? quote.data.requiredApprovals.map((entry) => normalizeTokenAmount(entry))
+    : []
+  const routes = Array.isArray(quote.data.routes) ? quote.data.routes : []
+  const selected = selectRoute(routes, input.routeIndex)
+
+  return {
+    provider: 'pendle-hosted-sdk',
+    chainId: input.chainId,
+    chain: input.chainSlug,
+    action: String(quote.data.action || ''),
+    walletAddress: input.walletAddress || null,
+    receiver: input.receiver,
+    inputs: Array.isArray(quote.data.inputs) ? quote.data.inputs.map((entry) => normalizeTokenAmount(entry)) : [],
+    requiredApprovals,
+    routeCount: routes.length,
+    routeIndex: selected.routeIndex,
+    route: normalizeRouteSummary(selected.route),
+    metadata: {
+      computingUnit: quote.headers.computingUnit || null
+    },
+    warnings: []
+  }
+}
+
+async function buildExecutionPlan ({
+  quote,
+  walletAddress,
+  approvalMode,
+  rpcUrl,
+  ethersLib
+}) {
+  const routeTx = quote.route && quote.route.tx ? quote.route.tx : null
+  if (!routeTx || !routeTx.to || !routeTx.data) {
+    throw new Error('Pendle quote route tx payload is missing.')
+  }
+
+  const warnings = []
+  const steps = []
+  const approvalChecks = []
+
+  if (approvalMode !== 'skip') {
+    if (!rpcUrl) {
+      throw new Error('RPC URL is required to evaluate required approvals.')
+    }
+    const provider = new ethersLib.JsonRpcProvider(rpcUrl, quote.chainId)
+    const spender = routeTx.to
+    const iface = new ethersLib.Interface(ERC20_ABI)
+
+    for (const approval of quote.requiredApprovals || []) {
+      const token = approval.token
+      const requiredAllowance = BigInt(approval.amount)
+      const contract = new ethersLib.Contract(token, ERC20_ABI, provider)
+      const currentAllowance = BigInt((await contract.allowance(walletAddress, spender)).toString())
+      const required = currentAllowance < requiredAllowance
+
+      let txRequest = null
+      if (required) {
+        const targetAmount = approvalMode === 'unlimited'
+          ? ((1n << 256n) - 1n)
+          : requiredAllowance
+        txRequest = {
+          to: token,
+          data: iface.encodeFunctionData('approve', [spender, targetAmount]),
+          value: '0'
+        }
+        steps.push({
+          name: `approval_${token}`,
+          txRequest
+        })
+      }
+
+      approvalChecks.push({
+        token,
+        spender,
+        requiredAllowance: requiredAllowance.toString(),
+        currentAllowance: currentAllowance.toString(),
+        approvalRequired: required,
+        approvalMode
+      })
+    }
+  } else if ((quote.requiredApprovals || []).length > 0) {
+    warnings.push('approval_checks_skipped_by_mode')
+  }
+
+  steps.push({
+    name: 'yield_convert',
+    txRequest: {
+      to: routeTx.to,
+      data: routeTx.data,
+      value: routeTx.value || '0'
+    }
+  })
+
+  return {
+    approvalMode,
+    approvalChecks,
+    steps,
+    warnings
+  }
+}
+
 async function listOpportunities (input) {
   const warnings = []
   const categories = normalizeCategories(input.categories)
@@ -221,6 +449,7 @@ async function listOpportunities (input) {
 }
 
 module.exports = {
-  listOpportunities
+  buildExecutionPlan,
+  listOpportunities,
+  quoteYield
 }
-

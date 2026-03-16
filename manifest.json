@@ -1,7 +1,7 @@
 {
-  "version": "0.1.68",
+  "version": "0.1.69",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "3624494ccaefa627749ade0f61ba52ad60e46052d9610b6290e509f9a77d6d14",
+  "sha256": "9d558514499d910333f541bc8faabe6a32699ba503364fe01d6098b21bd54194",
   "files": [
     {
       "path": "scripts/crypto-market-rank.js",
@@ -336,16 +336,36 @@
       "sha256": "252fda849f663921efce419c9bc8fe5c0839cb528859f5646d6c1e412a2f5b7d"
     },
     {
+      "path": "scripts/yield-action-helpers.js",
+      "sha256": "337c67c5eb219dc2722ad24db60798a375b2372477df109f545e78ba7f2bc70f"
+    },
+    {
       "path": "scripts/yield-adapter-pendle.js",
-      "sha256": "33fa0c8dd22712e4e6d38bb582e3cbd740e834f8286f8141daabfacbdb06e6e9"
+      "sha256": "e209681ec361fc115e77a521bbea606e6d9adce4e19acd489e9b7888c5fb0831"
+    },
+    {
+      "path": "scripts/yield-build.js",
+      "sha256": "910f71767ab0556e865618d97d96929b94ccf8b71c5761eced43b4b6a9a967d3"
     },
     {
       "path": "scripts/yield-common.js",
-      "sha256": "3040ba9e7bffe71d14878709948e10b67410783a080ada7f586754840bfeb70b"
+      "sha256": "1f4010a3d65ee6d5d642ec61a2b5e34e591248a169cd09030a359803b25dd45a"
+    },
+    {
+      "path": "scripts/yield-execute.js",
+      "sha256": "afaa7b243d2474facafe1cb8a62b8e9966cb38f50bfa028d9217340e0a567342"
     },
     {
       "path": "scripts/yield-opportunities.js",
       "sha256": "db901b96c26660226d15b35664910b8b3e1d17e736378ee20ce200ef09be9e23"
+    },
+    {
+      "path": "scripts/yield-quote.js",
+      "sha256": "4ea6a19c6ea7720df78bbe3d92f37e6a028db8c8f24b2a17536063d26ef59fd7"
+    },
+    {
+      "path": "scripts/yield-simulate.js",
+      "sha256": "81737b3390912754e65af5292a65ea1d597c72077b6866c0584b65ff10efc2be"
     }
   ]
 }
