@@ -898,17 +898,73 @@ async function buildRiskOrders (input) {
     throw new Error('Position payload missing pairIndex/tradeIndex.')
   }
 
-  const takeProfit =
-    input.takeProfit == null
-      ? Number(position.tp || 0)
-      : parseNonNegativeNumber(input.takeProfit, 'takeProfit')
-  const stopLoss =
-    input.stopLoss == null
-      ? Number(position.sl || 0)
-      : parseNonNegativeNumber(input.stopLoss, 'stopLoss')
-
-  if (takeProfit <= 0 && stopLoss <= 0) {
+  const hasTakeProfitInput = input.takeProfit != null
+  const hasStopLossInput = input.stopLoss != null
+  if (!hasTakeProfitInput && !hasStopLossInput) {
     throw new Error('Provide takeProfit and/or stopLoss.')
+  }
+
+  const tradingStorageContract = client.getContract('TradingStorage')
+  const onchainPosition = await tradingStorageContract.openTrades(
+    walletAddress,
+    position.pairIndex,
+    position.tradeIndex
+  )
+
+  const onchainTakeProfit = Number(
+    sdk.fromBlockchain10(toBigIntFlexible(onchainPosition && (onchainPosition.tp || onchainPosition[8]), 0n))
+  )
+  const onchainStopLoss = Number(
+    sdk.fromBlockchain10(toBigIntFlexible(onchainPosition && (onchainPosition.sl || onchainPosition[9]), 0n))
+  )
+  const onchainOpenPrice = Number(
+    sdk.fromBlockchain10(toBigIntFlexible(onchainPosition && (onchainPosition.openPrice || onchainPosition[5]), 0n))
+  )
+
+  const fallbackTakeProfit = Number.isFinite(onchainTakeProfit) ? onchainTakeProfit : Number(position.tp || 0)
+  const fallbackStopLoss = Number.isFinite(onchainStopLoss) ? onchainStopLoss : Number(position.sl || 0)
+
+  const takeProfit = hasTakeProfitInput
+    ? parseNonNegativeNumber(input.takeProfit, 'takeProfit')
+    : fallbackTakeProfit
+  const stopLoss = hasStopLossInput
+    ? parseNonNegativeNumber(input.stopLoss, 'stopLoss')
+    : fallbackStopLoss
+
+  const isLong =
+    onchainPosition && typeof onchainPosition.buy === 'boolean'
+      ? onchainPosition.buy
+      : position.side === 'long'
+        ? true
+        : position.side === 'short'
+          ? false
+          : null
+
+  if (Number.isFinite(onchainOpenPrice) && onchainOpenPrice > 0 && isLong !== null) {
+    if (takeProfit > 0) {
+      if (isLong && takeProfit <= onchainOpenPrice) {
+        throw new Error(
+          `Invalid takeProfit ${takeProfit}: for long positions it must be greater than openPrice ${onchainOpenPrice}.`
+        )
+      }
+      if (!isLong && takeProfit >= onchainOpenPrice) {
+        throw new Error(
+          `Invalid takeProfit ${takeProfit}: for short positions it must be less than openPrice ${onchainOpenPrice}.`
+        )
+      }
+    }
+    if (stopLoss > 0) {
+      if (isLong && stopLoss >= onchainOpenPrice) {
+        throw new Error(
+          `Invalid stopLoss ${stopLoss}: for long positions it must be less than openPrice ${onchainOpenPrice}.`
+        )
+      }
+      if (!isLong && stopLoss <= onchainOpenPrice) {
+        throw new Error(
+          `Invalid stopLoss ${stopLoss}: for short positions it must be greater than openPrice ${onchainOpenPrice}.`
+        )
+      }
+    }
   }
 
   const tradingContract = client.getContract('Trading')

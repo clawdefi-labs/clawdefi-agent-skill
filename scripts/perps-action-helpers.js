@@ -82,12 +82,12 @@ function parseRiskArgs (args) {
   const takeProfit = parseOptionalNumber(
     args['take-profit'] !== undefined ? args['take-profit'] : args.tp,
     'take-profit',
-    { minExclusive: 0 }
+    { minExclusive: -1 }
   )
   const stopLoss = parseOptionalNumber(
     args['stop-loss'] !== undefined ? args['stop-loss'] : args.sl,
     'stop-loss',
-    { minExclusive: 0 }
+    { minExclusive: -1 }
   )
 
   return {
