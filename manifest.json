@@ -1,7 +1,7 @@
 {
-  "version": "0.1.69",
+  "version": "0.1.70",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "9d558514499d910333f541bc8faabe6a32699ba503364fe01d6098b21bd54194",
+  "sha256": "2a6eeb84880683f7e2fd8ad8ffcb98ed2ddd1d395b5c3ca151bdde69e6fa8931",
   "files": [
     {
       "path": "scripts/crypto-market-rank.js",
@@ -53,11 +53,11 @@
     },
     {
       "path": "scripts/perps-action-helpers.js",
-      "sha256": "c7eb025af9d17b31acb4e4dd404a1bf94bffecaf860dacaa563cc0442db464c9"
+      "sha256": "e6752f019867659ad050e87a856d7c5699dd2281e17b8b0207b7c3effc7d573f"
     },
     {
       "path": "scripts/perps-adapter-avantis.js",
-      "sha256": "0cebe4278d946db0f02e5eac7c8bfc59ecb2c3cdf28ea044568fefd31878b68d"
+      "sha256": "57c9e5ff76d9f21d4f973a49713d8c6f8ff9c055b38349b4bfbecc0ba15b45f2"
     },
     {
       "path": "scripts/perps-cancel-order-build.js",
@@ -285,7 +285,7 @@
     },
     {
       "path": "scripts/update.sh",
-      "sha256": "7f0ec42a99e6961dda5fc265c67f649f97db33fe4dd3f6d7b9d77bdfde4e2be1"
+      "sha256": "4aef005a4d54fc33b856fdfcf37bdacb694be22cb78bab6c902131ff188911c7"
     },
     {
       "path": "scripts/wallet-balance.js",
