@@ -128,15 +128,6 @@ bash scripts/update.sh
 bash scripts/update-from-manifest.sh
 ```
 
-## Supported Chains
-- Ethereum Mainnet (Chain ID 1)
-- Base (Chain ID 8453)
-- Arbitrum One (Chain ID 42161)
-- OP Mainnet (Chain ID 10)
-- Polygon PoS (Chain ID 137)
-- BNB Chain (Chain ID 56)
-- Avalanche C-Chain (Chain ID 43114)
-
 ## Files
 - `SKILL.md` — main behavioral and workflow instructions
 - `manifest.json` — versioned file manifest with SHA-256 checksums
