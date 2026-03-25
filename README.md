@@ -1,21 +1,96 @@
 # ClawDeFi Skill Package
 
-Distributable skill definition for local OpenClaw-compatible agents.
+Distributable skill definition for local OpenClaw-compatible agents. Version **0.1.71**.
 
 ## Purpose
 Teach local agents how to:
-- first check MCP signer directory via `list_wallets`,
-- if wallets exist, default to reusing signer-boundary wallet handles and ask only whether to create an additional wallet,
-- if none exist and user asks to create now, create a signer-runtime generated wallet via MCP (`create_wallet`),
-- capture user risk profile,
-- query ClawDeFi MCP/API tools for contracts, ABIs, action specs, endpoint specs, and risk scores,
-- perform permissionless DeFi actions (swap, perps, options, yield, and future modules) with guardrails,
-- enforce disclaimer checks,
-- handle emergency unwind routines,
-- schedule periodic skill updates.
+- Discover, create, import, and manage wallets via the WDK (Wallet Development Kit)
+- Capture user risk profile and enforce disclaimer checks
+- Query ClawDeFi MCP/API tools for contracts, ABIs, action specs, and risk scores
+- Perform permissionless DeFi actions across multiple protocol categories with guardrails
+- Enforce pre-sign simulation on all fund-impacting transactions
+- Handle emergency unwind routines
+- Schedule periodic skill updates
+
+## Supported Protocol Modules
+
+### Trading (Swaps)
+Adapter: **0x Protocol** (primary), 1inch (legacy)
+- `swap-common.js`, `swap-quote.js`, `swap-build.js`, `swap-simulate.js`, `swap-execute.js`
+- `swap-action-helpers.js` — shared swap action utilities
+- `swap-1inch.js` — legacy 1inch swap module
+
+### Perpetuals
+Adapter: **Avantis** (Base)
+- `perps-common.js`, `perps-market-context.js`, `perps-adapter-avantis.js`
+- `perps-open-quote.js`, `perps-open-build.js`, `perps-open-simulate.js`, `perps-open-execute.js`
+- `perps-close-quote.js`, `perps-close-build.js`, `perps-close-simulate.js`, `perps-close-execute.js`
+- `perps-modify-position-build.js`, `perps-modify-position-simulate.js`, `perps-modify-position-execute.js`
+- `perps-cancel-order-build.js`, `perps-cancel-order-simulate.js`, `perps-cancel-order-execute.js`
+- `perps-risk-orders-build.js`, `perps-risk-orders-simulate.js`, `perps-risk-orders-execute.js`
+- `perps-position-list.js`, `perps-pending-orders.js`
+- `perps-referral-info.js`, `perps-referral-bind-build.js`, `perps-referral-bind-simulate.js`, `perps-referral-bind-execute.js`
+- `perps-action-helpers.js`, `perps-tx-action-common.js`
+
+### Lending
+Adapter: **Aave V3**
+- `lending-common.js`, `lending-adapter-aave.js`, `lending-markets.js`
+- `lending-quote.js`, `lending-build.js`, `lending-simulate.js`, `lending-execute.js`
+- `lending-action-helpers.js`
+
+### Yield
+Adapter: **Pendle**
+- `yield-common.js`, `yield-adapter-pendle.js`, `yield-opportunities.js`
+- `yield-quote.js`, `yield-build.js`, `yield-simulate.js`, `yield-execute.js`
+- `yield-action-helpers.js`
+
+### Options (Paused)
+Adapter: **Thetanuts**
+- `options-common.js`, `options-adapter-thetanuts.js`, `options-chain.js`
+- `options-market-data.js`, `options-orderbook.js`, `options-positions.js`
+- `options-quote.js`, `options-build.js`, `options-simulate.js`, `options-execute.js`
+- `options-action-helpers.js`
+
+### Predictions
+Adapter: **Polymarket**
+- `predictions-common.js`, `predictions-adapter-polymarket.js`, `predictions-markets.js`
+- `predictions-quote.js`, `predictions-build.js`, `predictions-simulate.js`, `predictions-execute.js`
+- `predictions-action-helpers.js`
+
+### Market Intelligence
+- `query-coingecko.js` — CoinGecko market data (price, rankings, search)
+- `query-pyth.js` — Pyth oracle price feeds
+- `query-pyth-stream-open.js`, `query-pyth-stream-poll.js`, `query-pyth-stream-close.js`, `query-pyth-stream-worker.js` — Pyth real-time streaming
+- `crypto-market-rank.js` — market ranking utilities
+- `market-intel-common.js` — shared market intel helpers
+- `trading-signal.js` — trading signal generation
+- `meme-rush.js` — meme token analytics
+
+### Wallet (WDK)
+- `wallet-common.js` — shared wallet utilities and chain config
+- `wallet-discover.js` — discover existing wallets
+- `wallet-create.js` — create new wallets
+- `wallet-import.js` — import wallets from private keys
+- `wallet-select.js` — select active wallet
+- `wallet-balance.js` — check token balances
+- `wallet-total-portfolio.js` — aggregate portfolio view
+- `wallet-transfer.js` — token transfers
+- `wallet-sign.js` — sign transactions
+- `wallet-sign-broadcast.js` — sign and broadcast transactions
+- `wallet-token-allowance-check.js` — check ERC-20 allowances
+- `wallet-token-allowance-set.js` — set ERC-20 allowances
+
+### Infrastructure
+- `query-protocol.js` — protocol registry intelligence queries
+- `query-chain-registry.js` — chain metadata registry
+- `query-contract-verification.js` — Etherscan contract verification
+- `query-address-info.js` — address metadata lookup
+- `query-token-info.js` — token metadata lookup
+- `query-token-audit.js` — token security audit checks
+- `query-avantis.js` — Avantis connectivity and pair-feed queries
+- `simulate-transaction.js` — pre-sign simulation (`eth_call` + `estimateGas`) with revert decoding
 
 ## Install Channels
-This skill is designed to support two install methods.
 
 1. ClawHub install (preferred)
 ```bash
@@ -28,12 +103,16 @@ clawhub install clawdefi-agent
 bash scripts/install-raw.sh
 ```
 
-Raw one-liner (manual style):
-```bash
-mkdir -p ~/.openclaw/skills/clawdefi-agent/scripts && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/SKILL.md -o ~/.openclaw/skills/clawdefi-agent/SKILL.md && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/simulate-transaction.js -o ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/swap-1inch.js -o ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-protocol.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-coingecko.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-avantis.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-avantis.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-pyth.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-pyth.js && curl -fsSL https://skills.clawdefi.ai/clawdefi-agent/scripts/query-contract-verification.js -o ~/.openclaw/skills/clawdefi-agent/scripts/query-contract-verification.js && chmod +x ~/.openclaw/skills/clawdefi-agent/scripts/simulate-transaction.js ~/.openclaw/skills/clawdefi-agent/scripts/swap-1inch.js ~/.openclaw/skills/clawdefi-agent/scripts/query-protocol.js ~/.openclaw/skills/clawdefi-agent/scripts/query-coingecko.js ~/.openclaw/skills/clawdefi-agent/scripts/query-avantis.js ~/.openclaw/skills/clawdefi-agent/scripts/query-pyth.js ~/.openclaw/skills/clawdefi-agent/scripts/query-contract-verification.js
+3. Agent-guided install
+```
+Please fetch this first:
+curl "https://www.clawdefi.ai/skill.md"
+
+Then follow the installation steps in that file to install the skill.
 ```
 
 ## Update Channels
+
 1. ClawHub update
 ```bash
 clawhub update clawdefi-agent
@@ -41,41 +120,40 @@ clawhub update clawdefi-agent
 
 2. Raw manifest update
 ```bash
+bash scripts/update.sh
+```
+
+3. Legacy updater
+```bash
 bash scripts/update-from-manifest.sh
 ```
 
-Cron example (every 6 hours):
-```bash
-0 */6 * * * /bin/bash /absolute/path/to/skill/scripts/update-from-manifest.sh >> /tmp/clawdefi-skill-update.log 2>&1
-```
+## Supported Chains
+- Ethereum Mainnet (Chain ID 1)
+- Base (Chain ID 8453)
+- Arbitrum One (Chain ID 42161)
+- OP Mainnet (Chain ID 10)
+- Polygon PoS (Chain ID 137)
+- BNB Chain (Chain ID 56)
+- Avalanche C-Chain (Chain ID 43114)
 
 ## Files
-- `SKILL.md`: main behavioral and workflow instructions.
-- `scripts/install-raw.sh`: raw installer script.
-- `scripts/update-from-manifest.sh`: checksum-verified raw updater script.
-- `scripts/simulate-transaction.js`: bundled pre-sign simulation module (`eth_call` + `estimateGas`) with revert decoding and slippage policy checks.
-- `scripts/swap-1inch.js`: bundled 1inch-first swap module for quote/build/execute flows.
-- `scripts/query-protocol.js`: bundled read-only protocol intelligence query module for `clawdefi-core`.
-- `scripts/query-coingecko.js`: bundled CoinGecko market-data query module (simple price, token price, coin details, search).
-- `scripts/query-avantis.js`: bundled Avantis connectivity + pair-feed query module for perp monitoring preflight.
-- `scripts/perps-referral-info.js`: reads current Avantis referral code/referrer binding for the selected wallet.
-- `scripts/perps-referral-bind-build.js`: builds deterministic Avantis referral bind transaction payload.
-- `scripts/perps-referral-bind-simulate.js`: simulates referral bind transaction locally via WDK wallet runtime.
-- `scripts/perps-referral-bind-execute.js`: executes referral bind transaction locally via WDK wallet runtime.
-- `scripts/query-pyth.js`: bundled Pyth oracle query module (Hermes latest/stream and Pyth Pro WSS endpoint guidance).
-- `scripts/query-contract-verification.js`: bundled Etherscan contract verification query module (`getsourcecode`).
+- `SKILL.md` — main behavioral and workflow instructions
+- `manifest.json` — versioned file manifest with SHA-256 checksums
+- `scripts/` — all runtime modules listed above
+- `scripts/install-raw.sh` — raw installer script
+- `scripts/install-platform.sh` — platform installer
+- `scripts/update.sh` — portable skill updater
+- `scripts/update-from-manifest.sh` — checksum-verified raw updater (legacy)
+- `scripts/update-platform.sh` — platform updater
+- `scripts/onboard.sh` — first-run onboarding script
+- `scripts/generate-skill-manifest.sh` — manifest generation utility
+- `scripts/generate-platform-manifest.sh` — platform manifest generation
 
-Local development notes:
-- `references/` is intentionally local-only and ignored by git.
-- raw installer scripts sync required runtime files only and do not install `references/`.
-- signer credentials stay local; never pass private key material to `clawdefi-core`.
-- wallet module remains swappable; never force one provider for every user.
-- wallet provider labels are internal; user-facing replies should say "signer-runtime wallet" and avoid internal module IDs.
-- `scripts/simulate-transaction.js` requires: `npm install ethers` and transaction context (`RPC_URL`, `CHAIN_ID`, `TX_TO`, optional `TX_DATA`, sender context, and optional slippage bounds).
-- `scripts/swap-1inch.js` requires: `npm install ethers`, `ONEINCH_API_KEY`, and swap context (`CHAIN_ID`, token pair, amount, sender/signer for execute mode, RPC for execute mode).
-- `scripts/query-protocol.js` requires: reachable `CORE_API_BASE_URL` (default `http://127.0.0.1:8080`) and read query inputs (`slug`, `chainSlug`, action key by mode).
-- `scripts/query-coingecko.js` requires: CoinGecko API access (`demo` or `pro` plan) and optional `COINGECKO_API_KEY` in local env.
-- `scripts/query-avantis.js` requires: Avantis socket/core/feed endpoints reachable from local runtime (defaults provided; override via env/flags when needed).
-- Avantis referral modules expose `clawdefiReferralRecipient` (defaults to `0x25Aa761B02C45D2B57bBb54Dd04D42772afdd291`; override via `CLAWDEFI_AVANTIS_REFERRER_ADDRESS` or `CLAWDEFI_FEE_RECIPIENT`).
-- `scripts/query-pyth.js` requires: Pyth feed IDs for `latest`/`stream` mode and optional `PYTH_PRO_ACCESS_TOKEN` for pro endpoint auth metadata.
-- `scripts/query-contract-verification.js` requires: user-managed `ETHERSCAN_API_KEY` in local env plus `CHAIN_ID` and `CONTRACT_ADDRESS`.
+## Local Development Notes
+- `references/` is intentionally local-only and ignored by git
+- Raw installer scripts sync required runtime files only and do not install `references/`
+- Signer credentials stay local; never pass private key material to `clawdefi-core`
+- Wallet module remains swappable; never force one provider for every user
+- All fund-impacting actions require pre-sign simulation via `simulate-transaction.js`
+- Avantis referral modules expose `clawdefiReferralRecipient` (defaults to `0x25Aa761B02C45D2B57bBb54Dd04D42772afdd291`; override via `CLAWDEFI_AVANTIS_REFERRER_ADDRESS`)
