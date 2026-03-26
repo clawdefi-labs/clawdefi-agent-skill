@@ -1,6 +1,6 @@
 # ClawDeFi Skill Package
 
-Distributable skill definition for local OpenClaw-compatible agents. Version **0.1.73**.
+Distributable skill definition for local OpenClaw-compatible agents. Version **0.1.74**.
 
 ## Purpose
 Teach local agents how to:
@@ -18,6 +18,7 @@ Teach local agents how to:
 Adapter: **0x Protocol** (primary), 1inch (legacy)
 - `swap-common.js`, `swap-quote.js`, `swap-build.js`, `swap-simulate.js`, `swap-execute.js`
 - `swap-action-helpers.js` — shared swap action utilities
+- `disclaimer-common.js` — disclaimer status/register helpers used by swap and crosschain recovery
 - `swap-1inch.js` — legacy 1inch swap module
 
 ### Perpetuals
@@ -74,6 +75,8 @@ Adapter: **Polymarket**
 - `wallet-select.js` — select active wallet
 - `wallet-balance.js` — check token balances
 - `wallet-total-portfolio.js` — aggregate portfolio view
+- `wallet-disclaimer-status.js` — read wallet disclaimer consent status
+- `wallet-register-consent.js` — idempotent consent registration (explicit confirm flag required)
 - `wallet-transfer.js` — token transfers
 - `wallet-sign.js` — sign transactions
 - `wallet-sign-broadcast.js` — sign and broadcast transactions
