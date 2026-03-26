@@ -1,6 +1,6 @@
 # ClawDeFi Skill Package
 
-Distributable skill definition for local OpenClaw-compatible agents. Version **0.1.74**.
+Distributable skill definition for local OpenClaw-compatible agents. Version **0.1.75**.
 
 ## Purpose
 Teach local agents how to:
