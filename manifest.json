@@ -1,7 +1,7 @@
 {
   "version": "0.1.76",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
-  "sha256": "698db3a16e282cdff30bc6838239971608364b4b139231462118865bf309345d",
+  "sha256": "d5ae7a0b0b2a3bdf9549f8ed1ef22d7f937d281f71f25d229929d9d25a95e538",
   "files": [
     {
       "path": "scripts/crosschain-action-helpers.js",
