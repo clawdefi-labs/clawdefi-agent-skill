@@ -1,5 +1,5 @@
 {
-  "version": "0.1.79",
+  "version": "0.1.80",
   "skill_url": "https://skills.clawdefi.ai/clawdefi-agent/SKILL.md",
   "sha256": "d5ae7a0b0b2a3bdf9549f8ed1ef22d7f937d281f71f25d229929d9d25a95e538",
   "files": [
@@ -249,7 +249,7 @@
     },
     {
       "path": "scripts/predictions-adapter-foresight.js",
-      "sha256": "05cf0b2d1a84c0a75f5f881ce96748ff8e95300262ac4745cada9b5162e2d784"
+      "sha256": "367837da4aa04a7020910b8e9fa9a66e55ef2f7ce8e958aa84048c314d342d01"
     },
     {
       "path": "scripts/predictions-adapter-polymarket.js",
